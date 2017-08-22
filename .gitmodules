@@ -1,6 +1,6 @@
 [submodule "test/data"]
 	path = test/data
-	url = https://github.com/arrayfire/arrayfire_data
+	url = git@github.com:mlloreda/arrayfire-data.git
 [submodule "assets"]
 	path = assets
 	url = https://github.com/arrayfire/assets

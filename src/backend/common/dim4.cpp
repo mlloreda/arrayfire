@@ -203,6 +203,8 @@ dim_t calcDim(const af_seq &seq, const dim_t &parentDim)
         outDim = seqElements(temp);
     } else {
         DIM_ASSERT(1, seq.begin >= -DBL_MIN && seq.begin < parentDim);
+        // std::cout << "seq.end: " << seq.end << std::endl;
+        // std::cout << "parentDim: " << parentDim << std::endl;
         DIM_ASSERT(1, seq.end < parentDim);
         outDim = seqElements(seq);
     }
