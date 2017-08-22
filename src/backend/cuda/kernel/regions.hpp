@@ -347,11 +347,13 @@ void regions(cuda::Param<T> out, cuda::CParam<char> in, cudaTextureObject_t tex)
 {
     const dim3 threads(THREADS_X, THREADS_Y);
 
+    // \TODO What is divup?
     const int blk_x = divup(in.dims[0], threads.x*2);
     const int blk_y = divup(in.dims[1], threads.y*2);
 
     const dim3 blocks(blk_x, blk_y);
 
+    // \MAL launch first kernel which
     CUDA_LAUNCH((initial_label<T,n_per_thread>), blocks, threads, out, in);
 
     POST_LAUNCH_CHECK();

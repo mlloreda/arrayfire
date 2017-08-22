@@ -10,63 +10,58 @@
 #include <arrayfire.h>
 #include <cstdio>
 #include <cstdlib>
+#include <cassert>
 
 using namespace af;
 
 int main(int argc, char *argv[])
 {
     try {
+        // array A = af::loadImage("/Users/mlloreda/work/af/af-connected-components/data/conf_cc_512x512.png", false).as(u8);
 
 
-        // Select a device and display arrayfire info
-        int device = argc > 1 ? atoi(argv[1]) : 0;
-        af::setDevice(device);
-        af::info();
-
-        printf("Create a 5-by-3 matrix of random floats on the GPU\n");
-        array A = randu(5,3, f32);
+        unsigned a[25] = {232,105,76,216,134,
+                          39,141,76,175,207,
+                          213,141,219,32,244,
+                          213,172,0,82,244,
+                          197,87,216,82,130};
+        array A(5, 5, a, afHost);
+        A = A.as(u8);
+        A = af::transpose(A);
         af_print(A);
 
-        printf("Element-wise arithmetic\n");
-        array B = sin(A) + 1.5;
-        af_print(B);
+        // > Seed
+        unsigned s[2] = { 2, 2 };
+        af::array seed(1,2, s, afHost);
+        seed = seed.as(u8);
 
-        printf("Negate the first three elements of second column\n");
-        B(seq(0, 2), 1) = B(seq(0, 2), 1) * -1;
-        af_print(B);
+        // > Type of CC
+        af_cc_type ccType;
+        ccType = AF_CC_CONFIDENCE;
 
-        printf("Fourier transform the result\n");
-        array C = fft(B);
-        af_print(C);
 
-        printf("Grab last row\n");
-        array c = C.row(end);
-        af_print(c);
+        // > Radius and multiplier
+        unsigned radius = 1;
+        unsigned multiplier = 1;
+        int iter = 1;
 
-        printf("Scan Test\n");
-        dim4 dims(16, 4, 1, 1);
-        array r = constant(2, dims);
-        af_print(r);
+        // \TODO: `af::confidence()` should take in a vector of seeds,
+        // which should return a vector of neighborhoods with their
+        // associated properties (radius, neighbors, lower and upper
+        // thresholds, etc)
+        double elapsedTime = 0;
+        af::timer start = af::timer::start();
 
-        printf("Scan\n");
-        array S = af::scan(r, 0, AF_BINARY_MUL);
-        af_print(S);
-
-        printf("Create 2-by-3 matrix from host data\n");
-        float d[] = { 1, 2, 3, 4, 5, 6 };
-        array D(2, 3, d, afHost);
-        af_print(D);
-
-        printf("Copy last column onto first\n");
-        D.col(0) = D.col(end);
-        af_print(D);
-
-        // Sort A
-        printf("Sort A and print sorted array and corresponding indices\n");
-        array vals, inds;
-        sort(vals, inds, A);
-        af_print(vals);
-        af_print(inds);
+        array out = af::confidence(A, ccType, seed, radius, multiplier, iter);
+        out.eval();
+        af::sync();
+        elapsedTime = af::timer::stop(start);
+        // af_print(out);
+        std::cout << "[INFO] Elapsed time: " << elapsedTime << std::endl;
+        // af::Window wnd("ConfCC");
+        // while(!wnd.close()) {
+        //     wnd.image(out.as(u8));
+        // }
 
     } catch (af::exception& e) {
 

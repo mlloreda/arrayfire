@@ -732,6 +732,8 @@ AFAPI array anisotropicDiffusion(const af::array& in, const float timestep,
                                  const float conductance, const unsigned iterations,
                                  const fluxFunction fftype=AF_FLUX_EXPONENTIAL,
                                  const diffusionEq diffusionKind=AF_DIFFUSION_GRAD);
+
+AFAPI array confidence(const array& in, const af_cc_type p, array seed, unsigned radius, unsigned multiplier, int iter);
 #endif
 }
 #endif
@@ -1475,6 +1477,13 @@ extern "C" {
                                           const unsigned iterations,
                                           const af_flux_function fftype,
                                           const af_diffusion_eq diffusion_kind);
+
+    AFAPI af_err af_confidence_connected(af_array* output, const af_array in,
+                                         const af_cc_type p,
+                                         af_array seed,
+                                         unsigned radius,
+                                         unsigned multiplier,
+                                         int iter);
 #endif
 
 #ifdef __cplusplus

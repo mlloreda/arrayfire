@@ -15,9 +15,10 @@
 
 using namespace af;
 
+//     sobel()
 static void diffs(array& Ix, array& Iy, array& It, array I1, array I2)
 {
-        //  3x3 derivative kernels
+    //  3x3 derivative kernels
     float dx_kernel[] = { -1.0f / 6.0f, -1.0f / 6.0f, -1.0f / 6.0f,
         0.0f / 6.0f,  0.0f / 6.0f,  0.0f / 6.0f,
         1.0f / 6.0f,  1.0f / 6.0f,  1.0f / 6.0f
