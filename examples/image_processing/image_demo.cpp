@@ -22,7 +22,7 @@ static void channel_split(array& rgb, array& outr, array& outg, array& outb) {
 }
 
 // 5x5 sigma-3 gaussian blur weights
-static const float h_gauss[] = {
+float h_gauss[] = {
     0.0318,  0.0375,  0.0397,  0.0375,  0.0318,
     0.0375,  0.0443,  0.0469,  0.0443,  0.0375,
     0.0397,  0.0469,  0.0495,  0.0469,  0.0397,
@@ -31,7 +31,7 @@ static const float h_gauss[] = {
 };
 
 // 3x3 sobel weights
-static const float h_sobel[] = {
+float h_sobel[] = {
     -2.0, -1.0,  0.0,
     -1.0,  0.0,  1.0,
     0.0,  1.0,  2.0

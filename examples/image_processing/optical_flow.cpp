@@ -42,7 +42,7 @@ static void optical_flow_demo(bool console)
 
     double time_total = 10; // run for N seconds
 
-    const float h_mean_kernel[] = {1.0f / 12.0f, 2.0f / 12.0f, 1.0f / 12.0f,
+    float h_mean_kernel[] = {1.0f / 12.0f, 2.0f / 12.0f, 1.0f / 12.0f,
         2.0f / 12.0f,        0.0f,  2.0f / 12.0f,
         1.0f / 12.0f, 2.0f / 12.0f, 1.1f / 12.0f
     };

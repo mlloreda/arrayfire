@@ -16,7 +16,7 @@ using namespace af;
 int main(int argc, char *argv[])
 {
     try {
-        static const float h_kernel[] = {1, 1, 1, 1, 0, 1, 1, 1, 1};
+        float h_kernel[] = {1, 1, 1, 1, 0, 1, 1, 1, 1};
         static const int reset = 500;
         static const int game_w = 128, game_h = 128;
 
