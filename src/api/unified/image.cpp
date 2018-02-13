@@ -272,3 +272,13 @@ af_err af_anisotropic_diffusion(af_array* out, const af_array in, const float dt
     CHECK_ARRAYS(in);
     return CALL(out, in, dt, K, iterations, fftype, eq);
 }
+
+af_err af_confidence_cc(af_array* output,
+                        const af_array in, const af_array seed,
+                        const af_cc_type cc_type,
+                        unsigned radius, unsigned multiplier,
+                        int iter)
+{
+    CHECK_ARRAYS(in, seed);
+    return CALL(output, in, seed, cc_type, radius, multiplier, iter);
+}

@@ -1,5 +1,5 @@
 /*******************************************************
- * Copyright (c) 2014, ArrayFire
+ * Copyright (c) 2018, ArrayFire
  * All rights reserved.
  *
  * This file is distributed under 3-clause BSD license.
@@ -7,11 +7,13 @@
  * http://arrayfire.com/licenses/BSD-3-Clause
  ********************************************************/
 
+#include <af/defines.h>
 #include <Array.hpp>
 
 namespace opencl
 {
-    template<typename T>
-    Array<T> confidence_connected(const Array<T> &in, const af_cc_type method);
+template<typename T>
+Array<T> confidenceConnected(const Array<T>& in, const Array<T>& seed,
+                             const af::ccType method,
+                             unsigned radius, unsigned multiplier, int iter);
 }
-

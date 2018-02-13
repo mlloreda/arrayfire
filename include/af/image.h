@@ -732,8 +732,28 @@ AFAPI array anisotropicDiffusion(const af::array& in, const float timestep,
                                  const float conductance, const unsigned iterations,
                                  const fluxFunction fftype=AF_FLUX_EXPONENTIAL,
                                  const diffusionEq diffusionKind=AF_DIFFUSION_GRAD);
+#endif
 
-AFAPI array confidence(const array& in, const af_cc_type p, array seed, unsigned radius, unsigned multiplier, int iter);
+#if AF_API_VERSION >= 36
+    /**
+       C++ Interface for confidence connected components
+
+       Depending on the \ref af_cc_type enum values passed to the function, it can do the following:
+       * Confidence Connected Components
+       * Isolated Connected Components
+
+       \param[in] in is the input image, expects non-integral (float/double) typed af_array
+       \param[in] seed af::array is the list of seed points from which the algorithm begins
+       \param[in] ccKind takes a values of enum \ref ccType
+       \param[in] radius is the neighborhood region to be considered around each seed point
+       \param[in] multiplier
+       \param[in] iter is number of iterations
+       \return out is the output af_array having the connected components
+
+       \ingroup image_func_confidence_cc
+    */
+AFAPI array confidenceCC(const array& in, const array& seed, const ccType ccKind,
+                         const unsigned radius, const unsigned multiplier, const int iter);
 #endif
 }
 #endif
@@ -1477,13 +1497,33 @@ extern "C" {
                                           const unsigned iterations,
                                           const af_flux_function fftype,
                                           const af_diffusion_eq diffusion_kind);
+#endif
 
-    AFAPI af_err af_confidence_connected(af_array* output, const af_array in,
-                                         const af_cc_type p,
-                                         af_array seed,
-                                         unsigned radius,
-                                         unsigned multiplier,
-                                         int iter);
+#if AF_API_VERSION >= 36
+    /**
+       C Interface for confidence connected components
+
+       Depending on the \ref af_cc_type enum values passed to the function, it can do the following:
+       * Confidence Connected Components
+       * Isolated Connected Components
+
+       \param[out] out is the output af_array having the connected components
+       \param[in] in is the input image, expects non-integral (float/double) typed af_array
+       \param[in] seed af_array is the list of seed points from which the algorithm begins
+       \param[in] cc_type takes a values of enum \ref af_cc_type
+       \param[in] radius is the neighborhood region to be considered around each seed point
+       \param[in] multiplier
+       \param[in] iter is number of iterations
+       \return \ref AF_SUCCESS if the execution is successful,
+       otherwise an appropriate error code is returned.
+
+       \ingroup image_func_confidence_cc
+    */
+    AFAPI af_err af_confidence_cc(af_array* out,
+                                  const af_array in, const af_array seed,
+                                  const af_cc_type cc_type,
+                                  unsigned radius, unsigned multiplier,
+                                  int iter);
 #endif
 
 #ifdef __cplusplus

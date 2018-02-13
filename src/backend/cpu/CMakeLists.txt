@@ -36,6 +36,8 @@ target_sources(afcpu
     cholesky.cpp
     cholesky.hpp
     complex.hpp
+    confidence_connected.hpp
+    confidence_connected.cpp
     convolve.cpp
     convolve.hpp
     copy.cpp
@@ -185,6 +187,7 @@ target_sources(afcpu
     kernel/assign.hpp
     kernel/bilateral.hpp
     kernel/canny.hpp
+    kernel/confidence_connected.hpp
     kernel/convolve.hpp
     kernel/copy.hpp
     kernel/diagonal.hpp

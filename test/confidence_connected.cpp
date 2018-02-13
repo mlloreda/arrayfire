@@ -17,13 +17,8 @@ using namespace af;
 using std::vector;
 using std::abs;
 
-// \MAL taken from Regions test
 template<typename T>
-class ConfidenceConnected : public ::testing::Test
-{
-    public:
-        virtual void SetUp() {}
-};
+class ConfidenceConnected : public ::testing::Test {};
 
 // typedef ::testing::Types<float, int, uint, short, ushort, uchar, double> TestTypes;
 typedef ::testing::Types<uchar> TestTypes; // \TODO
@@ -31,7 +26,7 @@ typedef ::testing::Types<uchar> TestTypes; // \TODO
 TYPED_TEST_CASE(ConfidenceConnected, TestTypes);
 
 template<typename T>
-void confidenceConnectedTest(std::string testFile, int iter)
+void cCCTest(std::string testFile, int iter)
 {
     vector<af::dim4> numDims;
     vector<vector<T> > in;
@@ -46,14 +41,15 @@ void confidenceConnectedTest(std::string testFile, int iter)
     af_array seedArray = 0;
 
     ASSERT_EQ(AF_SUCCESS, af_create_array(&inArray, &(in[0].front()),
-                                          inDims.ndims(), inDims.get(), (af_dtype)af::dtype_traits<T>::af_type));
+                                          inDims.ndims(), inDims.get(),
+                                          (af_dtype)af::dtype_traits<T>::af_type));
     ASSERT_EQ(AF_SUCCESS, af_create_array(&seedArray, &(in[1].front()),
                                           seedDims.ndims(), seedDims.get(), u8));
     af_cc_type ccType;
     ccType = AF_CC_CONFIDENCE;
     unsigned radius = 1;
     unsigned mult = 1;
-    ASSERT_EQ(AF_SUCCESS, af_confidence_connected(&outArray, inArray, ccType, seedArray, radius, mult, iter));
+    ASSERT_EQ(AF_SUCCESS, af_confidence_cc(&outArray, inArray, seedArray, ccType, radius, mult, iter));
 
     std::vector<T> outData(inDims.elements());
 
@@ -71,13 +67,12 @@ void confidenceConnectedTest(std::string testFile, int iter)
 
 }
 
-#define CONF_CC_INIT(desc, file, iter)                                  \
-    TYPED_TEST(ConfidenceConnected, desc)                               \
-    {                                                                   \
-        confidenceConnectedTest<TypeParam>(std::string(TEST_DIR "/connected_components/"#file"_"#iter".test"), iter); \
-    }
+#define CONF_CC_INIT(desc, file, iter)                              \
+TYPED_TEST(ConfidenceConnected, desc)                               \
+{                                                                   \
+    cCCTest<TypeParam>(std::string(TEST_DIR "/connected_components/"#file"_"#iter".test"), iter); \
+}
 
-    CONF_CC_INIT(ConfidenceConnected0, conf_cc_5x5, 1)
-    CONF_CC_INIT(ConfidenceConnected1, conf_cc_5x5, 2)
-    CONF_CC_INIT(ConfidenceConnected2, conf_cc_512x512, 1)
-
+CONF_CC_INIT(ConfidenceConnected0, conf_cc_5x5, 1)
+CONF_CC_INIT(ConfidenceConnected1, conf_cc_5x5, 2)
+CONF_CC_INIT(ConfidenceConnected2, conf_cc_512x512, 1)

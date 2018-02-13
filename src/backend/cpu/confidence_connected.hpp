@@ -1,5 +1,5 @@
 /*******************************************************
- * Copyright (c) 2014, ArrayFire
+ * Copyright (c) 2018, ArrayFire
  * All rights reserved.
  *
  * This file is distributed under 3-clause BSD license.
@@ -11,9 +11,8 @@
 
 namespace cpu
 {
-    typedef std::tuple<unsigned,unsigned> Coordinate;
-
-    template<typename T>
-    Array<T> confidence_connected(const Array<T> &in, const af_cc_type method, Array<T> seed, unsigned radius, unsigned multiplier, int iter);
+template<typename T>
+Array<T> confidence_connected(const Array<T> &in, const Array<T>& seed,
+                              const af::ccType method,
+                              unsigned radius, unsigned multiplier, int iter);
 }
-

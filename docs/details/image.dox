@@ -908,6 +908,17 @@ double y_center = m01 / m00;
 The Canny edge detector is an edge detection operator that uses a multi-stage algorithm to detect a
 wide range of edges in images. A more in depth discussion on it can be found [here](https://en.wikipedia.org/wiki/Canny_edge_detector).
 
+
+=======================================================================
+
+\defgroup image_func_confidence_cc Confidence Connected Components
+\ingroup connected_comps_mat
+
+\brief Find confidence based connected components in an image.
+
+TODO
+
+
 @}
 */
 

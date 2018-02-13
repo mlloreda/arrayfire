@@ -54,6 +54,7 @@ target_sources(c_api_interface
     ${CMAKE_CURRENT_SOURCE_DIR}/clamp.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/colorspace.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/complex.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/confidence_connected.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/convolve.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/corrcoef.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/covariance.cpp
