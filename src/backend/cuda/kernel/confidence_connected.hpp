@@ -1,5 +1,5 @@
 /*******************************************************
- * Copyright (c) 2014, ArrayFire
+ * Copyright (c) 2018, ArrayFire
  * All rights reserved.
  *
  * This file is distributed under 3-clause BSD license.
@@ -7,41 +7,22 @@
  * http://arrayfire.com/licenses/BSD-3-Clause
  ********************************************************/
 
-#include <math.hpp>                     // CUDA specific math functions
-
-#include <Param.hpp>                    // This header has the declaration of structures
-                                        // that are passed onto kernel. Operator overloads
-                                        // for creating Param objects from cuda::Array<T>
-                                        // objects is automatic, no special work is needed.
-                                        // Hence, the CUDA kernel wrapper function takes in
-                                        // Param and CParam(constant version of Param) instead
-                                        // of cuda::Array<T>
-
-#include <common/dispatch.hpp>                 // common utility header for CUDA & OpenCL backends
-                                        // has the divup macro
-
-#include <err_cuda.hpp>                 // CUDA specific error check functions and macros
-
-#include <debug_cuda.hpp>               // For Debug only related CUDA validations
+#include <Param.hpp>
+#include <common/dispatch.hpp>
+#include <err_cuda.hpp>
+#include <debug_cuda.hpp>
 
 namespace cuda
 {
-
 namespace kernel
 {
-
-static const unsigned TX = 16;          // Kernel Launch Config Values
-static const unsigned TY = 16;          // Kernel Launch Config Values
-const int threadsPerBlock = TX*TY;
-
-
-template <typename T>                   // CUDA kernel wrapper function
-void confidence_connected(cuda::Param<T> out, cuda::CParam<T> in, const af_cc_type p, cuda::CParam<T> seed, unsigned radius, unsigned multiplier, int iter)
+template <typename T>
+void confidenceConnected(Param<T> out,
+                         CParam<T> in, CParam<T> seed,
+                         const af::ccType p,
+                         unsigned radius, unsigned multiplier, int iter)
 {
-
-
+    CUDA_NOT_SUPPORTED("Cuda backend has no implementation yet");
 }
-
 }
-
 }

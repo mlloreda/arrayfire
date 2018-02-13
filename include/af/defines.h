@@ -397,14 +397,6 @@ typedef enum {
     AF_ID = 0
 } af_someenum_t;
 
-#if AF_API_VERSION >=36
-typedef enum
-{
-    AF_CC_CONFIDENCE = 1,
-    AF_CC_ISOLATED   = 2
-} af_cc_type;
-#endif
-
 #if AF_API_VERSION >=34
 typedef enum {
     AF_BINARY_ADD  = 0,
@@ -494,6 +486,14 @@ typedef enum {
 } af_topk_function;
 #endif
 
+#if AF_API_VERSION >=36
+typedef enum
+{
+    AF_CC_CONFIDENCE = 1,
+    AF_CC_ISOLATED   = 2
+} af_cc_type;
+#endif
+
 #ifdef __cplusplus
 namespace af
 {
@@ -505,7 +505,6 @@ namespace af
     typedef af_match_type matchType;
     typedef af_cspace_t CSpace;
     typedef af_someenum_t SomeEnum; // Purpose of Addition: How to add Function example
-    typedef af_cc_type ccType;
     typedef af_mat_prop trans;
     typedef af_conv_mode convMode;
     typedef af_conv_domain convDomain;
@@ -543,6 +542,9 @@ namespace af
     typedef af_flux_function fluxFunction;
     typedef af_diffusion_eq diffusionEq;
     typedef af_topk_function topkFunction;
+#endif
+#if AF_API_VERSION >= 36
+    typedef af_cc_type ccType;
 #endif
 }
 

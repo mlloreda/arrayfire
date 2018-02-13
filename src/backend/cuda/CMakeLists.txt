@@ -139,6 +139,7 @@ cuda_add_library(afcuda
     bilateral.cu
     canny.cu
     cholesky.cu
+    confidence_connected.cu
     copy.cu
     count.cu
     diagonal.cu
@@ -216,6 +217,7 @@ cuda_add_library(afcuda
     kernel/bilateral.hpp
     kernel/canny.hpp
     kernel/config.hpp
+    kernel/confidence_connected.hpp
     kernel/convolve.hpp
     kernel/diagonal.hpp
     kernel/diff.hpp
@@ -301,6 +303,7 @@ cuda_add_library(afcuda
     cast.hpp
     cholesky.hpp
     complex.hpp
+    confidence_connected.hpp
     convolve.cpp
     convolve.hpp
     copy.hpp

@@ -1,5 +1,5 @@
 /*******************************************************
- * Copyright (c) 2015, ArrayFire
+ * Copyright (c) 2018, ArrayFire
  * All rights reserved.
  *
  * This file is distributed under 3-clause BSD license.
@@ -11,13 +11,16 @@
 #include <Param.hpp>
 #include <utility.hpp>
 #include <tuple>
-#include <unordered_map> // \TODO move to proper location
+#include <unordered_map>
+#include <cstring>
 
 // \TODO use templates
 namespace cpu
 {
 namespace kernel
 {
+
+using Coordinate = std::tuple<unsigned,unsigned>;
 
 #define print(var) std::cout << "[INFO] " << #var << ": "  << var << std::endl;
 
@@ -28,19 +31,23 @@ std::unordered_map<std::string, int> regionCoordMap;
 
 // Utility functions
 template<typename T>
-void PrintNeighborhoodValues(std::vector<T> &n) {
+void PrintNeighborhoodValues(std::vector<T> &n)
+{
     for (int i = 0; i < n.size(); ++i) {
         std::cout << "  " << n[i] << " ";
     }
 }
+
 template<typename T>
-void PrintRegion(const std::vector<Coordinate> &n) {
+void PrintRegion(const std::vector<Coordinate> &n)
+{
     int row, col;
     for (typename std::vector<T>::iterator it = n.begin(); it != n.end(); ++it) {
         std::tie(row, col) = *it;
         std::cout << "(" << row << ", " << col << ")" << std::endl;
     }
 }
+
 void printCoordinate(std::string msg, int row, int col)
 {
     std::cout << msg << "(" << row << ", " << col << ")\n";
@@ -54,7 +61,11 @@ std::string CoordinateToString(const Coordinate &c)
 }
 
 template<typename T>
-std::tuple<float,float> CalculateThresholdsFromNeighborhoodStats(T intensity, std::tuple<float,float> stats, unsigned multiplier) {
+std::tuple<float,float> calculateThresholdsFromNeighborhoodStats(
+        T intensity,
+        std::tuple<float,float> stats,
+        unsigned multiplier)
+{
     float mean = 0, std_dev = 0;
     std::tie(mean, std_dev) = stats;
     short lowestIntensity = std::numeric_limits<short>::max();
@@ -73,7 +84,13 @@ std::tuple<float,float> CalculateThresholdsFromNeighborhoodStats(T intensity, st
 
     return std::make_pair(lower, upper);
 }
-void AddCoordNeighborsToSearchSpace(std::deque<Coordinate> &searchSpace, std::vector<Coordinate> &region, const Coordinate &coord, const af_connectivity conn, const unsigned radius, dim4 dims)
+
+void AddCoordNeighborsToSearchSpace(
+        std::deque<Coordinate> &searchSpace,
+        std::vector<Coordinate> &region,
+        const Coordinate &coord,
+        const af_connectivity conn,
+        const unsigned radius, dim4 dims)
 {
     unsigned coordRow, coordCol;
     std::tie(coordRow, coordCol) = coord;
@@ -137,9 +154,9 @@ void ProcessCoordinate(const Coordinate &coord,
 }
 
 template<typename T>
-void confidence_connected(Param<T> out, CParam<T> in,
-                          const af_cc_type cc_method, Param<T> seed,
-                          const unsigned radius, const unsigned multiplier, int iter)
+void confidenceConnected(Param<T> out, CParam<T> in, CParam<T> seed,
+                         const af::ccType cc_method,
+                         const unsigned radius, const unsigned multiplier, int iter)
 {
     dim4 oDims    = out.dims();
     assert(oDims[0] > 1 && oDims[1] > 1 && oDims[2] == 1 && oDims[3] == 1);
@@ -199,7 +216,7 @@ void confidence_connected(Param<T> out, CParam<T> in,
 
     // 2. Calculate and adjust thresholds
     short seedIntensity = (short)inPtr[seedCol*oDims[0] + seedRow];
-    std::tuple<float,float> thresholds = CalculateThresholdsFromNeighborhoodStats(seedIntensity, stats, multiplier);
+    std::tuple<float,float> thresholds = calculateThresholdsFromNeighborhoodStats(seedIntensity, stats, multiplier);
 
     // 3. Return binary output from flood fill operation
     std::vector<Coordinate> region;
@@ -241,7 +258,7 @@ void confidence_connected(Param<T> out, CParam<T> in,
         // print(std_dev);
 
         std::tuple<float,float> neighStats = std::make_pair(mean,std_dev);
-        std::tuple<float,float> thresholds = CalculateThresholdsFromNeighborhoodStats(seedIntensity, neighStats, multiplier);
+        std::tuple<float,float> thresholds = calculateThresholdsFromNeighborhoodStats(seedIntensity, neighStats, multiplier);
 
         std::deque<Coordinate> searchSpace;
         std::vector<Coordinate> searched;
@@ -280,7 +297,7 @@ void confidence_connected(Param<T> out, CParam<T> in,
         bool last_loop = (iter == numberOfIterations-1);
         if (last_loop) {
             T* dst = out.get();
-            memset(dst, 0, oDims[0]*oDims[1]);
+            std::memset(dst, 0, oDims[0]*oDims[1]);
             for (int idx = 0; idx < region.size(); ++idx) {
                 unsigned outRow, outCol;
                 std::tie(outRow, outCol) = region[idx];
@@ -293,14 +310,13 @@ void confidence_connected(Param<T> out, CParam<T> in,
     assert(numberOfIterations >= 0);
     if (numberOfIterations == 0) {
         T* dst = out.get();
-        memset(dst, 0, oDims[0]*oDims[1]);
+        std::memset(dst, 0, oDims[0]*oDims[1]);
         for (int idx = 0; idx < region.size(); ++idx) {
             unsigned outRow, outCol;
             std::tie(outRow, outCol) = region[idx];
             dst[outCol * oDims[0] + outRow] = (T)255;
         }
     }
-
 }
 
 }

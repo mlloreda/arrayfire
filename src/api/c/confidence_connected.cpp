@@ -1,5 +1,5 @@
 /*******************************************************
- * Copyright (c) 2014, ArrayFire
+ * Copyright (c) 2018, ArrayFire
  * All rights reserved.
  *
  * This file is distributed under 3-clause BSD license.
@@ -7,52 +7,24 @@
  * http://arrayfire.com/licenses/BSD-3-Clause
  ********************************************************/
 
-#include <af/dim4.hpp>          // Needed if you use dim4 class
-
-#include <af/image.h>            // Include header where function is delcared
-
-#include <af/defines.h>         // Include this header to access any enums,
-                                // #defines or constants declared
-
-#include <common/err_common.hpp>       // Header with error checking functions & macros
-
-#include <backend.hpp>          // This header make sures appropriate backend
-                                // related namespace is being used
-
-#include <Array.hpp>            // Header in which backend specific Array class
-                                // is defined
-
-#include <handle.hpp>           // Header that helps you retrieve backend specific
-                                // Arrays based on the af_array
-                                // (typedef in defines.h) handle.
-
-#include <confidence_connected.hpp>  // This is the backend specific header
-                                // where your new function declaration
-                                // is written
-
-
-#include <index.hpp>
-#include <af/statistics.h>
 #include <af/arith.h>
-
 #include <af/data.h>
+#include <af/image.h>
+#include <af/statistics.h>
 
-using namespace detail;         // detail is an alias to appropriate backend
-                                // defined in backend.hpp. You don't need to
-                                // change this
+#include <Array.hpp>
+#include <backend.hpp>
+#include <common/err_common.hpp>
+#include <confidence_connected.hpp>
+#include <handle.hpp>
+#include <index.hpp>
+
+using namespace detail;
 
 template<typename T>
-af_array confidence(const af_array& in, const af_cc_type& param, af_array seed, unsigned radius, unsigned multiplier, int iter)
+af_array confidence(const af_array& in, const af_array& seed, const af_cc_type& cc_type, unsigned radius, unsigned multiplier, int iter)
 {
-    // getArray<T> function is defined in handle.hpp
-    // and it returns backend specific Array, namely one of the following
-    //      * cpu::Array<T>
-    //      * cuda::Array<T>
-    //      * opencl::Array<T>
-    // getHandle<T> function is defined in handle.hpp takes one of the
-    // above backend specific detail::Array<T> and returns the
-    // universal array handle af_array
-    return getHandle<T>( confidence_connected<T>(getArray<T>(in), param, getArray<T>(seed), radius, multiplier, iter ) );
+    return getHandle<T>(confidenceConnected(getArray<T>(in), getArray<T>(seed), cc_type, radius, multiplier, iter));
 }
 
 template<typename T>
@@ -69,9 +41,11 @@ af_array ConfidenceConnectedComponents(const Array<T> in,
 
 
 template<typename T>
-af_array confidenceHelper(const Array<T> in, const af_cc_type param, Array<T> seed, unsigned radius, unsigned mult, unsigned iter)
+af_array ccHelper(const Array<T> in, Array<T> seed,
+                  const af_cc_type cc_type,
+                  unsigned radius, unsigned mult, unsigned iter)
 {
-    std::cout << "Hello from confidenceHelper()\n";
+    std::cout << "Hello from ccHelper()\n";
 
     // (af_span, af_span, af_span, af_span)
     // af_err err = af_create_indexers(&indexers);
@@ -184,42 +158,34 @@ af_array confidenceHelper(const Array<T> in, const af_cc_type param, Array<T> se
 
 
 
-af_err af_confidence_connected(af_array* out, const af_array in, const af_cc_type param, af_array seed, unsigned radius, unsigned multiplier, int iter)
+af_err af_confidence_cc(af_array* out, const af_array in, const af_array seed,
+                        const af_cc_type cc_type,
+                        const unsigned radius, const unsigned multiplier, const int iter)
 {
     try {
-        const ArrayInfo& info = getInfo(in);        // ArrayInfo is the base class which
-                                            // each backend specific Array inherits
-                                            // This class stores the basic array meta-data
-                                            // such as type of data, dimensions,
-                                            // offsets and strides. This class is declared
-                                            // in src/backend/common/ArrayInfo.hpp
+        const ArrayInfo& info = getInfo(in);
+
         af::dim4 dims = info.dims();
         ARG_ASSERT(2, (dims.ndims()>=0 && dims.ndims()<=3));
-                                            // defined in err_common.hpp
-                                            // there are other useful Macros
-                                            // for different purposes, feel free
-                                            // to look at the header
 
         af_array output;
         af_dtype type = info.getType();
 
-        switch(type) {                      // Based on the data type, call backend specific
-
-            case u8: output = confidenceHelper<uchar>(getArray<uchar>(in), param, getArray<uchar>(seed), radius, multiplier, iter); break;
-            default : TYPE_ERROR(0, type);  // Another helpful macro from err_common.hpp
-                                            // that helps throw type based error messages
+        switch(type) {
+            case u8: output = ccHelper<uchar>(getArray<uchar>(in), getArray<uchar>(seed), cc_type, radius, multiplier, iter); break;
+            default : TYPE_ERROR(0, type);
         }
 
 #if 0
         // \NOTE CUDA backend
         // ---
-        #include <af/seq.h>
-        #include <af/index.h>
-        #include <regions.hpp>
-        #include <copy.hpp>
-        #include <assign.hpp>
-        #include <math.hpp>
-        #include <tile.hpp>
+#include <af/seq.h>
+#include <af/index.h>
+#include <regions.hpp>
+#include <copy.hpp>
+#include <assign.hpp>
+#include <math.hpp>
+#include <tile.hpp>
         output = getHandle(detail::regions<uint>(castArray<char>(output), AF_CONNECTIVITY_8));
 
         std::vector<af_seq> seq(2, af_span);
@@ -230,36 +196,12 @@ af_err af_confidence_connected(af_array* out, const af_array in, const af_cc_typ
 
         // \TODO return region which covering the seed(s)
 
-        std::swap(*out, output);            // if the function has returned successfully,
-                                            // swap the temporary 'output' variable with
-                                            // '*out'
+        std::swap(*out, output);
     }
-    CATCHALL;                               // All throws/exceptions from any internal
-                                            // implementations are caught by this CATCHALL
-                                            // macro and handled appropriately.
+    CATCHALL;
 
-    return AF_SUCCESS;                      // In case of successfull completion, return AF_SUCCESS
-                                            // There are set of error codes defined in defines.h
-                                            // which you are used by CATCHALL to return approriate code
+    return AF_SUCCESS;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 #if 0

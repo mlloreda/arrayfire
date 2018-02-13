@@ -74,6 +74,8 @@ target_sources(afopencl
     clfft.cpp
     clfft.hpp
     complex.hpp
+    confidence_connected.cpp
+    confidence_connected.hpp
     convolve.cpp
     convolve.hpp
     convolve_separable.cpp
@@ -245,6 +247,7 @@ target_sources(afopencl
     kernel/canny.hpp
     kernel/config.cpp
     kernel/config.hpp
+    kernel/confidence_connected.hpp
     kernel/convolve.hpp
     kernel/convolve_separable.cpp
     kernel/convolve_separable.hpp
