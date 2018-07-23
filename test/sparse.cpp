@@ -15,6 +15,7 @@ using af::allTrue;
 using af::array;
 using af::constant;
 using af::deviceMemInfo;
+using af::dim4;
 using af::dtype_traits;
 using af::identity;
 using af::randu;

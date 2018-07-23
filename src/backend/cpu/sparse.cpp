@@ -291,14 +291,16 @@ SparseArray<T> sparseConvertDenseToStorage(const Array<T> &in_)
     SparseArray<T> sparse_ = createEmptySparseArray<T>(in_.dims(), nNZ, AF_STORAGE_CSR);
     sparse_.eval();
 
-    Array<T  > values = sparse_.getValues();
-    Array<int> rowIdx = sparse_.getRowIdx();
-    Array<int> colIdx = sparse_.getColIdx();
+    if (nNZ > 0) {
+        Array<T  > values = sparse_.getValues();
+        Array<int> rowIdx = sparse_.getRowIdx();
+        Array<int> colIdx = sparse_.getColIdx();
 
-    if(stype == AF_STORAGE_CSR)
-        getQueue().enqueue(kernel::dense_csr<T>, values, rowIdx, colIdx, in_);
-    else
-        AF_ERROR("CPU Backend only supports Dense to CSR or COO", AF_ERR_NOT_SUPPORTED);
+        if(stype == AF_STORAGE_CSR)
+            getQueue().enqueue(kernel::dense_csr<T>, values, rowIdx, colIdx, in_);
+        else
+            AF_ERROR("CPU Backend only supports Dense to CSR or COO", AF_ERR_NOT_SUPPORTED);
+    }
 
 
     return sparse_;

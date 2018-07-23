@@ -116,7 +116,10 @@ void Array<T>::eval()
 
     data = shared_ptr<T>(memAlloc<T>(elements()).release(), memFree<T>);
 
-    getQueue().enqueue(kernel::evalArray<T>, *this, this->node);
+    if (elements() > 0) {
+        getQueue().enqueue(kernel::evalArray<T>, *this, this->node);
+    }
+
     // Reset shared_ptr
     this->node = bufferNodePtr<T>();
     ready = true;

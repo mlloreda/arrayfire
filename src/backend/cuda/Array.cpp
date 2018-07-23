@@ -121,7 +121,9 @@ namespace cuda
         this->data = shared_ptr<T>(memAlloc<T>(elements()).release(), memFree<T>);
 
         ready = true;
-        evalNodes<T>(*this, this->getNode().get());
+        if (elements() > 0) {
+            evalNodes<T>(*this, this->getNode().get());
+        }
         // FIXME: Replace the current node in any JIT possible trees with the new BufferNode
         node = bufferNodePtr<T>();
     }

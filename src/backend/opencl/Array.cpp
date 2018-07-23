@@ -136,9 +136,11 @@ namespace opencl
                        {strides()[0], strides()[1], strides()[2], strides()[3]},
                        0};
 
-        Param res = {data.get(), info};
+        if (elements() > 0) {
+            Param res = {data.get(), info};
+            evalNodes(res, node.get());
+        }
 
-        evalNodes(res, node.get());
         ready = true;
         node = bufferNodePtr<T>();
     }

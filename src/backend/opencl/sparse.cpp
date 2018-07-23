@@ -65,11 +65,13 @@ SparseArray<T> sparseConvertDenseToStorage(const Array<T> &in_)
     SparseArray<T> sparse_ = createEmptySparseArray<T>(in_.dims(), nNZ, stype);
     sparse_.eval();
 
-    Array<T> &values = sparse_.getValues();
-    Array<int> &rowIdx = sparse_.getRowIdx();
-    Array<int> &colIdx = sparse_.getColIdx();
+    if (nNZ > 0) {
+        Array<T> &values = sparse_.getValues();
+        Array<int> &rowIdx = sparse_.getRowIdx();
+        Array<int> &colIdx = sparse_.getColIdx();
 
-    kernel::dense2csr<T>(values, rowIdx, colIdx, in_);
+        kernel::dense2csr<T>(values, rowIdx, colIdx, in_);
+    }
 
     return sparse_;
 }

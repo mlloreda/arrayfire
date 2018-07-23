@@ -170,8 +170,8 @@ void destroySparseArray(SparseArray<T> *sparse)
 ////////////////////////////////////////////////////////////////////////////
 template<typename T>
 SparseArray<T>::SparseArray(dim4 _dims, dim_t _nNZ, af::storage _storage):
-    base(_dims, _nNZ == 0 ? 1 : _nNZ, _storage, (af_dtype)dtype_traits<T>::af_type),
-    values(createValueArray<T>(_nNZ == 0 ? dim4(1) : dim4(_nNZ), scalar<T>(0)))
+    base(_dims, _nNZ, _storage, (af_dtype)dtype_traits<T>::af_type),
+    values(createValueArray<T>(dim4(_nNZ), scalar<T>(0)))
 {
 #if __cplusplus > 199711L
         static_assert(std::is_standard_layout<SparseArray<T>>::value,
