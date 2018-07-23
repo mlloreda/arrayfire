@@ -13,6 +13,7 @@
 
 using af::allTrue;
 using af::array;
+using af::constant;
 using af::deviceMemInfo;
 using af::dtype_traits;
 using af::identity;
@@ -185,6 +186,17 @@ TEST(Sparse, ISSUE_2134_CSC)
   A = 0;
   EXPECT_EQ(AF_ERR_SIZE, af_create_sparse_array(&A, 3, 3, value.get(), row.get(), col.get(), AF_STORAGE_COO));
   if(A != 0) af_release_array(A);
+}
+
+TEST(Sparse, ZerosMatToSparseArr)
+{
+    const int M = 3;
+    const int N = 2;
+    array A = constant(0, dim4(M,N));
+    af_print(A);
+
+    array spA = sparse(A);
+    af_print(spA);
 }
 
 template<typename T>
