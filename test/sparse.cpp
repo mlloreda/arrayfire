@@ -189,17 +189,6 @@ TEST(Sparse, ISSUE_2134_CSC)
   if(A != 0) af_release_array(A);
 }
 
-TEST(Sparse, ZerosMatToSparseArr)
-{
-    const int M = 3;
-    const int N = 2;
-    array A = constant(0, dim4(M,N));
-    af_print(A);
-
-    array spA = sparse(A);
-    af_print(spA);
-}
-
 template<typename T>
 class Sparse : public ::testing::Test {};
 

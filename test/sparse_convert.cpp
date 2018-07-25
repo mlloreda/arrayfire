@@ -156,3 +156,14 @@ TEST(SPARSE_CONVERT, CSC_ARG_ERROR)
 
     if(out != 0) af_release_array(out);
 }
+
+TEST(Sparse, ZerosMatToSparseArr)
+{
+    const int M = 3;
+    const int N = 2;
+    array A = constant(0, dim4(M,N));
+    af_print(A);
+
+    array spA = sparse(A);
+    af_print(spA);
+}
