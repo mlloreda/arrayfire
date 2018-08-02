@@ -77,27 +77,50 @@ public:
     ~TypeError() throw() {}
 };
 
+class ArgumentErrorOld : public AfError
+{
+    int argIndex;
+    std::string expected;
+    ArgumentErrorOld();
+
+public:
+
+    ArgumentErrorOld(const char * const func,
+                  const char * const file,
+                  const int line,
+                  const int index,
+                  const char * const expectString);
+
+    const std::string&
+    getExpectedCondition() const;
+
+    int getArgIndex() const;
+
+    ~ArgumentErrorOld() throw(){}
+};
+
+template <typename ... Ts>
 class ArgumentError : public AfError
 {
     int argIndex;
     std::string expected;
     std::string message;
+    std::tuple<Ts...> args;
     ArgumentError();
 
 public:
 
+    template<typename ... Args>
+    void setArgs(Args&& ... args);
+
+    template<typename ... Args>
     ArgumentError(const char * const func,
                   const char * const file,
                   const int line,
                   const int index,
                   const char * const expectString,
-                  const char * const msg);
-
-    ArgumentError(const char * const func,
-                  const char * const file,
-                  const int line,
-                  const int index,
-                  const char * const expectString);
+                  const char * const msg,
+                  Args&& ... args);
 
     const std::string&
     getExpectedCondition() const;
@@ -162,14 +185,17 @@ void print_error(const std::string &msg);
         }                                                   \
     } while(0)
 
+// \TODO(miguel) replace
 #define ARG_ASSERT(INDEX, COND) do {                        \
         if((COND) == false) {                               \
-            throw ArgumentError(__PRETTY_FUNCTION__,        \
+            throw ArgumentErrorOld(__PRETTY_FUNCTION__,     \
                                 __AF_FILENAME__, __LINE__,  \
                                 INDEX, #COND);              \
         }                                                   \
     } while(0)
 
+
+// \TODO(miguel) rename
 #define ARG_ASSERT_MSG(INDEX, COND, MSG, ...) do {      \
         if((COND) == false) {                           \
             throw ArgumentError(__PRETTY_FUNCTION__,    \
@@ -177,8 +203,9 @@ void print_error(const std::string &msg);
                                 __LINE__,               \
                                 INDEX,                  \
                                 #COND,                  \
-                                MSG);                   \
-        }                                               \
+                                MSG,                    \
+                                __VA_ARGS__);           \
+            }                                           \
     } while(0)
 
 #define TYPE_ERROR(INDEX, type) do {                        \

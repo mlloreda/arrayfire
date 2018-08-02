@@ -27,7 +27,8 @@ static af_array regions(af_array const &in, af_connectivity connectivity)
 af_err af_regions(af_array *out, const af_array in, const af_connectivity connectivity, const af_dtype type)
 {
     try {
-        ARG_ASSERT_MSG(2, (connectivity==AF_CONNECTIVITY_4 || connectivity==AF_CONNECTIVITY_8), "fmt %d");
+
+        ARG_ASSERT_MSG(2, (connectivity==AF_CONNECTIVITY_4 || connectivity==AF_CONNECTIVITY_8), "fmt %d", 10);
 
         const ArrayInfo& info = getInfo(in);
         af::dim4 dims  = info.dims();
