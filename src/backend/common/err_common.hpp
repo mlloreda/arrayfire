@@ -44,6 +44,9 @@ public:
     const std::string&
     getFileName() const;
 
+    const std::string&
+    getExtra() const;
+
     int getLine() const;
 
     af_err getError() const;
@@ -78,9 +81,17 @@ class ArgumentError : public AfError
 {
     int argIndex;
     std::string expected;
+    std::string message;
     ArgumentError();
 
 public:
+
+    ArgumentError(const char * const func,
+                  const char * const file,
+                  const int line,
+                  const int index,
+                  const char * const expectString,
+                  const char * const msg);
 
     ArgumentError(const char * const func,
                   const char * const file,
@@ -92,6 +103,9 @@ public:
     getExpectedCondition() const;
 
     int getArgIndex() const;
+
+    const std::string
+    getMessage() const;
 
     ~ArgumentError() throw(){}
 };
@@ -154,6 +168,17 @@ void print_error(const std::string &msg);
                                 __AF_FILENAME__, __LINE__,  \
                                 INDEX, #COND);              \
         }                                                   \
+    } while(0)
+
+#define ARG_ASSERT_MSG(INDEX, COND, MSG, ...) do {      \
+        if((COND) == false) {                           \
+            throw ArgumentError(__PRETTY_FUNCTION__,    \
+                                __AF_FILENAME__,        \
+                                __LINE__,               \
+                                INDEX,                  \
+                                #COND,                  \
+                                MSG);                   \
+        }                                               \
     } while(0)
 
 #define TYPE_ERROR(INDEX, type) do {                        \

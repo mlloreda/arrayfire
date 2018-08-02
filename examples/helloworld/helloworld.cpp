@@ -10,63 +10,33 @@
 #include <arrayfire.h>
 #include <cstdio>
 #include <cstdlib>
+#include <iostream>
 
 using namespace af;
+
+using std::cout;
+using std::endl;
 
 int main(int argc, char *argv[])
 {
     try {
-
 
         // Select a device and display arrayfire info
         int device = argc > 1 ? atoi(argv[1]) : 0;
         af::setDevice(device);
         af::info();
 
-        printf("Create a 5-by-3 matrix of random floats on the GPU\n");
-        array A = randu(5,3, f32);
+        printf("Create a 5-by-3 matrix of random unsigned ints  on the GPU\n");
+        array A = randu(5,5, b8);
         af_print(A);
 
-        printf("Element-wise arithmetic\n");
-        array B = sin(A) + 1.5;
-        af_print(B);
+        cout << "CONN4 " << AF_CONNECTIVITY_4 << endl;
+        cout << "CONN8 " << AF_CONNECTIVITY_8 << endl;
 
-        printf("Negate the first three elements of second column\n");
-        B(seq(0, 2), 1) = B(seq(0, 2), 1) * -1;
-        af_print(B);
-
-        printf("Fourier transform the result\n");
-        array C = fft(B);
-        af_print(C);
-
-        printf("Grab last row\n");
-        array c = C.row(end);
-        af_print(c);
-
-        printf("Scan Test\n");
-        dim4 dims(16, 4, 1, 1);
-        array r = constant(2, dims);
-        af_print(r);
-
-        printf("Scan\n");
-        array S = af::scan(r, 0, AF_BINARY_MUL);
-        af_print(S);
-
-        printf("Create 2-by-3 matrix from host data\n");
-        float d[] = { 1, 2, 3, 4, 5, 6 };
-        array D(2, 3, d, afHost);
-        af_print(D);
-
-        printf("Copy last column onto first\n");
-        D.col(0) = D.col(end);
-        af_print(D);
-
-        // Sort A
-        printf("Sort A and print sorted array and corresponding indices\n");
-        array vals, inds;
-        sort(vals, inds, A);
-        af_print(vals);
-        af_print(inds);
+        // Expects 4 or 8. Sending in 0 to invoke ARG_ASSERT.
+        af::connectivity conn = static_cast<connectivity>(0);
+        array reg = regions(A, conn);
+        af_print(reg);
 
     } catch (af::exception& e) {
 

@@ -102,10 +102,24 @@ ArgumentError::ArgumentError(const char * const func,
                              const char * const file,
                              const int line,
                              const int index,
-                             const char * const  expectString)
+                             const char * const condition,
+                             const char * const msg)
     : AfError(func, file, line, "Invalid argument", AF_ERR_ARG),
       argIndex(index),
-      expected(expectString)
+      expected(condition),
+      message(msg)
+{
+
+}
+
+ArgumentError::ArgumentError(const char * const func,
+                             const char * const file,
+                             const int line,
+                             const int index,
+                             const char * const condition)
+    : AfError(func, file, line, "Invalid argument", AF_ERR_ARG),
+      argIndex(index),
+      expected(condition)
 {
 
 }
@@ -113,6 +127,11 @@ ArgumentError::ArgumentError(const char * const func,
 const string& ArgumentError::getExpectedCondition() const
 {
     return expected;
+}
+
+const string ArgumentError::getMessage() const
+{
+    return message;
 }
 
 int ArgumentError::getArgIndex() const
@@ -183,7 +202,9 @@ af_err processException()
         print_error(ss.str());
         err = AF_ERR_SIZE;
     } catch (const ArgumentError &ex) {
-        ss << "In function " << ex.getFunctionName() << "\n"
+        // extra = build_string(getFmt(), getArgs());
+        ss << ex.getMessage() << "\n"
+           << "In function " << ex.getFunctionName() << "\n"
            << "In file " << ex.getFileName() << ":" << ex.getLine() << "\n"
            << "Invalid argument at index " << ex.getArgIndex() << "\n"
            << "Expected: " << ex.getExpectedCondition() << "\n";
