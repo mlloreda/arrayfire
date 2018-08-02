@@ -89,7 +89,7 @@ flipFunction<TY>()                                              \
     BOOST_COMPUTE_FUNCTION(TY, negateFn, (const TY x),          \
        {                                                        \
             return XMAX - x;                                    \
-        }                                                       \
+       }                                                        \
     );                                                          \
                                                                 \
     return negateFn;                                            \
@@ -131,10 +131,11 @@ namespace opencl
                         compute::buffer_iterator< type_t<Tk> > end  = compute::make_buffer_iterator< type_t<Tk> >(pKey_buf, pKeyOffset + pKey.info.dims[0]);
                         compute::buffer_iterator< type_t<Tv> > vals = compute::make_buffer_iterator< type_t<Tv> >(pVal_buf, pValOffset);
                         if(isAscending) {
-                            compute::sort_by_key(start, end, vals, c_queue);
+                            compute::sort_by_key(start, end, vals,
+                                                 compute::less< type_t<Tk> >(), c_queue);
                         } else {
                             compute::sort_by_key(start, end, vals,
-                                                  compute::greater< type_t<Tk> >(), c_queue);
+                                                 compute::greater< type_t<Tk> >(), c_queue);
                         }
                     }
                 }

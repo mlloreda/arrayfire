@@ -75,7 +75,7 @@ void sortTest(string pTestFile, const bool dir, const unsigned resultIdx0, bool 
     size_t nElems = tests[resultIdx0].size();
 
     // Get result
-    T* sxData = new T[tests[resultIdx0].size()];
+    T* sxData = new T[nElems];
     ASSERT_EQ(AF_SUCCESS, af_get_data_ptr((void*)sxData, sxArray));
 
     // Compare result
@@ -98,27 +98,26 @@ void sortTest(string pTestFile, const bool dir, const unsigned resultIdx0, bool 
     }
 
     // Using same inputs as sort_index. So just skipping the index results
-    SORT_INIT(Sort0True,  sort, true, 0);
-    SORT_INIT(Sort0False, sort,false, 2);
+    SORT_INIT(Sort0Ascending,  sort, true, 0);
+    SORT_INIT(Sort0Descending, sort,false, 2);
 
-    SORT_INIT(Sort2d0False, basic_2d, true, 0);
+    SORT_INIT(Sort2d0Ascending, basic_2d, true, 0);
 
-    SORT_INIT(Sort10x10True,  sort_10x10, true,  0);
-    SORT_INIT(Sort10x10False, sort_10x10, false, 2);
-    SORT_INIT(Sort1000True,   sort_1000,  true,  0);
-    SORT_INIT(Sort1000False,  sort_1000,  false, 2);
-    SORT_INIT(SortMedTrue,    sort_med1,  true,  0);
-    SORT_INIT(SortMedFalse,   sort_med1,  false, 2);
-
-    SORT_INIT(SortMed5True,   sort_med,   true,  0);
-    SORT_INIT(SortMed5False,  sort_med,   false, 2);
-    SORT_INIT(SortLargeTrue,  sort_large, true,  0);
-    SORT_INIT(SortLargeFalse, sort_large, false, 2);
+    SORT_INIT(Sort10x10Ascending,  sort_10x10, true,  0);
+    SORT_INIT(Sort10x10Descending, sort_10x10, false, 2);
+    SORT_INIT(Sort1000Ascending,   sort_1000,  true,  0);
+    SORT_INIT(Sort1000Descending,  sort_1000,  false, 2);
+    SORT_INIT(SortMedAscending,    sort_med1,  true,  0);
+    SORT_INIT(SortMedDescending,   sort_med1,  false, 2);
+    SORT_INIT(SortMed5Ascending,   sort_med,   true,  0);
+    SORT_INIT(SortMed5Descending,  sort_med,   false, 2);
+    SORT_INIT(SortLargeAscending,  sort_large, true,  0);
+    SORT_INIT(SortLargeDescending, sort_large, false, 2);
 
 
 ////////////////////////////////////// CPP ////////////////////////////////
 //
-TEST(Sort, CPPDim0)
+TEST(Sort, CPPSort10x10AscendingDim0)
 {
     if (noDoubleTests<float>()) return;
 
@@ -138,7 +137,7 @@ TEST(Sort, CPPDim0)
     size_t nElems = tests[resultIdx0].size();
 
     // Get result
-    float* sxData = new float[tests[resultIdx0].size()];
+    float* sxData = new float[nElems];
     output.host((void*)sxData);
 
     // Compare result
@@ -150,7 +149,7 @@ TEST(Sort, CPPDim0)
     delete[] sxData;
 }
 
-TEST(Sort, CPPDim1)
+TEST(Sort, CPPSort10x10AscendingDim1)
 {
     if (noDoubleTests<float>()) return;
 
@@ -174,7 +173,7 @@ TEST(Sort, CPPDim1)
     size_t nElems = tests[resultIdx0].size();
 
     // Get result
-    float* sxData = new float[tests[resultIdx0].size()];
+    float* sxData = new float[nElems];
     output.host((void*)sxData);
 
     // Compare result
@@ -186,7 +185,7 @@ TEST(Sort, CPPDim1)
     delete[] sxData;
 }
 
-TEST(Sort, CPPDim2)
+TEST(Sort, CPPSortMed5AscendingDim2)
 {
     if (noDoubleTests<float>()) return;
 
@@ -210,7 +209,7 @@ TEST(Sort, CPPDim2)
     size_t nElems = tests[resultIdx0].size();
 
     // Get result
-    float* sxData = new float[tests[resultIdx0].size()];
+    float* sxData = new float[nElems];
     output.host((void*)sxData);
 
     // Compare result

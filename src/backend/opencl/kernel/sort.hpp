@@ -56,16 +56,12 @@ namespace opencl
 
                         int valOffset = valWZ + y * val.info.strides[1];
 
+                        auto first = compute::make_buffer_iterator< type_t<T> >(val_buf, valOffset);
+                        auto last  = compute::make_buffer_iterator< type_t<T> >(val_buf, valOffset + val.info.dims[0]);
                         if(isAscending) {
-                            compute::sort(
-                                    compute::make_buffer_iterator< type_t<T> >(val_buf, valOffset),
-                                    compute::make_buffer_iterator< type_t<T> >(val_buf, valOffset + val.info.dims[0]),
-                                    compute::less< type_t<T> >(), c_queue);
+                            compute::sort(first, last, compute::less< type_t<T> >(), c_queue);
                         } else {
-                            compute::sort(
-                                    compute::make_buffer_iterator< type_t<T> >(val_buf, valOffset),
-                                    compute::make_buffer_iterator< type_t<T> >(val_buf, valOffset + val.info.dims[0]),
-                                    compute::greater< type_t<T> >(), c_queue);
+                            compute::sort(first, last, compute::greater< type_t<T> >(), c_queue);
                         }
                     }
                 }
@@ -111,11 +107,11 @@ namespace opencl
             compute::buffer pVal_buf((*pVal.data)());
 
             compute::buffer_iterator<type_t<T> > val0 = compute::make_buffer_iterator<type_t<T> >(pVal_buf, 0);
-            compute::buffer_iterator<type_t<T> > valN = compute::make_buffer_iterator<type_t<T> >(pVal_buf,+ pVal.info.dims[0]);
+            compute::buffer_iterator<type_t<T> > valN = compute::make_buffer_iterator<type_t<T> >(pVal_buf, pVal.info.dims[0]);
             compute::buffer_iterator<uint      > key0 = compute::make_buffer_iterator<uint>(pKey_buf, 0);
             compute::buffer_iterator<uint      > keyN = compute::make_buffer_iterator<uint>(pKey_buf, pKey.dims()[0]);
             if(isAscending) {
-                compute::sort_by_key(val0, valN, key0, c_queue);
+                compute::sort_by_key(val0, valN, key0, compute::less< type_t<T> >(), c_queue);
             } else {
                 compute::sort_by_key(val0, valN, key0, compute::greater< type_t<T> >(), c_queue);
             }

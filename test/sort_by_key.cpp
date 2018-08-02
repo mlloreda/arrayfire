@@ -78,7 +78,7 @@ void sortTest(string pTestFile, const bool dir, const unsigned resultIdx0, const
     size_t nElems = tests[resultIdx0].size();
 
     // Get result
-    T* keyData = new T[tests[resultIdx0].size()];
+    T* keyData = new T[nElems];
     ASSERT_EQ(AF_SUCCESS, af_get_data_ptr((void*)keyData, okeyArray));
 
     // Compare result
@@ -89,12 +89,10 @@ void sortTest(string pTestFile, const bool dir, const unsigned resultIdx0, const
     T* valData = new T[tests[resultIdx1].size()];
     ASSERT_EQ(AF_SUCCESS, af_get_data_ptr((void*)valData, ovalArray));
 
-#ifndef AF_OPENCL
     // Compare result
     for (size_t elIter = 0; elIter < nElems; ++elIter) {
         ASSERT_EQ(tests[resultIdx1][elIter], valData[elIter]) << "at: " << elIter << endl;
     }
-#endif
 
     // Delete
     delete[] keyData;
@@ -113,17 +111,16 @@ void sortTest(string pTestFile, const bool dir, const unsigned resultIdx0, const
         sortTest<TypeParam>(string(TEST_DIR"/sort/"#file".test"), dir, resultIdx0, resultIdx1); \
     }
 
-    SORT_INIT(Sort0True,      sort_by_key_tiny,  true,  0, 1);
-    SORT_INIT(Sort0False,     sort_by_key_tiny,  false, 2, 3);
-    SORT_INIT(Sort10x10True,  sort_by_key_2D,    true,  0, 1);
-    SORT_INIT(Sort10x10False, sort_by_key_2D,    false, 2, 3);
-    SORT_INIT(Sort1000True,   sort_by_key_1000,  true,  0, 1);
-    SORT_INIT(SortMedTrue,    sort_by_key_med,   true,  0, 1);
-    SORT_INIT(Sort1000False,  sort_by_key_1000,  false, 2, 3);
-    SORT_INIT(SortMedFalse,   sort_by_key_med,   false, 2, 3);
-
-    SORT_INIT(SortLargeTrue,  sort_by_key_large, true,  0, 1);
-    SORT_INIT(SortLargeFalse, sort_by_key_large, false, 2, 3);
+    SORT_INIT(Sort0Ascending,      sort_by_key_tiny,  true,  0, 1);
+    SORT_INIT(Sort0Descending,     sort_by_key_tiny,  false, 2, 3);
+    SORT_INIT(Sort10x10Ascending,  sort_by_key_2D,    true,  0, 1);
+    SORT_INIT(Sort10x10Descending, sort_by_key_2D,    false, 2, 3);
+    SORT_INIT(Sort1000Ascending,   sort_by_key_1000,  true,  0, 1);
+    SORT_INIT(Sort1000Descending,  sort_by_key_1000,  false, 2, 3);
+    SORT_INIT(SortMedAscending,    sort_by_key_med,   true,  0, 1);
+    SORT_INIT(SortMedDescending,   sort_by_key_med,   false, 2, 3);
+    SORT_INIT(SortLargeAscending,  sort_by_key_large, true,  0, 1);
+    SORT_INIT(SortLargeDescending, sort_by_key_large, false, 2, 3);
 
 
 
@@ -151,7 +148,7 @@ TEST(SortByKey, CPPDim0)
 
     size_t nElems = tests[resultIdx0].size();
     // Get result
-    float* keyData = new float[tests[resultIdx0].size()];
+    float* keyData = new float[nElems];
     out_keys.host((void*)keyData);
 
     // Compare result
@@ -200,7 +197,7 @@ TEST(SortByKey, CPPDim1)
 
     size_t nElems = tests[resultIdx0].size();
     // Get result
-    float* keyData = new float[tests[resultIdx0].size()];
+    float* keyData = new float[nElems];
     out_keys.host((void*)keyData);
 
     // Compare result
@@ -249,7 +246,7 @@ TEST(SortByKey, CPPDim2)
 
     size_t nElems = tests[resultIdx0].size();
     // Get result
-    float* keyData = new float[tests[resultIdx0].size()];
+    float* keyData = new float[nElems];
     out_keys.host((void*)keyData);
 
     // Compare result

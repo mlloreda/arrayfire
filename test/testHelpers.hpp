@@ -42,48 +42,48 @@ std::string readNextNonEmptyLine(std::ifstream &file)
 }
 
 template<typename inType, typename outType, typename FileElementType>
-void readTests(const std::string &FileName, std::vector<af::dim4> &inputDims,
-                std::vector<std::vector<inType> >   &testInputs,
-                std::vector<std::vector<outType> > &testOutputs)
+void readTests(const std::string &data_fn, std::vector<af::dim4> &inputDims,
+                std::vector<std::vector<inType> >   &dataInputs,
+                std::vector<std::vector<outType> > &dataOutputs)
 {
     using std::vector;
 
-    std::ifstream testFile(FileName.c_str());
-    if(testFile.good()) {
+    std::ifstream data_file(data_fn.c_str());
+    if(data_file.good()) {
         unsigned inputCount;
-        testFile >> inputCount;
+        data_file >> inputCount;
         inputDims.resize(inputCount);
         for(unsigned i=0; i<inputCount; i++) {
-            testFile >> inputDims[i];
+            data_file >> inputDims[i];
         }
 
         unsigned testCount;
-        testFile >> testCount;
-        testOutputs.resize(testCount);
+        data_file >> testCount;
+        dataOutputs.resize(testCount);
 
         vector<unsigned> testSizes(testCount);
         for(unsigned i = 0; i < testCount; i++) {
-            testFile >> testSizes[i];
+            data_file >> testSizes[i];
         }
 
-        testInputs.resize(inputCount,vector<inType>(0));
+        dataInputs.resize(inputCount,vector<inType>(0));
         for(unsigned k=0; k<inputCount; k++) {
             unsigned nElems = inputDims[k].elements();
-            testInputs[k].resize(nElems);
+            dataInputs[k].resize(nElems);
             FileElementType tmp;
             for(unsigned i = 0; i < nElems; i++) {
-                testFile >> tmp;
-                testInputs[k][i] = static_cast<inType>(tmp);
+                data_file >> tmp;
+                dataInputs[k][i] = static_cast<inType>(tmp);
             }
         }
 
-        testOutputs.resize(testCount, vector<outType>(0));
+        dataOutputs.resize(testCount, vector<outType>(0));
         for(unsigned i = 0; i < testCount; i++) {
-            testOutputs[i].resize(testSizes[i]);
+            dataOutputs[i].resize(testSizes[i]);
             FileElementType tmp;
             for(unsigned j = 0; j < testSizes[i]; j++) {
-                testFile >> tmp;
-                testOutputs[i][j] = static_cast<outType>(tmp);
+                data_file >> tmp;
+                dataOutputs[i][j] = static_cast<outType>(tmp);
             }
         }
     }

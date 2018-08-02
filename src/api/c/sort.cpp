@@ -71,8 +71,8 @@ static inline void sort_index(af_array *val, af_array *idx, const af_array in,
     const Array<T> &inArray = getArray<T>(in);
 
     // Initialize Dummy Arrays
-    Array<T> valArray = createEmptyArray<T>(af::dim4());
-    Array<uint> idxArray = createEmptyArray<uint>(af::dim4());
+    Array<T> valArray = createEmptyArray<T>(dim4());
+    Array<uint> idxArray = createEmptyArray<uint>(dim4());
 
     sort_index<T>(valArray, idxArray, inArray, dim, isAscending);
     *val = getHandle(valArray);
@@ -123,8 +123,8 @@ static inline void sort_by_key(af_array *okey, af_array *oval, const af_array ik
     const Array<Tv> &ivalArray = getArray<Tv>(ival);
 
     // Initialize Dummy Arrays
-    Array<Tk> okeyArray = createEmptyArray<Tk>(af::dim4());
-    Array<Tv> ovalArray = createEmptyArray<Tv>(af::dim4());
+    Array<Tk> okeyArray = createEmptyArray<Tk>(dim4());
+    Array<Tv> ovalArray = createEmptyArray<Tv>(dim4());
 
     sort_by_key<Tk, Tv>(okeyArray, ovalArray, ikeyArray, ivalArray, dim, isAscending);
     *okey = getHandle(okeyArray);
