@@ -98,19 +98,16 @@ int TypeError::getArgIndex() const
     return argIndex;
 }
 
-template<typename ... Args>
 ArgumentError::ArgumentError(const char * const func,
                              const char * const file,
                              const int line,
                              const int index,
                              const char * const condition,
-                             const char * const msg,
-                             const Args&&... args)
+                             const char * const msg)
     : AfError(func, file, line, "Invalid argument", AF_ERR_ARG),
       argIndex(index),
       expected(condition),
-      message(msg),
-      args(std::forward<Args>(args)...)
+      message(msg)
 {
 
 }
@@ -122,15 +119,6 @@ const string& ArgumentError::getExpectedCondition() const
 
 const string ArgumentError::getMessage() const
 {
-    // message = build_string(getFmt(), getArgs());
-
-    // const int num_args = std::tuple_size<args>::value;
-    // for (int i = 0; i < num_args; ++i) {
-    //     cout << i << " out of " << num_args << '\n';
-    // }
-
-    // sprintf(str, msg, std::forward<Args>(args) ...);
-
     return message;
 }
 
@@ -227,10 +215,9 @@ af_err processException()
         print_error(ss.str());
         err = AF_ERR_SIZE;
     } catch (const ArgumentError &ex) {
-        ss << ex.getMessage() << "\n"
-           << "In function " << ex.getFunctionName() << "\n"
+        ss << "In function " << ex.getFunctionName() << "\n"
            << "In file " << ex.getFileName() << ":" << ex.getLine() << "\n"
-           << "Invalid argument at index " << ex.getArgIndex() << "\n"
+           << "Invalid argument at index " << ex.getArgIndex() << ". " << ex.getMessage() << "\n"
            << "Expected: " << ex.getExpectedCondition() << "\n";
 
         print_error(ss.str());

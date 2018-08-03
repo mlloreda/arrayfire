@@ -15,6 +15,7 @@
 #include <cassert>
 #include <sstream>
 #include <stdexcept>
+#include <cstdio>
 #include <string>
 #include <vector>
 
@@ -43,9 +44,6 @@ public:
 
     const std::string&
     getFileName() const;
-
-    const std::string&
-    getExtra() const;
 
     int getLine() const;
 
@@ -99,36 +97,29 @@ public:
     ~ArgumentErrorOld() throw(){}
 };
 
-template <typename ... Ts>
 class ArgumentError : public AfError
 {
     int argIndex;
     std::string expected;
     std::string message;
-    std::tuple<Ts...> args;
     ArgumentError();
 
 public:
 
-    template<typename ... Args>
-    void setArgs(Args&& ... args);
-
-    template<typename ... Args>
     ArgumentError(const char * const func,
                   const char * const file,
                   const int line,
                   const int index,
                   const char * const expectString,
-                  const char * const msg,
-                  Args&& ... args);
+                  const char * const msg);
 
     const std::string&
     getExpectedCondition() const;
 
-    int getArgIndex() const;
-
     const std::string
     getMessage() const;
+
+    int getArgIndex() const;
 
     ~ArgumentError() throw(){}
 };
@@ -196,16 +187,17 @@ void print_error(const std::string &msg);
 
 
 // \TODO(miguel) rename
-#define ARG_ASSERT_MSG(INDEX, COND, MSG, ...) do {      \
+#define ARG_ASSERT_MSG(INDEX, COND, FMT, ...) do {      \
         if((COND) == false) {                           \
+            char msg[1024];                             \
+            sprintf(msg, FMT, __VA_ARGS__);             \
             throw ArgumentError(__PRETTY_FUNCTION__,    \
                                 __AF_FILENAME__,        \
                                 __LINE__,               \
                                 INDEX,                  \
                                 #COND,                  \
-                                MSG,                    \
-                                __VA_ARGS__);           \
-            }                                           \
+                                msg);                   \
+        }                                               \
     } while(0)
 
 #define TYPE_ERROR(INDEX, type) do {                        \

@@ -30,9 +30,6 @@ int main(int argc, char *argv[])
         array A = randu(5,5, b8);
         af_print(A);
 
-        cout << "CONN4 " << AF_CONNECTIVITY_4 << endl;
-        cout << "CONN8 " << AF_CONNECTIVITY_8 << endl;
-
         // Expects 4 or 8. Sending in 0 to invoke ARG_ASSERT.
         af::connectivity conn = static_cast<connectivity>(0);
         array reg = regions(A, conn);

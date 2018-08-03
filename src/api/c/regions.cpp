@@ -28,10 +28,11 @@ af_err af_regions(af_array *out, const af_array in, const af_connectivity connec
 {
     try {
 
-        ARG_ASSERT_MSG(2, (connectivity==AF_CONNECTIVITY_4 || connectivity==AF_CONNECTIVITY_8), "fmt %d", 10);
+        ARG_ASSERT_MSG(2, (connectivity==AF_CONNECTIVITY_4 || connectivity==AF_CONNECTIVITY_8),
+                       "Value of %d.", connectivity);
 
         const ArrayInfo& info = getInfo(in);
-        af::dim4 dims  = info.dims();
+        dim4 dims  = info.dims();
 
         dim_t in_ndims = dims.ndims();
         DIM_ASSERT(1, (in_ndims <= 3 && in_ndims >= 2));
