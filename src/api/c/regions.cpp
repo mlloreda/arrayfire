@@ -29,7 +29,9 @@ af_err af_regions(af_array *out, const af_array in, const af_connectivity connec
     try {
 
         ARG_ASSERT_MSG(2, (connectivity==AF_CONNECTIVITY_4 || connectivity==AF_CONNECTIVITY_8),
-                       "Value of %d.", connectivity);
+                       "Connectivity (%d) must be either %d or %d.", connectivity, AF_CONNECTIVITY_4, AF_CONNECTIVITY_8);
+
+        // ARG_ASSERT_MSG(2,
 
         const ArrayInfo& info = getInfo(in);
         dim4 dims  = info.dims();

@@ -40,7 +40,9 @@ AfError::AfError(const char * const func,
       fileName      (file),
       lineNumber(line),
       error(err)
-{}
+{
+    // printf("HEY %s\n", message);
+}
 
 AfError::AfError(string func,
                  string file,
@@ -51,7 +53,9 @@ AfError::AfError(string func,
       fileName      (file),
       lineNumber(line),
       error(err)
-{}
+{
+    // printf("THERE\n");
+}
 
 const string&
 AfError::getFunctionName() const
@@ -104,7 +108,7 @@ ArgumentError::ArgumentError(const char * const func,
                              const int index,
                              const char * const condition,
                              const char * const msg)
-    : AfError(func, file, line, "Invalid argument", AF_ERR_ARG),
+    : AfError(func, file, line, "Invalid argument blah", AF_ERR_ARG),
       argIndex(index),
       expected(condition),
       message(msg)
@@ -217,7 +221,8 @@ af_err processException()
     } catch (const ArgumentError &ex) {
         ss << "In function " << ex.getFunctionName() << "\n"
            << "In file " << ex.getFileName() << ":" << ex.getLine() << "\n"
-           << "Invalid argument at index " << ex.getArgIndex() << ". " << ex.getMessage() << "\n"
+           << "Invalid argument at index " << ex.getArgIndex() << "\n"
+           << ex.getMessage() << "\n"
            << "Expected: " << ex.getExpectedCondition() << "\n";
 
         print_error(ss.str());
