@@ -42,6 +42,18 @@ static inline void homography(af_array &H, int &inliers,
     H = getHandle<T>(bestH);
 }
 
+#define ASSERT_ARR(ARG, COND) do {              \
+        if ((COND) == false) {                  \
+            assert(0);                          \
+        }                                       \
+    } while(0)
+
+// #define ASSERT_ARR(ARG) do {                  \
+//         if (ARG.type() == "af_array")  {      \
+//             ArrayInfo info = getInfo(ARG);    \
+//         }                                     \
+//     } while(0)
+
 af_err af_homography(af_array *H, int *inliers,
                      const af_array x_src, const af_array y_src,
                      const af_array x_dst, const af_array y_dst,
@@ -64,18 +76,21 @@ af_err af_homography(af_array *H, int *inliers,
         af_dtype xdtype = xdinfo.getType();
         af_dtype ydtype = ydinfo.getType();
 
+        // ASSERT_ARG_ARR(x_src, xsdims[0] > 0, "Dimension 0 needs to be grater than 0");
+        // ASSERT_ARR_DIMS(0, x_src, xdims[0] > 0);
+
         if (xstype != f32) { TYPE_ERROR(1, xstype); }
         if (ystype != f32) { TYPE_ERROR(2, ystype); }
         if (xdtype != f32) { TYPE_ERROR(3, xdtype); }
         if (ydtype != f32) { TYPE_ERROR(4, ydtype); }
 
-        ARG_ASSERT(1, (xsdims[0] > 0));
-        ARG_ASSERT(2, (ysdims[0] == xsdims[0]));
-        ARG_ASSERT(3, (xddims[0] > 0));
-        ARG_ASSERT(4, (yddims[0] == xddims[0]));
+        // _ARG_ASSERT(1, (xsdims[0] > 0)); // Invalid
+        _ARG_ASSERT(2, (ysdims[0] == xsdims[0]));
+        _ARG_ASSERT(3, (xddims[0] > 0));
+        _ARG_ASSERT(4, (yddims[0] == xddims[0]));
 
-        ARG_ASSERT(5, (inlier_thr >= 0.1f));
-        ARG_ASSERT(6, (iterations > 0));
+        _ARG_ASSERT(5, (inlier_thr >= 0.1f));
+        _ARG_ASSERT(6, (iterations > 0));
 
         af_array outH;
         int outInl;

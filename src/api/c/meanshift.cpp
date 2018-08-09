@@ -30,9 +30,9 @@ af_err af_mean_shift(af_array *out, const af_array in,
                      const unsigned num_iterations, const bool is_color)
 {
     try {
-        ARG_ASSERT(2, (spatial_sigma>=0));
-        ARG_ASSERT(3, (chromatic_sigma>=0));
-        ARG_ASSERT(4, (num_iterations>0));
+        _ARG_ASSERT(2, (spatial_sigma>=0));
+        _ARG_ASSERT(3, (chromatic_sigma>=0));
+        _ARG_ASSERT(4, (num_iterations>0));
 
         const ArrayInfo& info = getInfo(in);
         af_dtype type  = info.getType();

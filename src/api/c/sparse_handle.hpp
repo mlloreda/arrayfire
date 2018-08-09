@@ -26,7 +26,7 @@ template<typename T>
 const common::SparseArray<T>& getSparseArray(const af_array &arr)
 {
     common::SparseArray<T> *A = reinterpret_cast<common::SparseArray<T>*>(arr);
-    ARG_ASSERT(0, A->isSparse() == true);
+    _ARG_ASSERT(0, A->isSparse() == true);
     return *A;
 }
 
@@ -34,7 +34,7 @@ template<typename T>
 common::SparseArray<T>& getWritableSparseArray(const af_array &arr)
 {
     const common::SparseArray<T> &A = getSparseArray<T>(arr);
-    ARG_ASSERT(0, A.isSparse() == true);
+    _ARG_ASSERT(0, A.isSparse() == true);
     return const_cast<common::SparseArray<T>&>(A);
 }
 

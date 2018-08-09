@@ -134,7 +134,7 @@ af_err af_norm(double *out, const af_array in,
 
         af_dtype i_type = i_info.getType();
 
-        ARG_ASSERT(1, i_info.isFloating());                       // Only floating and complex types
+        _ARG_ASSERT(1, i_info.isFloating());                       // Only floating and complex types
 
         *out = 0;
 

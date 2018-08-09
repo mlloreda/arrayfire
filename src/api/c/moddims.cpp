@@ -41,8 +41,8 @@ af_err af_moddims(af_array *out, const af_array in,
             *out = retain(in);
             return AF_SUCCESS;
         }
-        ARG_ASSERT(2, ndims >= 1);
-        ARG_ASSERT(3, dims != NULL);
+        _ARG_ASSERT(2, ndims >= 1);
+        _ARG_ASSERT(3, dims != NULL);
 
         af_array output = 0;
         dim4 newDims(ndims, dims);

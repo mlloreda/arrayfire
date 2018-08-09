@@ -18,6 +18,7 @@
 #include <reduce.hpp>
 #include <ireduce.hpp>
 #include <math.hpp>
+#include <spdlog/fmt/ostr.h>
 
 using af::dim4;
 using namespace detail;
@@ -34,8 +35,8 @@ static af_err reduce_type(af_array *out, const af_array in, const int dim)
 {
     try {
 
-        ARG_ASSERT(2, dim >= 0);
-        ARG_ASSERT(2, dim <  4);
+        _ARG_ASSERT(2, dim >= 0);
+        _ARG_ASSERT(2, dim <  4);
 
         const ArrayInfo& in_info = getInfo(in);
 
@@ -75,8 +76,8 @@ static af_err reduce_common(af_array *out, const af_array in, const int dim)
 {
     try {
 
-        ARG_ASSERT(2, dim >= 0);
-        ARG_ASSERT(2, dim <  4);
+        _ARG_ASSERT(2, dim >= 0);
+        _ARG_ASSERT(2, dim <  4);
 
         const ArrayInfo& in_info = getInfo(in);
 
@@ -116,8 +117,8 @@ static af_err reduce_promote(af_array *out, const af_array in, const int dim,
 {
     try {
 
-        ARG_ASSERT(2, dim >= 0);
-        ARG_ASSERT(2, dim <  4);
+        _ARG_ASSERT(2, dim >= 0);
+        _ARG_ASSERT(2, dim <  4);
 
         const ArrayInfo& in_info = getInfo(in);
 
@@ -211,7 +212,7 @@ static af_err reduce_all_type(double *real, double *imag, const af_array in)
         const ArrayInfo& in_info = getInfo(in);
         af_dtype type = in_info.getType();
 
-        ARG_ASSERT(0, real != NULL);
+        _ARG_ASSERT(0, real != NULL);
         *real = 0;
         if (imag) *imag = 0;
 
@@ -245,8 +246,9 @@ static af_err reduce_all_common(double *real_val, double *imag_val, const af_arr
         const ArrayInfo& in_info = getInfo(in);
         af_dtype type = in_info.getType();
 
-        ARG_ASSERT(2, in_info.ndims() > 0);
-        ARG_ASSERT(0, real_val != NULL);
+        ARG_ASSERT(2, in_info.ndims() > 0,
+                    "[ERROR] Invalid number of dimensions for `in`: {}", in_info.ndims());
+        _ARG_ASSERT(0, real_val != NULL);
         *real_val = 0;
         if (imag_val != NULL) *imag_val = 0;
 
@@ -267,14 +269,14 @@ static af_err reduce_all_common(double *real_val, double *imag_val, const af_arr
 
         case c32:
             cfval = reduce_all<op, cfloat, cfloat>(in);
-            ARG_ASSERT(1, imag_val != NULL);
+            _ARG_ASSERT(1, imag_val != NULL);
             *real_val = real(cfval);
             *imag_val = imag(cfval);
             break;
 
         case c64:
             cdval = reduce_all<op, cdouble, cdouble>(in);
-            ARG_ASSERT(1, imag_val != NULL);
+            _ARG_ASSERT(1, imag_val != NULL);
             *real_val = real(cdval);
             *imag_val = imag(cdval);
             break;
@@ -297,7 +299,7 @@ static af_err reduce_all_promote(double *real_val, double *imag_val, const af_ar
         const ArrayInfo& in_info = getInfo(in);
         af_dtype type = in_info.getType();
 
-        ARG_ASSERT(0, real_val != NULL);
+        _ARG_ASSERT(0, real_val != NULL);
         *real_val = 0;
         if (imag_val) *imag_val = 0;
 
@@ -319,14 +321,14 @@ static af_err reduce_all_promote(double *real_val, double *imag_val, const af_ar
 
         case c32:
             cfval = reduce_all<op, cfloat, cfloat>(in);
-            ARG_ASSERT(1, imag_val != NULL);
+            _ARG_ASSERT(1, imag_val != NULL);
             *real_val = real(cfval);
             *imag_val = imag(cfval);
             break;
 
         case c64:
             cdval = reduce_all<op, cdouble, cdouble>(in);
-            ARG_ASSERT(1, imag_val != NULL);
+            _ARG_ASSERT(1, imag_val != NULL);
             *real_val = real(cdval);
             *imag_val = imag(cdval);
             break;
@@ -395,11 +397,12 @@ static af_err ireduce_common(af_array *val, af_array *idx, const af_array in, co
 {
     try {
 
-        ARG_ASSERT(3, dim >= 0);
-        ARG_ASSERT(3, dim <  4);
+        _ARG_ASSERT(3, dim >= 0);
+        _ARG_ASSERT(3, dim <  4);
 
         const ArrayInfo& in_info = getInfo(in);
-        ARG_ASSERT(2, in_info.ndims() > 0);
+        ARG_ASSERT(2, in_info.ndims() > 0,
+                   "[ERROR] Invalid number of dimensions for `in`: {}", in_info.ndims());
 
         if (dim >= (int)in_info.ndims()) {
             *val = retain(in);
@@ -459,8 +462,9 @@ static af_err ireduce_all_common(double *real_val, double *imag_val,
         const ArrayInfo& in_info = getInfo(in);
         af_dtype type = in_info.getType();
 
-        ARG_ASSERT(3, in_info.ndims() > 0);
-        ARG_ASSERT(0, real_val != NULL);
+        ARG_ASSERT(3, in_info.ndims() > 0,
+                   "[ERROR] Invalid number of dimensions for `in`: {}", in_info.ndims());
+        _ARG_ASSERT(0, real_val != NULL);
         *real_val = 0;
         if (imag_val) *imag_val = 0;
 
@@ -481,14 +485,14 @@ static af_err ireduce_all_common(double *real_val, double *imag_val,
 
         case c32:
             cfval = ireduce_all<op, cfloat>(loc, in);
-            ARG_ASSERT(1, imag_val != NULL);
+            _ARG_ASSERT(1, imag_val != NULL);
             *real_val = real(cfval);
             *imag_val = imag(cfval);
             break;
 
         case c64:
             cdval = ireduce_all<op, cdouble>(loc, in);
-            ARG_ASSERT(1, imag_val != NULL);
+            _ARG_ASSERT(1, imag_val != NULL);
             *real_val = real(cdval);
             *imag_val = imag(cdval);
             break;

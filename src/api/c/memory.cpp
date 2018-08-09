@@ -261,8 +261,8 @@ af_err af_print_mem_info(const char *msg, const int device_id)
             device = getActiveDeviceId();
         }
 
-        if(msg != NULL) ARG_ASSERT(0, strlen(msg) < 256); // 256 character limit on msg
-        ARG_ASSERT(1, device >= 0 && device < getDeviceCount());
+        if(msg != NULL) _ARG_ASSERT(0, strlen(msg) < 256); // 256 character limit on msg
+        _ARG_ASSERT(1, device >= 0 && device < getDeviceCount());
 
         printMemInfo(msg ? msg : "", device);
     } CATCHALL;

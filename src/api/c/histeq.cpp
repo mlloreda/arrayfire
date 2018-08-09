@@ -69,7 +69,7 @@ af_err af_hist_equal(af_array *out, const af_array in, const af_array hist)
         af_dtype dataType  = dataInfo.getType();
         af::dim4 histDims  = histInfo.dims();
 
-        ARG_ASSERT(2, (histDims.ndims()==1));
+        _ARG_ASSERT(2, (histDims.ndims()==1));
 
         af_array output = 0;
         switch(dataType) {

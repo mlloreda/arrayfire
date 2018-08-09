@@ -14,6 +14,7 @@
 #include <common/err_common.hpp>
 #include <backend.hpp>
 #include <regions.hpp>
+#include <spdlog/fmt/ostr.h>
 
 using af::dim4;
 using namespace detail;
@@ -27,13 +28,15 @@ static af_array regions(af_array const &in, af_connectivity connectivity)
 af_err af_regions(af_array *out, const af_array in, const af_connectivity connectivity, const af_dtype type)
 {
     try {
-        ARG_ASSERT(2, (connectivity==AF_CONNECTIVITY_4 || connectivity==AF_CONNECTIVITY_8));
+        ARG_ASSERT(2, (connectivity==AF_CONNECTIVITY_4 || connectivity==AF_CONNECTIVITY_8),
+                   "[ERROR] Invalid `connectivity` value: {}", connectivity);
 
         const ArrayInfo& info = getInfo(in);
         af::dim4 dims  = info.dims();
 
         dim_t in_ndims = dims.ndims();
-        DIM_ASSERT(1, (in_ndims <= 3 && in_ndims >= 2));
+        ARG_ASSERT(1, (in_ndims <= 3 && in_ndims >= 2),
+                   "[ERROR] `in` contains invalid number of dimensions: {}", in_ndims);
 
         af_dtype in_type = info.getType();
         if (in_type != b8) {

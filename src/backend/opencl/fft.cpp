@@ -65,7 +65,7 @@ template<int rank>
 void verifySupported(const dim4 dims)
 {
     for (int i = 0; i < rank; i++) {
-        ARG_ASSERT(1, isSupLen(dims[i]));
+        _ARG_ASSERT(1, isSupLen(dims[i]));
     }
 }
 

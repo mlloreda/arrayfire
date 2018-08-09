@@ -19,6 +19,7 @@
 #include <math.hpp>
 #include <cast.hpp>
 #include <tile.hpp>
+#include <spdlog/fmt/ostr.h>
 
 #include "stats.h"
 
@@ -61,11 +62,18 @@ af_err af_cov(af_array* out, const af_array X, const af_array Y, const bool isbi
         af_dtype xType  = xInfo.getType();
         af_dtype yType  = yInfo.getType();
 
-        ARG_ASSERT(1, (xDims.ndims()<=2));
-        ARG_ASSERT(2, (xDims.ndims()==yDims.ndims()));
-        ARG_ASSERT(2, (xDims[0]==yDims[0]));
-        ARG_ASSERT(2, (xDims[1]==yDims[1]));
-        ARG_ASSERT(2, (xType==yType));
+
+        // These are quite verbose. Difficult to read.
+        ARG_ASSERT(1, (xDims.ndims() <= 2),
+                   "[ERROR] Invalid number of dimensions for X: {}", xDims.ndims());
+        ARG_ASSERT(2, (xDims.ndims()==yDims.ndims()),
+                   "[ERROR] Mismatching dimensions:\n\tX: {}\n\tY: {}", xDims.ndims(), yDims.ndims());
+        ARG_ASSERT(2, (xDims[0]==yDims[0]),
+                   "[ERROR] Mismatching first dimension \n\tX.dims(0): {}\n\tY.dims(0): {}", xDims[0], yDims[0]);
+        ARG_ASSERT(2, (xDims[1]==yDims[1]),
+                   "[ERROR] Mismatching second dimension \n\tX.dims(1): {}\n\tY.dims(1): {}", xDims[1], yDims[1]);
+        ARG_ASSERT(2, (xType==yType),
+                   "[ERROR] Mismatching types \n\tX.type(): {}\n\tY.type(): {}", xType, yType);
 
         af_array output = 0;
         switch(xType) {

@@ -46,14 +46,14 @@ af_err af_approx1(af_array *out, const af_array in, const af_array pos,
 
         af_dtype itype = i_info.getType();
 
-        ARG_ASSERT(1, i_info.isFloating());                       // Only floating and complex types
-        ARG_ASSERT(2, p_info.isRealFloating());                   // Only floating types
-        ARG_ASSERT(1, i_info.isSingle() == p_info.isSingle());    // Must have same precision
-        ARG_ASSERT(1, i_info.isDouble() == p_info.isDouble());    // Must have same precision
+        _ARG_ASSERT(1, i_info.isFloating());                       // Only floating and complex types
+        _ARG_ASSERT(2, p_info.isRealFloating());                   // Only floating types
+        _ARG_ASSERT(1, i_info.isSingle() == p_info.isSingle());    // Must have same precision
+        _ARG_ASSERT(1, i_info.isDouble() == p_info.isDouble());    // Must have same precision
         // POS should either be (x, 1, 1, 1) or (1, idims[1], idims[2], idims[3])
         DIM_ASSERT(2, p_info.isColumn() ||
                       (pdims[1] == idims[1] && pdims[2] == idims[2] && pdims[3] == idims[3]));
-        ARG_ASSERT(3, (method == AF_INTERP_LINEAR  ||
+        _ARG_ASSERT(3, (method == AF_INTERP_LINEAR  ||
                        method == AF_INTERP_NEAREST ||
                        method == AF_INTERP_CUBIC   ||
                        method == AF_INTERP_CUBIC_SPLINE ||
@@ -94,12 +94,12 @@ af_err af_approx2(af_array *out, const af_array in, const af_array pos0, const a
 
         af_dtype itype = i_info.getType();
 
-        ARG_ASSERT(1, i_info.isFloating());                     // Only floating and complex types
-        ARG_ASSERT(2, p_info.isRealFloating());                 // Only floating types
-        ARG_ASSERT(3, q_info.isRealFloating());                 // Only floating types
-        ARG_ASSERT(1, p_info.getType() == q_info.getType());    // Must have same type
-        ARG_ASSERT(1, i_info.isSingle() == p_info.isSingle());  // Must have same precision
-        ARG_ASSERT(1, i_info.isDouble() == p_info.isDouble());  // Must have same precision
+        _ARG_ASSERT(1, i_info.isFloating());                     // Only floating and complex types
+        _ARG_ASSERT(2, p_info.isRealFloating());                 // Only floating types
+        _ARG_ASSERT(3, q_info.isRealFloating());                 // Only floating types
+        _ARG_ASSERT(1, p_info.getType() == q_info.getType());    // Must have same type
+        _ARG_ASSERT(1, i_info.isSingle() == p_info.isSingle());  // Must have same precision
+        _ARG_ASSERT(1, i_info.isDouble() == p_info.isDouble());  // Must have same precision
         DIM_ASSERT(2, pdims == qdims);                          // POS0 and POS1 must have same dims
 
         // POS should either be (x, y, 1, 1) or (x, y, idims[2], idims[3])

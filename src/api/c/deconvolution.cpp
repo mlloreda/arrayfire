@@ -29,6 +29,7 @@
 #include <cmath>
 #include <type_traits>
 #include <vector>
+#include <spdlog/fmt/ostr.h>
 
 using af::dim4;
 using namespace detail;
@@ -194,14 +195,16 @@ af_err af_iterative_deconv(af_array* out, const af_array in, const af_array ker,
         const ArrayInfo& kernelInfo = getInfo(ker);
         const dim4& kernelDims = kernelInfo.dims();
 
-        DIM_ASSERT(2, (inputDims.ndims() == 2));
-        DIM_ASSERT(3, (kernelDims.ndims() == 2));
-        ARG_ASSERT(4, (iterations > 0));
-        ARG_ASSERT(5, std::isfinite(relax_factor));
-        ARG_ASSERT(5, (relax_factor > 0));
-        ARG_ASSERT(6, (algo==AF_ITERATIVE_DECONV_DEFAULT ||
-                       algo==AF_ITERATIVE_DECONV_LANDWEBER ||
-                       algo==AF_ITERATIVE_DECONV_RICHARDSONLUCY));
+        ARG_ASSERT(1, (inputDims.ndims() == 2),
+                   "Invalid number of dimensions for `in`: {}", inputDims.ndims());
+        ARG_ASSERT(2, (kernelDims.ndims() == 2),
+                   "Invalid number of dimensions for `ker`: {}", kernelDims.ndims());
+        _ARG_ASSERT(3, (iterations > 0));
+        _ARG_ASSERT(4, std::isfinite(relax_factor));
+        _ARG_ASSERT(4, (relax_factor > 0));
+        _ARG_ASSERT(5, (algo==AF_ITERATIVE_DECONV_DEFAULT ||
+                        algo==AF_ITERATIVE_DECONV_LANDWEBER ||
+                        algo==AF_ITERATIVE_DECONV_RICHARDSONLUCY));
         af_array res   = 0;
         unsigned iters = iterations;
         float rfac     = relax_factor;
@@ -301,9 +304,9 @@ af_err af_inverse_deconv(af_array* out, const af_array in, const af_array psf,
 
         DIM_ASSERT(2, (inputDims.ndims() == 2));
         DIM_ASSERT(3, (psfDims.ndims() == 2));
-        ARG_ASSERT(4, std::isfinite(gamma));
-        ARG_ASSERT(4, (gamma > 0));
-        ARG_ASSERT(5, (algo==AF_INVERSE_DECONV_DEFAULT ||
+        _ARG_ASSERT(4, std::isfinite(gamma));
+        _ARG_ASSERT(4, (gamma > 0));
+        _ARG_ASSERT(5, (algo==AF_INVERSE_DECONV_DEFAULT ||
                        algo==AF_INVERSE_DECONV_TIKHONOV));
         af_array res = 0;
 

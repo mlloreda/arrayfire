@@ -67,7 +67,7 @@ af_err af_transform_coordinates(af_array *out, const af_array tf, const float d0
     try {
         const ArrayInfo& tfInfo = getInfo(tf);
         dim4 tfDims = tfInfo.dims();
-        ARG_ASSERT(1, (tfDims[0]==3 && tfDims[1]==3 && tfDims.ndims()==2));
+        _ARG_ASSERT(1, (tfDims[0]==3 && tfDims[1]==3 && tfDims.ndims()==2));
 
         af_array output;
         af_dtype type  = tfInfo.getType();

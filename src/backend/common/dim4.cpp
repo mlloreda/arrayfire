@@ -13,6 +13,8 @@
 #include <cfloat>
 #include <af/dim4.hpp>
 #include <common/err_common.hpp>
+#include <fmt/ostream.h> // Need this on all the types we want fmtlib
+                         // to format/print
 
 namespace af
 {

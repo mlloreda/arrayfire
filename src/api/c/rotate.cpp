@@ -45,7 +45,7 @@ af_err af_rotate(af_array *out, const af_array in, const float theta,
 
         af_dtype itype = info.getType();
 
-        ARG_ASSERT(4, method == AF_INTERP_NEAREST  ||
+        _ARG_ASSERT(4, method == AF_INTERP_NEAREST  ||
                       method == AF_INTERP_BILINEAR ||
                       method == AF_INTERP_BILINEAR_COSINE ||
                       method == AF_INTERP_BICUBIC ||

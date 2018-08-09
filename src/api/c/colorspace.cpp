@@ -59,8 +59,8 @@ af_err af_color_space(af_array *out, const af_array image, const af_cspace_t to,
             return af_retain_array(out, image);
         }
 
-        ARG_ASSERT(2, (to == AF_GRAY || to == AF_RGB || to == AF_HSV || to == AF_YCbCr));
-        ARG_ASSERT(2, (from == AF_GRAY || from == AF_RGB || from == AF_HSV || from == AF_YCbCr));
+        _ARG_ASSERT(2, (to == AF_GRAY || to == AF_RGB || to == AF_HSV || to == AF_YCbCr));
+        _ARG_ASSERT(2, (from == AF_GRAY || from == AF_RGB || from == AF_HSV || from == AF_YCbCr));
 
         switch(from) {
             case AF_GRAY : color_space<AF_GRAY >(out, image, to);   break;

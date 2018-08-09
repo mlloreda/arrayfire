@@ -33,7 +33,7 @@ af_err af_resize(af_array *out, const af_array in, const dim_t odim0, const dim_
         const ArrayInfo& info = getInfo(in);
         af_dtype type = info.getType();
 
-        ARG_ASSERT(4, method == AF_INTERP_NEAREST  ||
+        _ARG_ASSERT(4, method == AF_INTERP_NEAREST  ||
                       method == AF_INTERP_BILINEAR ||
                       method == AF_INTERP_BILINEAR_COSINE ||
                       method == AF_INTERP_BICUBIC ||

@@ -28,7 +28,7 @@ static double median(const af_array& in)
 {
     dim_t nElems = getInfo(in).elements();
     dim4 dims(nElems, 1, 1, 1);
-    ARG_ASSERT(0, nElems > 0);
+    _ARG_ASSERT(0, nElems > 0);
 
     af_array temp = 0;
     AF_CHECK(af_moddims(&temp, in, 1, dims.get()));
@@ -159,7 +159,7 @@ af_err af_median_all(double *realVal, double *imagVal, const af_array in)
         const ArrayInfo& info = getInfo(in);
         af_dtype type = info.getType();
 
-        ARG_ASSERT(2, info.ndims() > 0);
+        _ARG_ASSERT(2, info.ndims() > 0);
         switch(type) {
             case f64: *realVal = median<double>(in); break;
             case f32: *realVal = median<float >(in); break;
@@ -178,12 +178,12 @@ af_err af_median_all(double *realVal, double *imagVal, const af_array in)
 af_err af_median(af_array* out, const af_array in, const dim_t dim)
 {
     try {
-        ARG_ASSERT(2, (dim >= 0 && dim <= 4));
+        _ARG_ASSERT(2, (dim >= 0 && dim <= 4));
 
         af_array output = 0;
         const ArrayInfo& info = getInfo(in);
 
-        ARG_ASSERT(1, info.ndims() > 0);
+        _ARG_ASSERT(1, info.ndims() > 0);
         af_dtype type = info.getType();
         switch(type) {
             case f64: output = median<double>(in, dim); break;

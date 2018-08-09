@@ -51,12 +51,12 @@ af_err af_sparse_matmul(af_array *out,
         common::SparseArrayBase lhsBase = getSparseArrayBase(lhs);
         const ArrayInfo& rhsInfo = getInfo(rhs);
 
-        ARG_ASSERT(2, lhsBase.isSparse() == true && rhsInfo.isSparse() == false);
+        _ARG_ASSERT(2, lhsBase.isSparse() == true && rhsInfo.isSparse() == false);
 
         af_dtype lhs_type = lhsBase.getType();
         af_dtype rhs_type = rhsInfo.getType();
 
-        ARG_ASSERT(1, lhsBase.getStorage() == AF_STORAGE_CSR);
+        _ARG_ASSERT(1, lhsBase.getStorage() == AF_STORAGE_CSR);
 
         if (!(optLhs == AF_MAT_NONE ||
               optLhs == AF_MAT_TRANS ||

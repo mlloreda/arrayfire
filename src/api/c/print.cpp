@@ -173,7 +173,7 @@ af_err af_print_array(af_array arr)
 af_err af_print_array_gen(const char *exp, const af_array arr, const int precision)
 {
     try {
-        ARG_ASSERT(0, exp != NULL);
+        _ARG_ASSERT(0, exp != NULL);
         const ArrayInfo& info = getInfo(arr, false);   // Don't assert sparse/dense
         af_dtype type = info.getType();
 
@@ -212,7 +212,7 @@ af_err af_array_to_string(char **output, const char *exp, const af_array arr,
                           const int precision, bool transpose)
 {
     try {
-        ARG_ASSERT(0, exp != NULL);
+        _ARG_ASSERT(0, exp != NULL);
         const ArrayInfo& info = getInfo(arr, false);   // Don't assert sparse/dense
         af_dtype type = info.getType();
         std::stringstream ss;

@@ -164,7 +164,7 @@ static af_array var_(const af_array& in, const af_array& weights,
 af_err af_var(af_array *out, const af_array in, const bool isbiased, const dim_t dim)
 {
     try {
-        ARG_ASSERT(3, (dim>=0 && dim<=3));
+        _ARG_ASSERT(3, (dim>=0 && dim<=3));
 
         af_array output = 0;
         const ArrayInfo& info = getInfo(in);
@@ -196,7 +196,7 @@ af_err af_var(af_array *out, const af_array in, const bool isbiased, const dim_t
 af_err af_var_weighted(af_array *out, const af_array in, const af_array weights, const dim_t dim)
 {
     try {
-        ARG_ASSERT(3, (dim>=0 && dim<=3));
+        _ARG_ASSERT(3, (dim>=0 && dim<=3));
 
         af_array output = 0;
         const ArrayInfo& iInfo = getInfo(in);
@@ -204,7 +204,7 @@ af_err af_var_weighted(af_array *out, const af_array in, const af_array weights,
         af_dtype iType  = iInfo.getType();
         af_dtype wType  = wInfo.getType();
 
-        ARG_ASSERT(2, (wType==f32 || wType==f64)); /* verify that weights are non-complex real numbers */
+        _ARG_ASSERT(2, (wType==f32 || wType==f64)); /* verify that weights are non-complex real numbers */
 
         switch(iType) {
             case f64: output = var_<double,  double>(in, weights, AF_VARIANCE_POPULATION, dim); break;
@@ -268,7 +268,7 @@ af_err af_var_all_weighted(double *realVal, double *imagVal, const af_array in, 
         af_dtype iType  = iInfo.getType();
         af_dtype wType  = wInfo.getType();
 
-        ARG_ASSERT(3, (wType==f32 || wType==f64)); /* verify that weights are non-complex real numbers */
+        _ARG_ASSERT(3, (wType==f32 || wType==f64)); /* verify that weights are non-complex real numbers */
 
         switch(iType) {
             case f64: *realVal = varAll<double, double>(in, weights); break;
@@ -307,7 +307,7 @@ af_err af_meanvar(af_array *mean, af_array *var, const af_array in,
       if(weights != 0) {
         const ArrayInfo& wInfo = getInfo(weights);
         af_dtype wType  = wInfo.getType();
-        ARG_ASSERT(3, (wType==f32 || wType==f64));
+        _ARG_ASSERT(3, (wType==f32 || wType==f64));
       }
       af_dtype iType  = iInfo.getType();
 

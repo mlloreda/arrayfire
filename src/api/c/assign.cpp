@@ -115,9 +115,9 @@ af_err af_assign_seq(af_array *out,
                      const af_seq *index, const af_array rhs)
 {
     try {
-        ARG_ASSERT(0, (lhs != 0));
-        ARG_ASSERT(1, (ndims > 0));
-        ARG_ASSERT(3, (rhs != 0));
+        _ARG_ASSERT(0, (lhs != 0));
+        _ARG_ASSERT(1, (ndims > 0));
+        _ARG_ASSERT(3, (rhs != 0));
 
         const ArrayInfo& lInfo = getInfo(lhs);
 
@@ -155,11 +155,11 @@ af_err af_assign_seq(af_array *out,
                 vector<af_seq> inSeqs(ndims, af_span);
                 for (unsigned i=0; i<ndims; ++i) {
                     inSeqs[i] = convert2Canonical(index[i], outDims[i]);
-                    ARG_ASSERT(3, (inSeqs[i].begin >= 0. || inSeqs[i].end >= 0.));
+                    _ARG_ASSERT(3, (inSeqs[i].begin >= 0. || inSeqs[i].end >= 0.));
                     if (signbit(inSeqs[i].step)) {
-                        ARG_ASSERT(3, inSeqs[i].begin >= inSeqs[i].end);
+                        _ARG_ASSERT(3, inSeqs[i].begin >= inSeqs[i].end);
                     } else {
-                        ARG_ASSERT(3, inSeqs[i].begin <= inSeqs[i].end);
+                        _ARG_ASSERT(3, inSeqs[i].begin <= inSeqs[i].end);
                     }
                 }
                 DIM_ASSERT(0, (outDims.ndims()>=inDims.ndims()));
@@ -205,7 +205,7 @@ af_err af_assign_gen(af_array *out, const af_array lhs,
                     const af_array rhs_)
 {
     try {
-        ARG_ASSERT(3, (indexs!=NULL));
+        _ARG_ASSERT(3, (indexs!=NULL));
 
         int track = 0;
         vector<af_seq> seqs(AF_MAX_DIMS, af_span);
@@ -222,8 +222,8 @@ af_err af_assign_gen(af_array *out, const af_array lhs,
             return af_assign_seq(out, lhs, ndims, seqs.data(), rhs);
         }
 
-        ARG_ASSERT(1, (lhs!=0));
-        ARG_ASSERT(4, (rhs!=0));
+        _ARG_ASSERT(1, (lhs!=0));
+        _ARG_ASSERT(4, (rhs!=0));
 
         const ArrayInfo& lInfo = getInfo(lhs);
         const ArrayInfo& rInfo = getInfo(rhs);
@@ -238,7 +238,7 @@ af_err af_assign_gen(af_array *out, const af_array lhs,
         if(lhsDims.ndims() == 0)
             return af_create_handle(out, 0, nullptr, lhsType);
 
-        ARG_ASSERT(2, (ndims == 1) || (ndims == (dim_t)lInfo.ndims()));
+        _ARG_ASSERT(2, (ndims == 1) || (ndims == (dim_t)lInfo.ndims()));
 
         if (ndims == 1 && ndims != (dim_t)lInfo.ndims()) {
             af_array tmp_in = 0, tmp_out = 0;
@@ -253,9 +253,9 @@ af_err af_assign_gen(af_array *out, const af_array lhs,
             return AF_SUCCESS;
         }
 
-        ARG_ASSERT(1, (lhsType==rhsType));
-        ARG_ASSERT(1, (lhsDims.ndims()>=rhsDims.ndims()));
-        ARG_ASSERT(2, (lhsDims.ndims()>=ndims));
+        _ARG_ASSERT(1, (lhsType==rhsType));
+        _ARG_ASSERT(1, (lhsDims.ndims()>=rhsDims.ndims()));
+        _ARG_ASSERT(2, (lhsDims.ndims()>=ndims));
 
         af_array output = 0;
         if (*out != lhs) {
@@ -319,19 +319,19 @@ af_err af_assign_gen(af_array *out, const af_array lhs,
                     const ArrayInfo& idxInfo = getInfo(indexs[i].idx.arr);
                     af_dtype idxType = idxInfo.getType();
 
-                    ARG_ASSERT(3, (idxType!=c32));
-                    ARG_ASSERT(3, (idxType!=c64));
-                    ARG_ASSERT(3, (idxType!=b8 ));
+                    _ARG_ASSERT(3, (idxType!=c32));
+                    _ARG_ASSERT(3, (idxType!=c64));
+                    _ARG_ASSERT(3, (idxType!=b8 ));
 
                     idxrs[i] = { { indexs[i].idx.arr },
                                  isSeq, indexs[i].isBatch };
                 } else {
                     af_seq inSeq = convert2Canonical(indexs[i].idx.seq, lhsDims[i]);
-                    ARG_ASSERT(3, (inSeq.begin >= 0 || inSeq.end >= 0));
+                    _ARG_ASSERT(3, (inSeq.begin >= 0 || inSeq.end >= 0));
                     if (signbit(inSeq.step)) {
-                        ARG_ASSERT(3, inSeq.begin >= inSeq.end);
+                        _ARG_ASSERT(3, inSeq.begin >= inSeq.end);
                     } else {
-                        ARG_ASSERT(3, inSeq.begin <= inSeq.end);
+                        _ARG_ASSERT(3, inSeq.begin <= inSeq.end);
                     }
 
                     idxrs[i].idx.seq = inSeq;

@@ -60,7 +60,7 @@ af_err af_example_function(af_array* out, const af_array a, const af_someenum_t 
                                             // in src/backend/common/ArrayInfo.hpp
         af::dim4 dims = info.dims();
 
-        ARG_ASSERT(2, (dims.ndims()>=0 && dims.ndims()<=3));
+        _ARG_ASSERT(2, (dims.ndims()>=0 && dims.ndims()<=3));
                                             // defined in err_common.hpp
                                             // there are other useful Macros
                                             // for different purposes, feel free

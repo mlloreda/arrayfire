@@ -15,6 +15,7 @@
 #include <sparse.hpp>
 #include <sparse_handle.hpp>
 #include <af/sparse.h>
+#include <spdlog/fmt/ostr.h>
 
 using namespace detail;
 using common::SparseArrayBase;
@@ -83,7 +84,10 @@ af_err af_create_handle(af_array *result,
     try {
         AF_CHECK(af_init());
 
-        if (ndims > 0) ARG_ASSERT(2, ndims > 0 && dims != NULL);
+        if (ndims > 0) {
+            _ARG_ASSERT(1, ndims > 0);
+            _ARG_ASSERT(2, dims != NULL);
+        }
 
         dim4 d(0);
         for(unsigned i = 0; i < ndims; i++) {
@@ -382,7 +386,7 @@ inline void getScalar(T* out, const af_array& arr)
 af_err af_get_scalar(void* output_value, const af_array arr)
 {
     try {
-        ARG_ASSERT(0, (output_value!=NULL));
+        _ARG_ASSERT(0, (output_value!=NULL));
 
         const ArrayInfo& info   = getInfo(arr);
         const af_dtype type     = info.getType();

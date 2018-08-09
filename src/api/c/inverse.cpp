@@ -41,7 +41,7 @@ af_err af_inverse(af_array *out, const af_array in, const af_mat_prop options)
         }
 
         DIM_ASSERT(1, i_info.dims()[0] == i_info.dims()[1]);      // Only square matrices
-        ARG_ASSERT(1, i_info.isFloating());                       // Only floating and complex types
+        _ARG_ASSERT(1, i_info.isFloating());                       // Only floating and complex types
 
         af_array output;
 

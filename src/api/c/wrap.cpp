@@ -41,10 +41,10 @@ af_err af_wrap(af_array *out, const af_array in,
         af_dtype type = info.getType();
         af::dim4 idims = info.dims();
 
-        ARG_ASSERT(2, wx > 0);
-        ARG_ASSERT(3, wx > 0);
-        ARG_ASSERT(4, sx > 0);
-        ARG_ASSERT(5, sy > 0);
+        _ARG_ASSERT(2, wx > 0);
+        _ARG_ASSERT(3, wx > 0);
+        _ARG_ASSERT(4, sx > 0);
+        _ARG_ASSERT(5, sy > 0);
 
         dim_t nx = (ox + 2 * px - wx) / sx + 1;
         dim_t ny = (oy + 2 * py - wy) / sy + 1;

@@ -58,9 +58,9 @@ af_err af_iir(af_array *y, const af_array b, const af_array a, const af_array x)
 
         af_dtype xtype = xinfo.getType();
 
-        ARG_ASSERT(1, ainfo.getType() == xtype);
-        ARG_ASSERT(2, binfo.getType() == xtype);
-        ARG_ASSERT(1, binfo.ndims() == ainfo.ndims());
+        _ARG_ASSERT(1, ainfo.getType() == xtype);
+        _ARG_ASSERT(2, binfo.getType() == xtype);
+        _ARG_ASSERT(1, binfo.ndims() == ainfo.ndims());
 
         dim4 adims = ainfo.dims();
         dim4 bdims = binfo.dims();
@@ -73,7 +73,7 @@ af_err af_iir(af_array *y, const af_array b, const af_array a, const af_array x)
         if (xinfo.ndims() > 1) {
             if (binfo.ndims() > 1) {
                 for (int i = 1; i < 3; i++) {
-                    ARG_ASSERT(1, bdims[i] == xdims[i]);
+                    _ARG_ASSERT(1, bdims[i] == xdims[i]);
                 }
             }
         }

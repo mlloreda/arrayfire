@@ -60,7 +60,7 @@ static af_err af_unary(af_array *out, const af_array in)
     try {
 
         const ArrayInfo& in_info = getInfo(in);
-        ARG_ASSERT(1, in_info.isReal());
+        _ARG_ASSERT(1, in_info.isReal());
 
         af_dtype in_type = in_info.getType();
         af_array res;

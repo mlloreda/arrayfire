@@ -38,8 +38,8 @@ static af_array medfilt1(af_array const &in, dim_t w_wid, af_border_type edge_pa
 af_err af_medfilt1(af_array *out, const af_array in, const dim_t wind_width, const af_border_type edge_pad)
 {
     try {
-        ARG_ASSERT(2, (wind_width>0));
-        ARG_ASSERT(4, (edge_pad>=AF_PAD_ZERO && edge_pad<=AF_PAD_SYM));
+        _ARG_ASSERT(2, (wind_width>0));
+        _ARG_ASSERT(4, (edge_pad>=AF_PAD_ZERO && edge_pad<=AF_PAD_SYM));
 
         const ArrayInfo& info = getInfo(in);
         af::dim4 dims  = info.dims();
@@ -84,10 +84,10 @@ static af_array medfilt2(af_array const &in, dim_t w_len, dim_t w_wid, af_border
 af_err af_medfilt2(af_array *out, const af_array in, const dim_t wind_length, const dim_t wind_width, const af_border_type edge_pad)
 {
     try {
-        ARG_ASSERT(2, (wind_length==wind_width));
-        ARG_ASSERT(2, (wind_length>0));
-        ARG_ASSERT(3, (wind_width>0));
-        ARG_ASSERT(4, (edge_pad>=AF_PAD_ZERO && edge_pad<=AF_PAD_SYM));
+        _ARG_ASSERT(2, (wind_length==wind_width));
+        _ARG_ASSERT(2, (wind_length>0));
+        _ARG_ASSERT(3, (wind_width>0));
+        _ARG_ASSERT(4, (edge_pad>=AF_PAD_ZERO && edge_pad<=AF_PAD_SYM));
 
         const ArrayInfo& info = getInfo(in);
         af::dim4 dims  = info.dims();
@@ -127,10 +127,10 @@ af_err af_minfilt(af_array *out, const af_array in, const dim_t wind_length,
                   const dim_t wind_width, const af_border_type edge_pad)
 {
     try {
-        ARG_ASSERT(2, (wind_length==wind_width));
-        ARG_ASSERT(2, (wind_length>0));
-        ARG_ASSERT(3, (wind_width>0));
-        ARG_ASSERT(4, (edge_pad==AF_PAD_ZERO));
+        _ARG_ASSERT(2, (wind_length==wind_width));
+        _ARG_ASSERT(2, (wind_length>0));
+        _ARG_ASSERT(3, (wind_width>0));
+        _ARG_ASSERT(4, (edge_pad==AF_PAD_ZERO));
 
         const ArrayInfo& info = getInfo(in);
         af::dim4 dims  = info.dims();
@@ -155,10 +155,10 @@ af_err af_maxfilt(af_array *out, const af_array in, const dim_t wind_length,
                   const dim_t wind_width, const af_border_type edge_pad)
 {
     try {
-        ARG_ASSERT(2, (wind_length==wind_width));
-        ARG_ASSERT(2, (wind_length>0));
-        ARG_ASSERT(3, (wind_width>0));
-        ARG_ASSERT(4, (edge_pad==AF_PAD_ZERO));
+        _ARG_ASSERT(2, (wind_length==wind_width));
+        _ARG_ASSERT(2, (wind_length>0));
+        _ARG_ASSERT(3, (wind_width>0));
+        _ARG_ASSERT(4, (edge_pad==AF_PAD_ZERO));
 
         const ArrayInfo& info = getInfo(in);
         af::dim4 dims  = info.dims();

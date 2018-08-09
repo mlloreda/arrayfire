@@ -24,7 +24,7 @@ using namespace detail;
 af_err af_set_backend(const af_backend bknd)
 {
     try {
-        ARG_ASSERT(0, bknd==getBackend());
+        _ARG_ASSERT(0, bknd==getBackend());
     }
     CATCHALL;
 
@@ -48,7 +48,7 @@ af_err af_get_available_backends(int* result)
 af_err af_get_backend_id(af_backend *result, const af_array in)
 {
     try {
-        ARG_ASSERT(1, in != 0);
+        _ARG_ASSERT(1, in != 0);
         const ArrayInfo& info = getInfo(in, false, false);
         *result = info.getBackendId();
     } CATCHALL;
@@ -58,7 +58,7 @@ af_err af_get_backend_id(af_backend *result, const af_array in)
 af_err af_get_device_id(int *device, const af_array in)
 {
     try {
-        ARG_ASSERT(1, in != 0);
+        _ARG_ASSERT(1, in != 0);
         const ArrayInfo& info = getInfo(in, false, false);
         *device = info.getDevId();
     } CATCHALL;
@@ -141,8 +141,8 @@ af_err af_get_device(int *device)
 af_err af_set_device(const int device)
 {
     try {
-        ARG_ASSERT(0, device >= 0);
-        ARG_ASSERT(0, setDevice(device) >= 0);
+        _ARG_ASSERT(0, device >= 0);
+        _ARG_ASSERT(0, setDevice(device) >= 0);
     } CATCHALL;
 
     return AF_SUCCESS;

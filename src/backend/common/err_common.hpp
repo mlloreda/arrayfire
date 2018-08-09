@@ -148,7 +148,16 @@ void print_error(const std::string &msg);
         }                                                   \
     } while(0)
 
-#define ARG_ASSERT(INDEX, COND) do {                        \
+#define ARG_ASSERT(INDEX, COND, FMT, ...) do {              \
+        if((COND) == false) {                               \
+            fmt::print(FMT, __VA_ARGS__);                   \
+            throw ArgumentError(__PRETTY_FUNCTION__,        \
+                                __AF_FILENAME__, __LINE__,  \
+                                INDEX, #COND);              \
+        }                                                   \
+    } while(0)
+
+#define _ARG_ASSERT(INDEX, COND) do {                       \
         if((COND) == false) {                               \
             throw ArgumentError(__PRETTY_FUNCTION__,        \
                                 __AF_FILENAME__, __LINE__,  \

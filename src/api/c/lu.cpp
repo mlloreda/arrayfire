@@ -51,7 +51,7 @@ af_err af_lu(af_array *lower, af_array *upper, af_array *pivot, const af_array i
 
         af_dtype type = i_info.getType();
 
-        ARG_ASSERT(3, i_info.isFloating());                       // Only floating and complex types
+        _ARG_ASSERT(3, i_info.isFloating());                       // Only floating and complex types
 
         if(i_info.ndims() == 0) {
             AF_CHECK(af_create_handle(lower, 0, nullptr, type));
@@ -84,7 +84,7 @@ af_err af_lu_inplace(af_array *pivot, af_array in, const bool is_lapack_piv)
             AF_ERROR("lu can not be used in batch mode", AF_ERR_BATCH);
         }
 
-        ARG_ASSERT(1, i_info.isFloating()); // Only floating and complex types
+        _ARG_ASSERT(1, i_info.isFloating()); // Only floating and complex types
 
         if(i_info.ndims() == 0) {
             return af_create_handle(pivot, 0, nullptr, type);

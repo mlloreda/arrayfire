@@ -207,7 +207,7 @@ af_err af_canny(af_array* out, const af_array in, const af_canny_threshold ct,
         // the input is of 5x5 size. It's not mandatory but
         // it is essentially of no use if image is less than 5x5
         DIM_ASSERT(2, (dims[0]>=5 && dims[1]>=5));
-        ARG_ASSERT(5, (sw==3));
+        _ARG_ASSERT(5, (sw==3));
 
         af_array output;
 

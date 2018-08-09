@@ -42,7 +42,7 @@ af_err convert(af_array* out, const af_array& in)
             return af_create_handle(out, 0, nullptr, iType);
         }
 
-        ARG_ASSERT(1, (inputDims.ndims() >= 3));
+        _ARG_ASSERT(1, (inputDims.ndims() >= 3));
 
         af_array output = 0;
         switch (iType) {

@@ -42,8 +42,8 @@ af_err af_solve(af_array *out, const af_array a, const af_array b, const af_mat_
         dim4 adims = a_info.dims();
         dim4 bdims = b_info.dims();
 
-        ARG_ASSERT(1, a_info.isFloating());                       // Only floating and complex types
-        ARG_ASSERT(2, b_info.isFloating());                       // Only floating and complex types
+        _ARG_ASSERT(1, a_info.isFloating());                       // Only floating and complex types
+        _ARG_ASSERT(2, b_info.isFloating());                       // Only floating and complex types
 
         TYPE_ASSERT(a_type == b_type);
 
@@ -114,8 +114,8 @@ af_err af_solve_lu(af_array *out, const af_array a,
           return af_create_handle(out, 0, nullptr, a_type);
         }
 
-        ARG_ASSERT(1, a_info.isFloating());                       // Only floating and complex types
-        ARG_ASSERT(2, b_info.isFloating());                       // Only floating and complex types
+        _ARG_ASSERT(1, a_info.isFloating());                       // Only floating and complex types
+        _ARG_ASSERT(2, b_info.isFloating());                       // Only floating and complex types
 
         TYPE_ASSERT(a_type == b_type);
 

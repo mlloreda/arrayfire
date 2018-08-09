@@ -119,8 +119,8 @@ static int save(const char *key, const af_array arr, const char *filename, const
 af_err af_save_array(int *index, const char *key, const af_array arr, const char *filename, const bool append)
 {
     try {
-        ARG_ASSERT(0, key != NULL);
-        ARG_ASSERT(2, filename != NULL);
+        _ARG_ASSERT(0, key != NULL);
+        _ARG_ASSERT(2, filename != NULL);
 
         const ArrayInfo& info = getInfo(arr);
         af_dtype type = info.getType();
@@ -329,7 +329,7 @@ af_err af_read_array_index(af_array *out, const char *filename, const unsigned i
     try {
         AF_CHECK(af_init());
 
-        ARG_ASSERT(1, filename != NULL);
+        _ARG_ASSERT(1, filename != NULL);
 
         af_array output = checkVersionAndRead(filename, index);
         std::swap(*out, output);
@@ -342,8 +342,8 @@ af_err af_read_array_key(af_array *out, const char *filename, const char *key)
 {
     try {
         AF_CHECK(af_init());
-        ARG_ASSERT(1, filename != NULL);
-        ARG_ASSERT(2, key != NULL);
+        _ARG_ASSERT(1, filename != NULL);
+        _ARG_ASSERT(2, key != NULL);
 
         // Find index of key. Then call read by index
         int index = checkVersionAndFindIndex(filename, key);
@@ -361,8 +361,8 @@ af_err af_read_array_key(af_array *out, const char *filename, const char *key)
 af_err af_read_array_key_check(int *index, const char *filename, const char* key)
 {
     try {
-        ARG_ASSERT(1, filename != NULL);
-        ARG_ASSERT(2, key != NULL);
+        _ARG_ASSERT(1, filename != NULL);
+        _ARG_ASSERT(2, key != NULL);
 
         AF_CHECK(af_init());
 

@@ -58,11 +58,11 @@ af_err af_corrcoef(double *realVal, double *imagVal, const af_array X, const af_
         af_dtype xType  = xInfo.getType();
         af_dtype yType  = yInfo.getType();
 
-        ARG_ASSERT(2, (xType==yType));
-        ARG_ASSERT(2, (xDims.ndims()==yDims.ndims()));
+        _ARG_ASSERT(2, (xType==yType));
+        _ARG_ASSERT(2, (xDims.ndims()==yDims.ndims()));
 
         for (dim_t i=0; i<xDims.ndims(); ++i)
-            ARG_ASSERT(2, (xDims[i]==yDims[i]));
+            _ARG_ASSERT(2, (xDims[i]==yDims[i]));
 
         switch(xType) {
             case f64: *realVal = corrcoef<double, double>(X, Y); break;

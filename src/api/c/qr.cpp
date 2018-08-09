@@ -57,7 +57,7 @@ af_err af_qr(af_array *q, af_array *r, af_array *tau, const af_array in)
             return AF_SUCCESS;
         }
 
-        ARG_ASSERT(3, i_info.isFloating());                       // Only floating and complex types
+        _ARG_ASSERT(3, i_info.isFloating());                       // Only floating and complex types
 
         switch(type) {
             case f32: qr<float  >(q, r, tau, in);  break;
@@ -83,7 +83,7 @@ af_err af_qr_inplace(af_array *tau, af_array in)
 
         af_dtype type = i_info.getType();
 
-        ARG_ASSERT(1, i_info.isFloating()); // Only floating and complex types
+        _ARG_ASSERT(1, i_info.isFloating()); // Only floating and complex types
 
         if(i_info.ndims() == 0) {
             return af_create_handle(tau, 0, nullptr, type);

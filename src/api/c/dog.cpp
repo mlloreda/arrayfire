@@ -48,8 +48,8 @@ af_err af_dog(af_array *out, const af_array in, const int radius1, const int rad
     try {
         const ArrayInfo& info = getInfo(in);
         dim4 inDims = info.dims();
-        ARG_ASSERT(1, (inDims.ndims()>=2));
-        ARG_ASSERT(1, (inDims.ndims()<=3));
+        _ARG_ASSERT(1, (inDims.ndims()>=2));
+        _ARG_ASSERT(1, (inDims.ndims()<=3));
 
         af_array output;
         af_dtype type  = info.getType();

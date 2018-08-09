@@ -105,7 +105,7 @@ af_err af_stdev_all(double *realVal, double *imagVal, const af_array in)
 af_err af_stdev(af_array *out, const af_array in, const dim_t dim)
 {
     try {
-        ARG_ASSERT(2, (dim>=0 && dim<=3));
+        _ARG_ASSERT(2, (dim>=0 && dim<=3));
 
         af_array output = 0;
         const ArrayInfo& info = getInfo(in);

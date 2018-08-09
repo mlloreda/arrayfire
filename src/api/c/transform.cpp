@@ -65,8 +65,8 @@ af_err af_transform(af_array *out, const af_array in, const af_array tf,
         af_dtype itype = i_info.getType();
 
         // Assert type and interpolation
-        ARG_ASSERT(2, t_info.getType() == f32);
-        ARG_ASSERT(5, method == AF_INTERP_NEAREST  ||
+        _ARG_ASSERT(2, t_info.getType() == f32);
+        _ARG_ASSERT(5, method == AF_INTERP_NEAREST  ||
                       method == AF_INTERP_BILINEAR ||
                       method == AF_INTERP_BILINEAR_COSINE ||
                       method == AF_INTERP_BICUBIC ||
@@ -83,8 +83,8 @@ af_err af_transform(af_array *out, const af_array in, const af_array tf,
 
         // If transform is batched, the output dimensions must be specified
         if(tdims[2] * tdims[3] > 1) {
-            ARG_ASSERT(3, odim0 > 0);
-            ARG_ASSERT(4, odim1 > 0);
+            _ARG_ASSERT(3, odim0 > 0);
+            _ARG_ASSERT(4, odim1 > 0);
         }
 
         // If idims[2] > 1 and tdims[2] > 1, then both must be equal

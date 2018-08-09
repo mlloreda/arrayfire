@@ -51,13 +51,13 @@ af_err af_susan(af_features* out, const af_array in,
         const ArrayInfo& info = getInfo(in);
         af::dim4 dims  = info.dims();
 
-        ARG_ASSERT(1, dims.ndims()==2);
-        ARG_ASSERT(2, radius < 10);
-        ARG_ASSERT(2, radius<=edge);
-        ARG_ASSERT(3, diff_thr > 0.0f);
-        ARG_ASSERT(4, geom_thr > 0.0f);
-        ARG_ASSERT(5, (feature_ratio > 0.0f && feature_ratio <= 1.0f));
-        ARG_ASSERT(6, (dims[0] >= (dim_t)(2*edge+1) || dims[1] >= (dim_t)(2*edge+1)));
+        _ARG_ASSERT(1, dims.ndims()==2);
+        _ARG_ASSERT(2, radius < 10);
+        _ARG_ASSERT(2, radius<=edge);
+        _ARG_ASSERT(3, diff_thr > 0.0f);
+        _ARG_ASSERT(4, geom_thr > 0.0f);
+        _ARG_ASSERT(5, (feature_ratio > 0.0f && feature_ratio <= 1.0f));
+        _ARG_ASSERT(6, (dims[0] >= (dim_t)(2*edge+1) || dims[1] >= (dim_t)(2*edge+1)));
 
         af_dtype type  = info.getType();
         switch(type) {

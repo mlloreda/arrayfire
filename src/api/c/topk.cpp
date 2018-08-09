@@ -43,7 +43,7 @@ af_err af_topk(af_array *values, af_array *indices, const af_array in,
 
         ArrayInfo inInfo = getInfo(in);
 
-        ARG_ASSERT(1, (inInfo.ndims()>0));
+        _ARG_ASSERT(1, (inInfo.ndims()>0));
 
         if (inInfo.elements() == 1) {
             dim_t dims[1] = {1};

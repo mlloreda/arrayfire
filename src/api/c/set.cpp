@@ -34,7 +34,7 @@ af_err af_set_unique(af_array *out, const af_array in, const bool is_sorted)
             return af_retain_array(out, in);
         }
 
-        ARG_ASSERT(1, in_info.isVector());
+        _ARG_ASSERT(1, in_info.isVector());
 
         af_dtype type = in_info.getType();
 
@@ -82,13 +82,13 @@ af_err af_set_union(af_array *out, const af_array first, const af_array second, 
             return af_retain_array(out, first);
         }
 
-        ARG_ASSERT(1, (first_info.isVector() || first_info.isScalar()));
-        ARG_ASSERT(1, (second_info.isVector() || second_info.isScalar()));
+        _ARG_ASSERT(1, (first_info.isVector() || first_info.isScalar()));
+        _ARG_ASSERT(1, (second_info.isVector() || second_info.isScalar()));
 
         af_dtype first_type = first_info.getType();
         af_dtype second_type = second_info.getType();
 
-        ARG_ASSERT(1, first_type == second_type);
+        _ARG_ASSERT(1, first_type == second_type);
 
         switch(first_type) {
             case f32: res = setUnion<float  >(first, second, is_unique); break;
@@ -132,13 +132,13 @@ af_err af_set_intersect(af_array *out, const af_array first, const af_array seco
             return af_retain_array(out, second);
         }
 
-        ARG_ASSERT(1, (first_info.isVector() || first_info.isScalar()));
-        ARG_ASSERT(1, (second_info.isVector() || second_info.isScalar()));
+        _ARG_ASSERT(1, (first_info.isVector() || first_info.isScalar()));
+        _ARG_ASSERT(1, (second_info.isVector() || second_info.isScalar()));
 
         af_dtype first_type = first_info.getType();
         af_dtype second_type = second_info.getType();
 
-        ARG_ASSERT(1, first_type == second_type);
+        _ARG_ASSERT(1, first_type == second_type);
 
         af_array res;
         switch(first_type) {

@@ -80,8 +80,8 @@ static inline af_array scan_op(const af_array in, const int dim, af_binary_op op
 af_err af_accum(af_array *out, const af_array in, const int dim)
 {
     try {
-        ARG_ASSERT(2, dim >= 0);
-        ARG_ASSERT(2, dim <  4);
+        _ARG_ASSERT(2, dim >= 0);
+        _ARG_ASSERT(2, dim <  4);
 
         const ArrayInfo& in_info = getInfo(in);
 
@@ -121,8 +121,8 @@ af_err af_accum(af_array *out, const af_array in, const int dim)
 af_err af_scan(af_array *out, const af_array in, const int dim, af_binary_op op, bool inclusive_scan)
 {
     try {
-        ARG_ASSERT(2, dim >= 0);
-        ARG_ASSERT(2, dim <  4);
+        _ARG_ASSERT(2, dim >= 0);
+        _ARG_ASSERT(2, dim <  4);
 
         const ArrayInfo& in_info = getInfo(in);
 
@@ -161,8 +161,8 @@ af_err af_scan(af_array *out, const af_array in, const int dim, af_binary_op op,
 af_err af_scan_by_key(af_array *out, const af_array key, const af_array in, const int dim, af_binary_op op, bool inclusive_scan)
 {
     try {
-        ARG_ASSERT(2, dim >= 0);
-        ARG_ASSERT(2, dim <  4);
+        _ARG_ASSERT(2, dim >= 0);
+        _ARG_ASSERT(2, dim <  4);
 
         const ArrayInfo& in_info = getInfo(in);
         const ArrayInfo& key_info = getInfo(key);
@@ -172,7 +172,7 @@ af_err af_scan_by_key(af_array *out, const af_array key, const af_array in, cons
             return AF_SUCCESS;
         }
 
-        ARG_ASSERT(2, in_info.dims() == key_info.dims());
+        _ARG_ASSERT(2, in_info.dims() == key_info.dims());
 
         af_dtype type = in_info.getType();
         af_array res;

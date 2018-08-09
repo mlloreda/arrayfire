@@ -82,11 +82,11 @@ af_err af_index(af_array *result, const af_array in,
         for (unsigned i=0; i<ndims; ++i) {
             indices_[i] = convert2Canonical(indices[i], iDims[i]);
 
-            ARG_ASSERT(3, (indices_[i].begin >= 0. && indices_[i].end >= 0.));
+            _ARG_ASSERT(3, (indices_[i].begin >= 0. && indices_[i].end >= 0.));
             if (signbit(indices_[i].step)) {
-              ARG_ASSERT(3, indices_[i].begin >= indices_[i].end);
+              _ARG_ASSERT(3, indices_[i].begin >= indices_[i].end);
             } else {
-              ARG_ASSERT(3, indices_[i].begin <= indices_[i].end);
+              _ARG_ASSERT(3, indices_[i].begin <= indices_[i].end);
             }
         }
 
@@ -155,14 +155,14 @@ af_err af_lookup(af_array *out, const af_array in,
             return AF_SUCCESS;
         }
 
-        ARG_ASSERT(3, (dim >= 0 && dim <= 3));
-        ARG_ASSERT(2, idxInfo.isVector() || idxInfo.isScalar());
+        _ARG_ASSERT(3, (dim >= 0 && dim <= 3));
+        _ARG_ASSERT(2, idxInfo.isVector() || idxInfo.isScalar());
 
         af_dtype idxType = idxInfo.getType();
 
-        ARG_ASSERT(2, (idxType != c32));
-        ARG_ASSERT(2, (idxType != c64));
-        ARG_ASSERT(2, (idxType != b8));
+        _ARG_ASSERT(2, (idxType != c32));
+        _ARG_ASSERT(2, (idxType != c64));
+        _ARG_ASSERT(2, (idxType != b8));
 
         af_array output = 0;
 
@@ -198,8 +198,8 @@ af_err af_index_gen(af_array *out, const af_array in,
                     const dim_t ndims, const af_index_t* indexs)
 {
     try {
-        ARG_ASSERT(2, (ndims>0));
-        ARG_ASSERT(3, (indexs != NULL));
+        _ARG_ASSERT(2, (ndims>0));
+        _ARG_ASSERT(3, (indexs != NULL));
 
         const ArrayInfo& iInfo  = getInfo(in);
         const dim4& iDims  = iInfo.dims();
@@ -242,20 +242,20 @@ af_err af_index_gen(af_array *out, const af_array in,
                     const ArrayInfo& idxInfo = getInfo(indexs[i].idx.arr);
                     af_dtype idxType = idxInfo.getType();
 
-                    ARG_ASSERT(3, (idxType != c32));
-                    ARG_ASSERT(3, (idxType != c64));
-                    ARG_ASSERT(3, (idxType != b8 ));
+                    _ARG_ASSERT(3, (idxType != c32));
+                    _ARG_ASSERT(3, (idxType != c64));
+                    _ARG_ASSERT(3, (idxType != b8 ));
 
                     idxrs[i] = { { indexs[i].idx.arr },
                                  isSeq, indexs[i].isBatch };
                 } else {
                     // copy the af_seq to local variable
                     af_seq inSeq = convert2Canonical(indexs[i].idx.seq, iDims[i]);
-                    ARG_ASSERT(3, (inSeq.begin >= 0. || inSeq.end >= 0.));
+                    _ARG_ASSERT(3, (inSeq.begin >= 0. || inSeq.end >= 0.));
                     if (signbit(inSeq.step)) {
-                        ARG_ASSERT(3, inSeq.begin >= inSeq.end);
+                        _ARG_ASSERT(3, inSeq.begin >= inSeq.end);
                     } else {
-                        ARG_ASSERT(3, inSeq.begin <= inSeq.end);
+                        _ARG_ASSERT(3, inSeq.begin <= inSeq.end);
                     }
                     idxrs[i].idx.seq = inSeq;
                     idxrs[i].isSeq   = isSeq;
@@ -314,9 +314,9 @@ af_err af_set_array_indexer(af_index_t* indexer,
                             const af_array idx, const dim_t dim)
 {
     try {
-        ARG_ASSERT(0, (indexer != NULL));
-        ARG_ASSERT(1, (idx != NULL));
-        ARG_ASSERT(2, (dim >= 0 && dim <= 3));
+        _ARG_ASSERT(0, (indexer != NULL));
+        _ARG_ASSERT(1, (idx != NULL));
+        _ARG_ASSERT(2, (dim >= 0 && dim <= 3));
         indexer[dim] = af_index_t{{idx}, false, false};
     }
     CATCHALL;
@@ -327,9 +327,9 @@ af_err af_set_seq_indexer(af_index_t* indexer, const af_seq* idx,
                           const dim_t dim, const bool is_batch)
 {
     try {
-        ARG_ASSERT(0, (indexer != NULL));
-        ARG_ASSERT(1, (idx != NULL));
-        ARG_ASSERT(2, (dim >= 0 && dim <= 3));
+        _ARG_ASSERT(0, (indexer != NULL));
+        _ARG_ASSERT(1, (idx != NULL));
+        _ARG_ASSERT(2, (dim >= 0 && dim <= 3));
         indexer[dim].idx.seq = *idx;
         indexer[dim].isSeq   = true;
         indexer[dim].isBatch = is_batch;
@@ -343,8 +343,8 @@ af_err af_set_seq_param_indexer(af_index_t* indexer, const double begin,
                                 const dim_t dim, const bool is_batch)
 {
     try {
-        ARG_ASSERT(0, (indexer != NULL));
-        ARG_ASSERT(4, (dim >= 0 && dim <= 3));
+        _ARG_ASSERT(0, (indexer != NULL));
+        _ARG_ASSERT(4, (dim >= 0 && dim <= 3));
         af_seq s = af_make_seq(begin, end, step);
         indexer[dim].idx.seq = s;
         indexer[dim].isSeq = true;

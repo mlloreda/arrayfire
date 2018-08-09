@@ -34,12 +34,12 @@ af_err af_unwrap(af_array *out, const af_array in, const dim_t wx, const dim_t w
         af_dtype type = info.getType();
         af::dim4 idims = info.dims();
 
-        ARG_ASSERT(2, wx > 0 && wx <= idims[0] + 2 * px);
-        ARG_ASSERT(3, wy > 0 && wy <= idims[1] + 2 * py);
-        ARG_ASSERT(4, sx > 0);
-        ARG_ASSERT(5, sy > 0);
-        ARG_ASSERT(6, px >= 0 && px < wx);
-        ARG_ASSERT(7, py >= 0 && py < wy);
+        _ARG_ASSERT(2, wx > 0 && wx <= idims[0] + 2 * px);
+        _ARG_ASSERT(3, wy > 0 && wy <= idims[1] + 2 * py);
+        _ARG_ASSERT(4, sx > 0);
+        _ARG_ASSERT(5, sy > 0);
+        _ARG_ASSERT(6, px >= 0 && px < wx);
+        _ARG_ASSERT(7, py >= 0 && py < wy);
 
         af_array output;
 

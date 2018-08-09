@@ -39,8 +39,8 @@ af_err af_select(af_array *out, const af_array cond, const af_array a, const af_
             return af_retain_array(out, cond);
         }
 
-        ARG_ASSERT(2, ainfo.getType() == binfo.getType());
-        ARG_ASSERT(1, cond_info.getType() == b8);
+        _ARG_ASSERT(2, ainfo.getType() == binfo.getType());
+        _ARG_ASSERT(1, cond_info.getType() == b8);
 
         dim4 adims = ainfo.dims();
         dim4 bdims = binfo.dims();
@@ -89,7 +89,7 @@ af_err af_select_scalar_r(af_array *out, const af_array cond, const af_array a, 
         const ArrayInfo& ainfo = getInfo(a);
         const ArrayInfo& cinfo = getInfo(cond);
 
-        ARG_ASSERT(1, cinfo.getType() == b8);
+        _ARG_ASSERT(1, cinfo.getType() == b8);
 
         dim4 adims = ainfo.dims();
         dim4 cond_dims = cinfo.dims();
@@ -129,7 +129,7 @@ af_err af_select_scalar_l(af_array *out, const af_array cond, const double a, co
         const ArrayInfo& binfo = getInfo(b);
         const ArrayInfo& cinfo = getInfo(cond);
 
-        ARG_ASSERT(1, cinfo.getType() == b8);
+        _ARG_ASSERT(1, cinfo.getType() == b8);
 
         dim4 bdims = binfo.dims();
         dim4 cond_dims = cinfo.dims();

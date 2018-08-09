@@ -58,13 +58,13 @@ af_err af_sift(af_features* feat, af_array* desc, const af_array in, const unsig
         const ArrayInfo& info = getInfo(in);
         af::dim4 dims  = info.dims();
 
-        ARG_ASSERT(2, (dims[0] >= 15 && dims[1] >= 15 && dims[2] == 1 && dims[3] == 1));
-        ARG_ASSERT(3, n_layers > 0);
-        ARG_ASSERT(4, contrast_thr > 0.0f);
-        ARG_ASSERT(5, edge_thr >= 1.0f);
-        ARG_ASSERT(6, init_sigma > 0.5f);
-        ARG_ASSERT(8, img_scale > 0.0f);
-        ARG_ASSERT(9, feature_ratio > 0.0f);
+        _ARG_ASSERT(2, (dims[0] >= 15 && dims[1] >= 15 && dims[2] == 1 && dims[3] == 1));
+        _ARG_ASSERT(3, n_layers > 0);
+        _ARG_ASSERT(4, contrast_thr > 0.0f);
+        _ARG_ASSERT(5, edge_thr >= 1.0f);
+        _ARG_ASSERT(6, init_sigma > 0.5f);
+        _ARG_ASSERT(8, img_scale > 0.0f);
+        _ARG_ASSERT(9, feature_ratio > 0.0f);
 
         dim_t in_ndims = dims.ndims();
         DIM_ASSERT(1, (in_ndims <= 3 && in_ndims >= 2));
@@ -99,13 +99,13 @@ af_err af_gloh(af_features* feat, af_array* desc, const af_array in, const unsig
         const ArrayInfo& info = getInfo(in);
         af::dim4 dims  = info.dims();
 
-        ARG_ASSERT(2, (dims[0] >= 15 && dims[1] >= 15 && dims[2] == 1 && dims[3] == 1));
-        ARG_ASSERT(3, n_layers > 0);
-        ARG_ASSERT(4, contrast_thr > 0.0f);
-        ARG_ASSERT(5, edge_thr >= 1.0f);
-        ARG_ASSERT(6, init_sigma > 0.5f);
-        ARG_ASSERT(8, img_scale > 0.0f);
-        ARG_ASSERT(9, feature_ratio > 0.0f);
+        _ARG_ASSERT(2, (dims[0] >= 15 && dims[1] >= 15 && dims[2] == 1 && dims[3] == 1));
+        _ARG_ASSERT(3, n_layers > 0);
+        _ARG_ASSERT(4, contrast_thr > 0.0f);
+        _ARG_ASSERT(5, edge_thr >= 1.0f);
+        _ARG_ASSERT(6, init_sigma > 0.5f);
+        _ARG_ASSERT(8, img_scale > 0.0f);
+        _ARG_ASSERT(9, feature_ratio > 0.0f);
 
         dim_t in_ndims = dims.ndims();
         DIM_ASSERT(1, (in_ndims <= 3 && in_ndims >= 2));

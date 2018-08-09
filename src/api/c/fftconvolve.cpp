@@ -134,7 +134,7 @@ af_err fft_convolve(af_array *out, const af_array signal, const af_array filter,
 
         AF_BATCH_KIND convBT = identifyBatchKind<baseDim>(sdims, fdims);
 
-        ARG_ASSERT(1, (convBT != AF_BATCH_UNSUPPORTED));
+        _ARG_ASSERT(1, (convBT != AF_BATCH_UNSUPPORTED));
 
         af_array output;
         switch(stype) {

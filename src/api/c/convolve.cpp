@@ -46,8 +46,8 @@ inline static af_array convolve2(const af_array &s, const af_array &c_f, const a
         return getHandle(cast<T, accT>(arithOp<accT, af_mul_t>(signal, filter, signal.dims())));
     }
 
-    ARG_ASSERT(2, colFilter.isVector());
-    ARG_ASSERT(3, rowFilter.isVector());
+    _ARG_ASSERT(2, colFilter.isVector());
+    _ARG_ASSERT(3, rowFilter.isVector());
 
     return getHandle(convolve2<T, accT, expand>(getArray<T>(s), colFilter, rowFilter));
 }
@@ -96,7 +96,7 @@ af_err convolve(af_array *out, const af_array signal, const af_array filter)
 
         AF_BATCH_KIND convBT = identifyBatchKind<baseDim>(sdims, fdims);
 
-        ARG_ASSERT(1, (convBT != AF_BATCH_UNSUPPORTED && convBT != AF_BATCH_DIFF));
+        _ARG_ASSERT(1, (convBT != AF_BATCH_UNSUPPORTED && convBT != AF_BATCH_DIFF));
 
         af_array output;
         switch(stype) {
@@ -131,7 +131,7 @@ af_err convolve2_sep(af_array *out, af_array col_filter, af_array row_filter, co
 
         const af_dtype signalType  = sInfo.getType();
 
-        ARG_ASSERT(1, (sdims.ndims()>=2));
+        _ARG_ASSERT(1, (sdims.ndims()>=2));
 
         af_array output = 0;
 

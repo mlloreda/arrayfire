@@ -63,13 +63,13 @@ af_err af_harris(af_features *out, const af_array in, const unsigned max_corners
         const unsigned edge = (block_size > 0) ? block_size / 2 : filter_len / 2;
 
         DIM_ASSERT(1, (in_ndims == 2));
-        ARG_ASSERT(1, (dims[0] >= (dim_t)(2*edge+1) || dims[1] >= (dim_t)(2*edge+1)));
-        ARG_ASSERT(3, (max_corners > 0) || (min_response > 0.0f));
-        ARG_ASSERT(7, (k_thr >= 0.01f));
+        _ARG_ASSERT(1, (dims[0] >= (dim_t)(2*edge+1) || dims[1] >= (dim_t)(2*edge+1)));
+        _ARG_ASSERT(3, (max_corners > 0) || (min_response > 0.0f));
+        _ARG_ASSERT(7, (k_thr >= 0.01f));
         // Upper limits for sigma and block_size are due to convolve2 template
         // at maximum length of 31 elements for the filter in OpenCL
-        ARG_ASSERT(4, (block_size > 2) || (sigma >= 0.5f && sigma <= 5.f));
-        ARG_ASSERT(5, (block_size <= 32));
+        _ARG_ASSERT(4, (block_size > 2) || (sigma >= 0.5f && sigma <= 5.f));
+        _ARG_ASSERT(5, (block_size <= 32));
 
         af_dtype type  = info.getType();
         switch(type) {

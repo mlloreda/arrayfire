@@ -106,7 +106,7 @@ FREE_IMAGE_TYPE getFIT(FI_CHANNELS channels, af_dtype type)
 af_err af_load_image_native(af_array *out, const char* filename)
 {
     try {
-        ARG_ASSERT(1, filename != NULL);
+        _ARG_ASSERT(1, filename != NULL);
 
         FreeImage_Module& _ = getFreeImagePlugin();
 
@@ -292,7 +292,7 @@ af_err af_save_image_native(const char* filename, const af_array in)
 {
     try {
 
-        ARG_ASSERT(0, filename != NULL);
+        _ARG_ASSERT(0, filename != NULL);
 
         FreeImage_Module& _ = getFreeImagePlugin();
 

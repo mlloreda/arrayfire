@@ -39,8 +39,8 @@ af_err af_replace(af_array a, const af_array cond, const af_array b)
             return AF_SUCCESS;
         }
 
-        ARG_ASSERT(2, ainfo.getType() == binfo.getType());
-        ARG_ASSERT(1, cinfo.getType() == b8);
+        _ARG_ASSERT(2, ainfo.getType() == binfo.getType());
+        _ARG_ASSERT(1, cinfo.getType() == b8);
 
         DIM_ASSERT(1, ainfo.ndims() >= binfo.ndims());
         DIM_ASSERT(1, cinfo.ndims() == std::min(ainfo.ndims(), binfo.ndims()));
@@ -86,7 +86,7 @@ af_err af_replace_scalar(af_array a, const af_array cond, const double b)
         const ArrayInfo& ainfo = getInfo(a);
         const ArrayInfo& cinfo = getInfo(cond);
 
-        ARG_ASSERT(1, cinfo.getType() == b8);
+        _ARG_ASSERT(1, cinfo.getType() == b8);
         DIM_ASSERT(1, cinfo.ndims() == ainfo.ndims());
 
         dim4 adims = ainfo.dims();

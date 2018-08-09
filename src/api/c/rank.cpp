@@ -57,7 +57,7 @@ af_err af_rank(uint *out, const af_array in, const double tol)
 
         af_dtype type = i_info.getType();
 
-        ARG_ASSERT(1, i_info.isFloating());                       // Only floating and complex types
+        _ARG_ASSERT(1, i_info.isFloating());                       // Only floating and complex types
 
         uint output;
         if(i_info.ndims() == 0) {

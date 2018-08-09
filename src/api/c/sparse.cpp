@@ -82,9 +82,9 @@ af_err af_create_sparse_array(
 
         TYPE_ASSERT(vInfo.isFloating());
         DIM_ASSERT(3, vInfo.isLinear());
-        ARG_ASSERT(4, rInfo.getType() == s32);
+        _ARG_ASSERT(4, rInfo.getType() == s32);
         DIM_ASSERT(4, rInfo.isLinear());
-        ARG_ASSERT(5, cInfo.getType() == s32);
+        _ARG_ASSERT(5, cInfo.getType() == s32);
         DIM_ASSERT(5, cInfo.isLinear());
 
         const size_t nNZ = vInfo.elements();
@@ -303,11 +303,11 @@ af_err af_sparse_convert_to(af_array *out, const af_array in,
 
         // Dense not allowed as input -> Should never happen with SparseArrayBase
         // CSC is currently not supported
-        ARG_ASSERT(1, base.getStorage() != AF_STORAGE_DENSE
+        _ARG_ASSERT(1, base.getStorage() != AF_STORAGE_DENSE
                    && base.getStorage() != AF_STORAGE_CSC);
 
         // Conversion to and from CSC is not supported
-        ARG_ASSERT(2, destStorage != AF_STORAGE_CSC);
+        _ARG_ASSERT(2, destStorage != AF_STORAGE_CSC);
 
         if(base.getStorage() == destStorage) {
             // Return a reference
@@ -337,7 +337,7 @@ af_err af_sparse_to_dense(af_array *out, const af_array in)
 
         // Dense not allowed as input -> Should never happen
         // To convert from dense to type, use the create* functions
-        ARG_ASSERT(1, base.getStorage() != AF_STORAGE_DENSE);
+        _ARG_ASSERT(1, base.getStorage() != AF_STORAGE_DENSE);
 
         switch(base.getType()) {
             case f32: output = sparseConvertStorage<float  >(in, AF_STORAGE_DENSE); break;

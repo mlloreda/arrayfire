@@ -31,14 +31,14 @@ af_err af_create_strided_array(af_array *arr,
 {
     try {
 
-        ARG_ASSERT(2, offset >= 0);
-        ARG_ASSERT(3, ndims >=1 && ndims <= 4);
-        ARG_ASSERT(4, dims_ != NULL);
-        ARG_ASSERT(5, strides_ != NULL);
-        ARG_ASSERT(5, strides_[0] == 1);
+        _ARG_ASSERT(2, offset >= 0);
+        _ARG_ASSERT(3, ndims >=1 && ndims <= 4);
+        _ARG_ASSERT(4, dims_ != NULL);
+        _ARG_ASSERT(5, strides_ != NULL);
+        _ARG_ASSERT(5, strides_[0] == 1);
 
         for (int i = 1; i < (int)ndims; i++) {
-            ARG_ASSERT(5, strides_[i] > 0);
+            _ARG_ASSERT(5, strides_[i] > 0);
         }
 
         dim4 dims(ndims, dims_);

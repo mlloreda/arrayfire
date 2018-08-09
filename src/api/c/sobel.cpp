@@ -33,8 +33,8 @@ af_err af_sobel_operator(af_array *dx, af_array *dy, const af_array img, const u
 {
     try {
         //FIXME: ADD SUPPORT FOR OTHER KERNEL SIZES
-        //ARG_ASSERT(4, (ker_size==3 || ker_size==5 || ker_size==7));
-        ARG_ASSERT(4, (ker_size==3));
+        //_ARG_ASSERT(4, (ker_size==3 || ker_size==5 || ker_size==7));
+        _ARG_ASSERT(4, (ker_size==3));
 
         const ArrayInfo& info = getInfo(img);
         af::dim4 dims  = info.dims();

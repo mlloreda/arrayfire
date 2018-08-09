@@ -66,7 +66,7 @@ namespace cuda
     template<typename inType, typename outType>
     Array<outType> padArray(Array<inType> const &in, dim4 const &dims, outType default_value, double factor)
     {
-        ARG_ASSERT(1, (in.ndims() == dims.ndims()));
+        _ARG_ASSERT(1, (in.ndims() == dims.ndims()));
         Array<outType> ret = createEmptyArray<outType>(dims);
         kernel::copy<inType, outType>(ret, in, in.ndims(), default_value, factor);
         return ret;
@@ -107,7 +107,7 @@ namespace cuda
     template<typename inType, typename outType>
     void copyArray(Array<outType> &out, Array<inType> const &in)
     {
-        ARG_ASSERT(1, (in.ndims() == out.dims().ndims()));
+        _ARG_ASSERT(1, (in.ndims() == out.dims().ndims()));
         copyWrapper<inType, outType> copyFn;
         copyFn(out, in);
     }

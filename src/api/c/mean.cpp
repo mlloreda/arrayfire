@@ -54,7 +54,7 @@ static af_array mean(const af_array &in, const af_array &weights, const dim_t di
 af_err af_mean(af_array *out, const af_array in, const dim_t dim)
 {
     try {
-        ARG_ASSERT(2, (dim>=0 && dim<=3));
+        _ARG_ASSERT(2, (dim>=0 && dim<=3));
 
         af_array output = 0;
         const ArrayInfo& info = getInfo(in);
@@ -83,7 +83,7 @@ af_err af_mean(af_array *out, const af_array in, const dim_t dim)
 af_err af_mean_weighted(af_array *out, const af_array in, const af_array weights, const dim_t dim)
 {
     try {
-        ARG_ASSERT(3, (dim>=0 && dim<=3));
+        _ARG_ASSERT(3, (dim>=0 && dim<=3));
 
         af_array output = 0;
         const ArrayInfo& iInfo = getInfo(in);
@@ -91,7 +91,7 @@ af_err af_mean_weighted(af_array *out, const af_array in, const af_array weights
         af_dtype iType  = iInfo.getType();
         af_dtype wType  = wInfo.getType();
 
-        ARG_ASSERT(2, (wType==f32 || wType==f64)); /* verify that weights are non-complex real numbers */
+        _ARG_ASSERT(2, (wType==f32 || wType==f64)); /* verify that weights are non-complex real numbers */
 
         //FIXME: We should avoid additional copies
         af_array w = weights;
@@ -100,7 +100,7 @@ af_err af_mean_weighted(af_array *out, const af_array in, const af_array weights
             dim4 wDims = wInfo.dims();
             dim4 tDims(1,1,1,1);
             for (int i = 0; i < 4; i++) {
-                ARG_ASSERT(2, wDims[i] == 1 || wDims[i] == iDims[i]);
+                _ARG_ASSERT(2, wDims[i] == 1 || wDims[i] == iDims[i]);
                 tDims[i] = iDims[i] / wDims[i];
             }
             AF_CHECK(af_tile(&w, weights, tDims[0], tDims[1], tDims[2], tDims[3]));
@@ -172,7 +172,7 @@ af_err af_mean_all_weighted(double *realVal, double *imagVal, const af_array in,
         af_dtype iType  = iInfo.getType();
         af_dtype wType  = wInfo.getType();
 
-        ARG_ASSERT(3, (wType==f32 || wType==f64)); /* verify that weights are non-complex real numbers */
+        _ARG_ASSERT(3, (wType==f32 || wType==f64)); /* verify that weights are non-complex real numbers */
 
         switch(iType) {
             case f64: *realVal = mean<double>(in, weights); break;

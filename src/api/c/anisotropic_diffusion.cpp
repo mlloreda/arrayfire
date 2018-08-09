@@ -64,8 +64,8 @@ af_err af_anisotropic_diffusion(af_array* out, const af_array in, const float dt
 
         DIM_ASSERT(1, (inputNumDims>=2));
 
-        ARG_ASSERT(3, (K>0 || K<0));
-        ARG_ASSERT(4, (iterations>0));
+        _ARG_ASSERT(3, (K>0 || K<0));
+        _ARG_ASSERT(4, (iterations>0));
 
         float DT = dt;
         float maxDt = 1.0f/std::pow(2.0f, static_cast<float>(2)+1);

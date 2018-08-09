@@ -44,8 +44,8 @@ af_err af_join(af_array *out, const int dim, const af_array first, const af_arra
         af::dim4  fdims = finfo.dims();
         af::dim4  sdims = sinfo.dims();
 
-        ARG_ASSERT(1, dim >= 0 && dim < 4);
-        ARG_ASSERT(2, finfo.getType() == sinfo.getType());
+        _ARG_ASSERT(1, dim >= 0 && dim < 4);
+        _ARG_ASSERT(2, finfo.getType() == sinfo.getType());
         if(sinfo.elements() == 0) {
             return af_retain_array(out, first);
         }
@@ -90,7 +90,7 @@ af_err af_join(af_array *out, const int dim, const af_array first, const af_arra
 af_err af_join_many(af_array *out, const int dim, const unsigned n_arrays, const af_array *inputs)
 {
     try {
-        ARG_ASSERT(3, n_arrays > 1 && n_arrays <= 10);
+        _ARG_ASSERT(3, n_arrays > 1 && n_arrays <= 10);
 
         std::vector<ArrayInfo> info;
         info.reserve(n_arrays);
@@ -100,10 +100,10 @@ af_err af_join_many(af_array *out, const int dim, const unsigned n_arrays, const
             dims[i] = info[i].dims();
         }
 
-        ARG_ASSERT(1, dim >= 0 && dim < 4);
+        _ARG_ASSERT(1, dim >= 0 && dim < 4);
 
         for(int i = 1; i < (int)n_arrays; i++) {
-            ARG_ASSERT(3, info[0].getType() == info[i].getType());
+            _ARG_ASSERT(3, info[0].getType() == info[i].getType());
             DIM_ASSERT(3, info[i].elements() > 0);
         }
 

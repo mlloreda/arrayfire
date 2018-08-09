@@ -208,7 +208,7 @@ static af_err readImage(af_array *rImage, const uchar* pSrcLine, const int nSrcP
 af_err af_load_image(af_array *out, const char* filename, const bool isColor)
 {
     try {
-        ARG_ASSERT(1, filename != NULL);
+        _ARG_ASSERT(1, filename != NULL);
 
         FreeImage_Module& _ = getFreeImagePlugin();
 
@@ -355,7 +355,7 @@ af_err af_save_image(const char* filename, const af_array in_)
 {
     try {
 
-        ARG_ASSERT(0, filename != NULL);
+        _ARG_ASSERT(0, filename != NULL);
 
         FreeImage_Module& _ = getFreeImagePlugin();
 
@@ -530,7 +530,7 @@ af_err af_save_image(const char* filename, const af_array in_)
 af_err af_load_image_memory(af_array *out, const void* ptr)
 {
     try {
-        ARG_ASSERT(1, ptr != NULL);
+        _ARG_ASSERT(1, ptr != NULL);
 
         FreeImage_Module& _ = getFreeImagePlugin();
 
@@ -794,7 +794,7 @@ af_err af_delete_image_memory(void *ptr)
 {
     try {
 
-        ARG_ASSERT(0, ptr != NULL);
+        _ARG_ASSERT(0, ptr != NULL);
 
         FreeImage_Module& _ = getFreeImagePlugin();
 

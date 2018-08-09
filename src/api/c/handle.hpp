@@ -48,7 +48,7 @@ getArray(const af_array &arr)
     detail::Array<T> *A = reinterpret_cast<detail::Array<T>*>(arr);
     if ((af_dtype)af::dtype_traits<T>::af_type != A->getType())
         AF_ERROR("Invalid type for input array.", AF_ERR_INTERNAL);
-    ARG_ASSERT(0, A->isSparse() == false);
+    _ARG_ASSERT(0, A->isSparse() == false);
     return *A;
 }
 
@@ -84,7 +84,7 @@ static detail::Array<T> &
 getWritableArray(const af_array &arr)
 {
     const detail::Array<T> &A = getArray<T>(arr);
-    ARG_ASSERT(0, A.isSparse() == false);
+    _ARG_ASSERT(0, A.isSparse() == false);
     return const_cast<detail::Array<T>&>(A);
 }
 
@@ -179,7 +179,7 @@ getCopyOnWriteArray(const af_array &arr)
     if ((af_dtype)af::dtype_traits<T>::af_type != A->getType())
         AF_ERROR("Invalid type for input array.", AF_ERR_INTERNAL);
 
-    ARG_ASSERT(0, A->isSparse() == false);
+    _ARG_ASSERT(0, A->isSparse() == false);
 
     if (A->useCount() > 1) {
         *A = copyArray(*A);
