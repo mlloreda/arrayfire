@@ -130,17 +130,17 @@ template<bool isYCbCr2RGB>
 af_err convert(af_array* out, const af_array& in, const af_ycc_std standard)
 {
     try {
-        const ArrayInfo& info = getInfo(in);
-        af_dtype iType = info.getType();
-        af::dim4 inputDims = info.dims();
+        ARG_SETUP(in);
+
+        af::dim4 inputDims = in_info.dims();
 
         ARG_ASSERT(1, (inputDims.ndims() >= 3));
 
         af_array output = 0;
-        switch (iType) {
+        switch (in_info.getType()) {
             case f64: output = convert<double, isYCbCr2RGB>(in, standard); break;
             case f32: output = convert<float , isYCbCr2RGB>(in, standard); break;
-            default: TYPE_ERROR(1, iType); break;
+            default: TYPE_ERROR(in); break;
         }
         std::swap(*out, output);
     }

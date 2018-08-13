@@ -24,19 +24,19 @@ using namespace detail;
 
 static af_array cast(const af_array in, const af_dtype type)
 {
-    const ArrayInfo& info = getInfo(in, false, true);
+    const ArrayInfo& in_info = getInfo(in, false, true);
 
-    if (info.getType() == type) {
+    if (in_info.getType() == type) {
         return retain(in);
     }
 
-    if(info.isSparse()) {
+    if (in_info.isSparse()) {
         switch (type) {
         case f32: return getHandle(castSparse<float  >(in));
         case f64: return getHandle(castSparse<double >(in));
         case c32: return getHandle(castSparse<cfloat >(in));
         case c64: return getHandle(castSparse<cdouble>(in));
-        default: TYPE_ERROR(2, type);
+        default: UNSUPPORTED_TYPE(type);
         }
     } else {
         switch (type) {
@@ -52,7 +52,7 @@ static af_array cast(const af_array in, const af_dtype type)
         case u64: return getHandle(castArray<uintl   >(in));
         case s16: return getHandle(castArray<short   >(in));
         case u16: return getHandle(castArray<ushort  >(in));
-        default: TYPE_ERROR(2, type);
+        default: UNSUPPORTED_TYPE(type);
         }
     }
 }
@@ -60,18 +60,17 @@ static af_array cast(const af_array in, const af_dtype type)
 af_err af_cast(af_array *out, const af_array in, const af_dtype type)
 {
     try {
-        const ArrayInfo& info = getInfo(in, false, true);
-
-        af_dtype inType = info.getType();
-        if((inType == c32 || inType == c64)
-            && (type == f32 || type == f64)) {
+        const ArrayInfo& in_info = getInfo(in, false, true);
+        const af_dtype inType = in_info.getType();
+        if ((inType == c32 || inType == c64)
+           && (type == f32 || type == f64)) {
             AF_ERROR("Casting is not allowed from complex (c32/c64) to real (f32/f64) types.\n"
                      "Use abs, real, imag etc to convert complex to floating type.",
                      AF_ERR_TYPE);
         }
 
-        dim4 idims = info.dims();
-        if(idims.elements() == 0) {
+        const dim4 idims = in_info.dims();
+        if (idims.elements() == 0) {
             return af_create_handle(out, 0, nullptr, type);
         }
 
@@ -87,9 +86,9 @@ af_err af_cast(af_array *out, const af_array in, const af_dtype type)
 af_err af_cplx(af_array *out, const af_array in, const af_dtype type)
 {
     try {
-        af_array res;
-        const ArrayInfo& in_info = getInfo(in);
+        ARG_SETUP(in);
 
+        af_array res;
         if (in_info.isDouble()) {
             res = cast(in, c64);
         } else {

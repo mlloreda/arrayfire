@@ -77,16 +77,16 @@ static forge::Image* convert_and_copy_image(const af_array in)
 af_err af_draw_image(const af_window wind, const af_array in, const af_cell* const props)
 {
 #if defined(WITH_GRAPHICS)
-    if(wind==0) {
+    if (wind == 0) {
         fprintf(stderr, "Not a valid window\n");
         return AF_SUCCESS;
     }
 
     try {
-        const ArrayInfo& info = getInfo(in);
+        ARG_SETUP(in);
 
-        af::dim4 in_dims = info.dims();
-        af_dtype type    = info.getType();
+        af::dim4 in_dims = in_info.dims();
+
         DIM_ASSERT(0, in_dims[2] == 1 || in_dims[2] == 3 || in_dims[2] == 4);
         DIM_ASSERT(0, in_dims[3] == 1);
 
@@ -94,7 +94,7 @@ af_err af_draw_image(const af_window wind, const af_array in, const af_cell* con
         makeContextCurrent(window);
         forge::Image* image = NULL;
 
-        switch(type) {
+        switch(in_info.getType()) {
             case f32: image = convert_and_copy_image<float >(in); break;
             case b8 : image = convert_and_copy_image<char  >(in); break;
             case s32: image = convert_and_copy_image<int   >(in); break;
@@ -102,7 +102,7 @@ af_err af_draw_image(const af_window wind, const af_array in, const af_cell* con
             case s16: image = convert_and_copy_image<short >(in); break;
             case u16: image = convert_and_copy_image<ushort>(in); break;
             case u8 : image = convert_and_copy_image<uchar >(in); break;
-            default:  TYPE_ERROR(1, type);
+            default:  TYPE_ERROR(in);
         }
 
         auto gridDims = ForgeManager::getInstance().getWindowGrid(window);

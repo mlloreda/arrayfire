@@ -36,15 +36,15 @@ forge::Chart* setup_surface(const forge::Window* const window,
     Array<T> yIn = getArray<T>(yVals);
     Array<T> zIn = getArray<T>(zVals);
 
-    const ArrayInfo& Xinfo = getInfo(xVals);
-    const ArrayInfo& Yinfo = getInfo(yVals);
-    const ArrayInfo& Zinfo = getInfo(zVals);
+    ARG_SETUP(xVals);
+    ARG_SETUP(yVals);
+    ARG_SETUP(zVals);
 
-    af::dim4 X_dims = Xinfo.dims();
-    af::dim4 Y_dims = Yinfo.dims();
-    af::dim4 Z_dims = Zinfo.dims();
+    af::dim4 X_dims = xVals_info.dims();
+    af::dim4 Y_dims = yVals_info.dims();
+    af::dim4 Z_dims = zVals_info.dims();
 
-    if(Xinfo.isVector()){
+    if (xVals_info.isVector()){
         // Convert xIn is a column vector
         xIn = modDims(xIn, xIn.elements());
         // Now tile along second dimension
@@ -125,32 +125,28 @@ forge::Chart* setup_surface(const forge::Window* const window,
 af_err af_draw_surface(const af_window wind, const af_array xVals, const af_array yVals, const af_array S, const af_cell* const props)
 {
 #if defined(WITH_GRAPHICS)
-    if(wind==0) {
-        std::cerr<<"Not a valid window"<<std::endl;
+    if (wind == 0) {
+        std::cerr << "Not a valid window" << std::endl;
         return AF_SUCCESS;
     }
 
     try {
-        const ArrayInfo& Xinfo = getInfo(xVals);
-        af::dim4 X_dims = Xinfo.dims();
-        af_dtype Xtype  = Xinfo.getType();
+        ARG_SETUP(xVals);
+        ARG_SETUP(yVals);
+        ARG_SETUP(S);
 
-        const ArrayInfo& Yinfo = getInfo(yVals);
-        af::dim4 Y_dims = Yinfo.dims();
-        af_dtype Ytype  = Yinfo.getType();
+        af::dim4 X_dims = xVals_info.dims();
+        af::dim4 Y_dims = yVals_info.dims();
+        af::dim4 S_dims = S_info.dims();
 
-        const ArrayInfo& Sinfo = getInfo(S);
-        af::dim4 S_dims = Sinfo.dims();
-        af_dtype Stype  = Sinfo.getType();
+        ASSERT_TYPE_EQ(xVals, yVals);
+        ASSERT_TYPE_EQ(yVals, S);
 
-        TYPE_ASSERT(Xtype == Ytype);
-        TYPE_ASSERT(Ytype == Stype);
-
-        if(!Yinfo.isVector()){
+        if (!yVals_info.isVector()) {
             DIM_ASSERT(1, X_dims == Y_dims);
             DIM_ASSERT(3, Y_dims == S_dims);
-        }else{
-            DIM_ASSERT(3, ( X_dims[0] * Y_dims[0] == (dim_t)Sinfo.elements()));
+        } else {
+            DIM_ASSERT(3, (X_dims[0] * Y_dims[0] == (dim_t)S_info.elements()));
         }
 
         forge::Window* window = reinterpret_cast<forge::Window*>(wind);
@@ -158,14 +154,14 @@ af_err af_draw_surface(const af_window wind, const af_array xVals, const af_arra
 
         forge::Chart* chart = NULL;
 
-        switch(Xtype) {
+        switch(xVals_info.getType()) {
             case f32: chart = setup_surface<float  >(window, xVals, yVals , S, props); break;
             case s32: chart = setup_surface<int    >(window, xVals, yVals , S, props); break;
             case u32: chart = setup_surface<uint   >(window, xVals, yVals , S, props); break;
             case s16: chart = setup_surface<short  >(window, xVals, yVals , S, props); break;
             case u16: chart = setup_surface<ushort >(window, xVals, yVals , S, props); break;
             case u8 : chart = setup_surface<uchar  >(window, xVals, yVals , S, props); break;
-            default:  TYPE_ERROR(1, Xtype);
+            default:  TYPE_ERROR(xVals);
         }
 
         auto gridDims = ForgeManager::getInstance().getWindowGrid(window);

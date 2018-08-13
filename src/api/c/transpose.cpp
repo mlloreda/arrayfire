@@ -29,17 +29,16 @@ static inline af_array trs(const af_array in, const bool conjugate)
 af_err af_transpose(af_array *out, af_array in, const bool conjugate)
 {
     try {
-        const ArrayInfo& info = getInfo(in);
-        af_dtype type = info.getType();
-        af::dim4 dims = info.dims();
+        ARG_SETUP(in);
 
+        const af::dim4 dims = in_info.dims();
         if (dims.elements() == 0) {
             return af_retain_array(out, in);
         }
 
-        if (dims[0]==1 || dims[1]==1) {
+        if (dims[0] == 1 || dims[1] == 1) {
             af::dim4 outDims(dims[1],dims[0],dims[2],dims[3]);
-            if(conjugate) {
+            if (conjugate) {
                 af_array temp = 0;
                 AF_CHECK(af_conjg(&temp, in));
                 AF_CHECK(af_moddims(out, temp, outDims.ndims(), outDims.get()));
@@ -54,7 +53,7 @@ af_err af_transpose(af_array *out, af_array in, const bool conjugate)
         }
 
         af_array output;
-        switch(type) {
+        switch(in_info.getType()) {
             case f32: output = trs<float>  (in, conjugate);    break;
             case c32: output = trs<cfloat> (in, conjugate);    break;
             case f64: output = trs<double> (in, conjugate);    break;
@@ -67,7 +66,7 @@ af_err af_transpose(af_array *out, af_array in, const bool conjugate)
             case u64: output = trs<uintl>  (in, conjugate);    break;
             case s16: output = trs<short>  (in, conjugate);    break;
             case u16: output = trs<ushort> (in, conjugate);    break;
-            default : TYPE_ERROR(1, type);
+            default : TYPE_ERROR(in);
         }
         std::swap(*out,output);
     }
@@ -85,18 +84,17 @@ static inline void transpose_inplace(af_array in, const bool conjugate)
 af_err af_transpose_inplace(af_array in, const bool conjugate)
 {
     try {
-        const ArrayInfo& info = getInfo(in);
-        af_dtype type = info.getType();
-        af::dim4 dims = info.dims();
+        ARG_SETUP(in);
+        af::dim4 dims = in_info.dims();
 
         // InPlace only works on square matrices
         DIM_ASSERT(0, dims[0] == dims[1]);
 
         // If singleton element
-        if(dims[0] == 1)
+        if (dims[0] == 1)
             return AF_SUCCESS;
 
-        switch(type) {
+        switch(in_info.getType()) {
             case f32: transpose_inplace<float>  (in, conjugate);    break;
             case c32: transpose_inplace<cfloat> (in, conjugate);    break;
             case f64: transpose_inplace<double> (in, conjugate);    break;
@@ -109,7 +107,7 @@ af_err af_transpose_inplace(af_array in, const bool conjugate)
             case u64: transpose_inplace<uintl>  (in, conjugate);    break;
             case s16: transpose_inplace<short>  (in, conjugate);    break;
             case u16: transpose_inplace<ushort> (in, conjugate);    break;
-            default : TYPE_ERROR(1, type);
+            default : TYPE_ERROR(in);
         }
     }
     CATCHALL;

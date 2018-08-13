@@ -372,17 +372,17 @@ af_err af_save_image(const char* filename, const af_array in_)
             AF_ERROR("FreeImage Error: Unknown Filetype", AF_ERR_NOT_SUPPORTED);
         }
 
-        const ArrayInfo& info = getInfo(in_);
+        ARG_SETUP(in_);
         // check image color type
-        uint channels = info.dims()[2];
+        uint channels = in__info.dims()[2];
         DIM_ASSERT(1, channels <= 4);
         DIM_ASSERT(1, channels != 2);
 
         int fi_bpp = channels * 8;
 
         // sizes
-        uint fi_w = info.dims()[1];
-        uint fi_h = info.dims()[0];
+        uint fi_w = in__info.dims()[1];
+        uint fi_h = in__info.dims()[0];
 
         // create the result image storage using FreeImage
         bitmap_ptr pResultBitmap = make_bitmap_ptr(_.FreeImage_Allocate(fi_w, fi_h, fi_bpp, 0, 0, 0));
@@ -398,7 +398,7 @@ af_err af_save_image(const char* filename, const af_array in_)
         AF_CHECK(af_max_all(&max_real, &max_imag, in_));
         if (max_real <= 1) {
             af_array c255 = 0;
-            AF_CHECK(af_constant(&c255, 255.0, info.ndims(), info.dims().get(), f32));
+            AF_CHECK(af_constant(&c255, 255.0, in__info.ndims(), in__info.dims().get(), f32));
             AF_CHECK(af_mul(&in, in_, c255, false));
             AF_CHECK(af_release_array(c255));
             free_in = true;
@@ -406,7 +406,7 @@ af_err af_save_image(const char* filename, const af_array in_)
             in = in_;
         } else if (max_real < 65536) {
             af_array c255 = 0;
-            AF_CHECK(af_constant(&c255, 257.0, info.ndims(), info.dims().get(), f32));
+            AF_CHECK(af_constant(&c255, 257.0, in__info.ndims(), in__info.dims().get(), f32));
             AF_CHECK(af_div(&in, in_, c255, false));
             AF_CHECK(af_release_array(c255));
             free_in = true;
@@ -418,7 +418,7 @@ af_err af_save_image(const char* filename, const af_array in_)
         uint nDstPitch = _.FreeImage_GetPitch(pResultBitmap.get());
         uchar* pDstLine = _.FreeImage_GetBits(pResultBitmap.get()) + nDstPitch * (fi_h - 1);
         af_array rr = 0, gg = 0, bb = 0, aa = 0;
-        AF_CHECK(channel_split(in, info.dims(), &rr, &gg, &bb, &aa)); // convert array to 3 channels if needed
+        AF_CHECK(channel_split(in, in__info.dims(), &rr, &gg, &bb, &aa)); // convert array to 3 channels if needed
 
         uint step = channels; // force 3 channels saving
         uint indx = 0;
@@ -431,11 +431,11 @@ af_err af_save_image(const char* filename, const af_array in_)
             AF_CHECK(af_transpose(&bbT, bb, false));
             AF_CHECK(af_transpose(&aaT, aa, false));
 
-            const ArrayInfo& cinfo = getInfo(rrT);
-            float* pSrc0 = pinnedAlloc<float>(cinfo.elements());
-            float* pSrc1 = pinnedAlloc<float>(cinfo.elements());
-            float* pSrc2 = pinnedAlloc<float>(cinfo.elements());
-            float* pSrc3 = pinnedAlloc<float>(cinfo.elements());
+            ARG_SETUP(rrT);
+            float* pSrc0 = pinnedAlloc<float>(rrT_info.elements());
+            float* pSrc1 = pinnedAlloc<float>(rrT_info.elements());
+            float* pSrc2 = pinnedAlloc<float>(rrT_info.elements());
+            float* pSrc3 = pinnedAlloc<float>(rrT_info.elements());
 
             AF_CHECK(af_get_data_ptr((void*)pSrc0, rrT));
             AF_CHECK(af_get_data_ptr((void*)pSrc1, ggT));
@@ -462,10 +462,10 @@ af_err af_save_image(const char* filename, const af_array in_)
             AF_CHECK(af_transpose(&ggT, gg, false));
             AF_CHECK(af_transpose(&bbT, bb, false));
 
-            const ArrayInfo& cinfo = getInfo(rrT);
-            float* pSrc0 = pinnedAlloc<float>(cinfo.elements());
-            float* pSrc1 = pinnedAlloc<float>(cinfo.elements());
-            float* pSrc2 = pinnedAlloc<float>(cinfo.elements());
+            ARG_SETUP(rrT);
+            float* pSrc0 = pinnedAlloc<float>(rrT_info.elements());
+            float* pSrc1 = pinnedAlloc<float>(rrT_info.elements());
+            float* pSrc2 = pinnedAlloc<float>(rrT_info.elements());
 
             AF_CHECK(af_get_data_ptr((void*)pSrc0, rrT));
             AF_CHECK(af_get_data_ptr((void*)pSrc1, ggT));
@@ -486,8 +486,9 @@ af_err af_save_image(const char* filename, const af_array in_)
             pinnedFree(pSrc2);
         } else {
             AF_CHECK(af_transpose(&rrT, rr, false));
-            const ArrayInfo& cinfo = getInfo(rrT);
-            float* pSrc0 = pinnedAlloc<float>(cinfo.elements());
+            ARG_SETUP(rrT);
+
+            float* pSrc0 = pinnedAlloc<float>(rrT_info.elements());
             AF_CHECK(af_get_data_ptr((void*)pSrc0, rrT));
 
             for (uint y = 0; y < fi_h; ++y) {

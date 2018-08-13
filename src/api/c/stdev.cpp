@@ -71,9 +71,9 @@ static af_array stdev(const af_array& in, int dim)
 af_err af_stdev_all(double *realVal, double *imagVal, const af_array in)
 {
     try {
-        const ArrayInfo& info = getInfo(in);
-        af_dtype type = info.getType();
-        switch(type) {
+        ARG_SETUP(in);
+
+        switch(in_info.getType()) {
             case f64: *realVal = stdev<double, double>(in); break;
             case f32: *realVal = stdev<float , float >(in); break;
             case s32: *realVal = stdev<int   , float >(in); break;
@@ -95,7 +95,7 @@ af_err af_stdev_all(double *realVal, double *imagVal, const af_array in)
             //    *realVal = real(tmp);
             //    *imagVal = imag(tmp);
             //    } break;
-            default : TYPE_ERROR(1, type);
+            default : TYPE_ERROR(in);
         }
     }
     CATCHALL;
@@ -107,10 +107,10 @@ af_err af_stdev(af_array *out, const af_array in, const dim_t dim)
     try {
         ARG_ASSERT(2, (dim>=0 && dim<=3));
 
+        ARG_SETUP(in);
+
         af_array output = 0;
-        const ArrayInfo& info = getInfo(in);
-        af_dtype type = info.getType();
-        switch(type) {
+        switch(in_info.getType()) {
             case f64: output = stdev<double,  double>(in, dim); break;
             case f32: output = stdev<float ,  float >(in, dim); break;
             case s32: output = stdev<int   ,  float >(in, dim); break;
@@ -124,7 +124,7 @@ af_err af_stdev(af_array *out, const af_array in, const dim_t dim)
             // TODO: FIXME: sqrt(complex) is not present in cuda/opencl backend
             //case c32: output = stdev<cfloat,  cfloat>(in, dim); break;
             //case c64: output = stdev<cdouble,cdouble>(in, dim); break;
-            default : TYPE_ERROR(1, type);
+            default : TYPE_ERROR(in);
         }
         std::swap(*out, output);
     }

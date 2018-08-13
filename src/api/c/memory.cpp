@@ -51,7 +51,7 @@ af_err af_device_array(af_array *arr, const void *data,
         case u16: res = getHandle(createDeviceDataArray<ushort >(d, data)); break;
         case u8 : res = getHandle(createDeviceDataArray<uchar  >(d, data)); break;
         case b8 : res = getHandle(createDeviceDataArray<char   >(d, data)); break;
-        default: TYPE_ERROR(4, type);
+        default: UNSUPPORTED_TYPE(type);
         }
 
         std::swap(*arr, res);
@@ -63,9 +63,9 @@ af_err af_device_array(af_array *arr, const void *data,
 af_err af_get_device_ptr(void **data, const af_array arr)
 {
     try {
-        af_dtype type = getInfo(arr).getType();
+        ARG_SETUP(arr);
 
-        switch (type) {
+        switch (arr_info.getType()) {
             //FIXME: Perform copy if memory not continuous
         case f32: *data = getDevicePtr(getArray<float  >(arr)); break;
         case f64: *data = getDevicePtr(getArray<double >(arr)); break;
@@ -79,8 +79,7 @@ af_err af_get_device_ptr(void **data, const af_array arr)
         case u16: *data = getDevicePtr(getArray<ushort >(arr)); break;
         case u8 : *data = getDevicePtr(getArray<uchar  >(arr)); break;
         case b8 : *data = getDevicePtr(getArray<char   >(arr)); break;
-
-        default: TYPE_ERROR(4, type);
+        default: TYPE_ERROR(arr);
         }
 
     } CATCHALL;
@@ -105,9 +104,9 @@ af_err af_lock_device_ptr(const af_array arr)
 af_err af_lock_array(const af_array arr)
 {
     try {
-        af_dtype type = getInfo(arr).getType();
+        ARG_SETUP(arr);
 
-        switch (type) {
+        switch (arr_info.getType()) {
         case f32: lockArray<float  >(arr); break;
         case f64: lockArray<double >(arr); break;
         case c32: lockArray<cfloat >(arr); break;
@@ -120,7 +119,7 @@ af_err af_lock_array(const af_array arr)
         case u16: lockArray<ushort >(arr); break;
         case u8 : lockArray<uchar  >(arr); break;
         case b8 : lockArray<char   >(arr); break;
-        default: TYPE_ERROR(4, type);
+        default: TYPE_ERROR(arr);
         }
 
     } CATCHALL;
@@ -141,9 +140,9 @@ inline bool checkUserLock(const af_array arr)
 af_err af_is_locked_array(bool *res, const af_array arr)
 {
     try {
-        af_dtype type = getInfo(arr).getType();
+        ARG_SETUP(arr);
 
-        switch (type) {
+        switch (arr_info.getType()) {
         case f32: *res = checkUserLock<float  >(arr); break;
         case f64: *res = checkUserLock<double >(arr); break;
         case c32: *res = checkUserLock<cfloat >(arr); break;
@@ -156,7 +155,7 @@ af_err af_is_locked_array(bool *res, const af_array arr)
         case u16: *res = checkUserLock<ushort >(arr); break;
         case u8 : *res = checkUserLock<uchar  >(arr); break;
         case b8 : *res = checkUserLock<char   >(arr); break;
-        default: TYPE_ERROR(4, type);
+        default: TYPE_ERROR(arr);
         }
 
     } CATCHALL;
@@ -181,9 +180,9 @@ af_err af_unlock_device_ptr(const af_array arr)
 af_err af_unlock_array(const af_array arr)
 {
     try {
-        af_dtype type = getInfo(arr).getType();
+        ARG_SETUP(arr);
 
-        switch (type) {
+        switch (arr_info.getType()) {
         case f32: unlockArray<float  >(arr); break;
         case f64: unlockArray<double >(arr); break;
         case c32: unlockArray<cfloat >(arr); break;
@@ -196,7 +195,7 @@ af_err af_unlock_array(const af_array arr)
         case u16: unlockArray<ushort >(arr); break;
         case u8 : unlockArray<uchar  >(arr); break;
         case b8 : unlockArray<char   >(arr); break;
-        default: TYPE_ERROR(4, type);
+        default: TYPE_ERROR(arr);
         }
 
     } CATCHALL;

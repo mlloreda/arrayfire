@@ -309,38 +309,38 @@ af_err af_save_image_native(const char* filename, const af_array in)
             AF_ERROR("FreeImage Error: Unknown Filetype", AF_ERR_NOT_SUPPORTED);
         }
 
-        const ArrayInfo& info = getInfo(in);
+        ARG_SETUP(in);
         // check image color type
-        FI_CHANNELS channels = (FI_CHANNELS)info.dims()[2];
+        FI_CHANNELS channels = (FI_CHANNELS)in_info.dims()[2];
         DIM_ASSERT(1, channels <= 4);
         DIM_ASSERT(1, channels != 2);
 
         // sizes
-        uint fi_w = info.dims()[1];
-        uint fi_h = info.dims()[0];
+        uint fi_w = in_info.dims()[1];
+        uint fi_h = in_info.dims()[0];
 
-        af_dtype type = info.getType();
+        const af_dtype in_type = in_info.getType();
 
         // FI assumes [0-255] for u8
         // FI assumes [0-65k] for u16
         // FI assumes [0-1]   for f32
         int fi_bpp = 0;
-        switch(type) {
+        switch(in_type) {
             case u8:  fi_bpp = channels * 8; break;
             case u16: fi_bpp = channels * 16; break;
             case f32: fi_bpp = channels * 32; break;
-            default: TYPE_ERROR(1, type);
+            default: TYPE_ERROR(in);
         }
 
-        FREE_IMAGE_TYPE fit_type = getFIT(channels, type);
+        FREE_IMAGE_TYPE fit_type = getFIT(channels, in_type);
 
         // create the result image storage using FreeImage
         bitmap_ptr pResultBitmap = make_bitmap_ptr(nullptr);
-        switch(type) {
+        switch(in_type) {
             case u8:  pResultBitmap.reset(_.FreeImage_AllocateT(fit_type, fi_w, fi_h, fi_bpp, 0, 0, 0)); break;
             case u16: pResultBitmap.reset(_.FreeImage_AllocateT(fit_type, fi_w, fi_h, fi_bpp, 0, 0, 0)); break;
             case f32: pResultBitmap.reset(_.FreeImage_AllocateT(fit_type, fi_w, fi_h, fi_bpp, 0, 0, 0)); break;
-            default: TYPE_ERROR(1, type);
+            default: TYPE_ERROR(in);
         }
 
         if(pResultBitmap == NULL) {
@@ -352,25 +352,25 @@ af_err af_save_image_native(const char* filename, const af_array in)
         void* pDstLine = _.FreeImage_GetBits(pResultBitmap.get()) + nDstPitch * (fi_h - 1);
 
         if(channels == AFFI_GRAY) {
-            switch(type) {
-                case u8:  save_t<uchar , AFFI_GRAY>((uchar *)pDstLine, in, info.dims(), nDstPitch); break;
-                case u16: save_t<ushort, AFFI_GRAY>((ushort*)pDstLine, in, info.dims(), nDstPitch); break;
-                case f32: save_t<float , AFFI_GRAY>((float *)pDstLine, in, info.dims(), nDstPitch); break;
-                default: TYPE_ERROR(1, type);
+            switch(in_type) {
+                case u8:  save_t<uchar , AFFI_GRAY>((uchar *)pDstLine, in, in_info.dims(), nDstPitch); break;
+                case u16: save_t<ushort, AFFI_GRAY>((ushort*)pDstLine, in, in_info.dims(), nDstPitch); break;
+                case f32: save_t<float , AFFI_GRAY>((float *)pDstLine, in, in_info.dims(), nDstPitch); break;
+                default: TYPE_ERROR(in);
             }
         } else if(channels == AFFI_RGB) {
-            switch(type) {
-                case u8:  save_t<uchar , AFFI_RGB >((uchar *)pDstLine, in, info.dims(), nDstPitch); break;
-                case u16: save_t<ushort, AFFI_RGB >((ushort*)pDstLine, in, info.dims(), nDstPitch); break;
-                case f32: save_t<float , AFFI_RGB >((float *)pDstLine, in, info.dims(), nDstPitch); break;
-                default: TYPE_ERROR(1, type);
+            switch(in_type) {
+                case u8:  save_t<uchar , AFFI_RGB >((uchar *)pDstLine, in, in_info.dims(), nDstPitch); break;
+                case u16: save_t<ushort, AFFI_RGB >((ushort*)pDstLine, in, in_info.dims(), nDstPitch); break;
+                case f32: save_t<float , AFFI_RGB >((float *)pDstLine, in, in_info.dims(), nDstPitch); break;
+                default: TYPE_ERROR(in);
             }
         } else {
-            switch(type) {
-                case u8:  save_t<uchar , AFFI_RGBA>((uchar *)pDstLine, in, info.dims(), nDstPitch); break;
-                case u16: save_t<ushort, AFFI_RGBA>((ushort*)pDstLine, in, info.dims(), nDstPitch); break;
-                case f32: save_t<float , AFFI_RGBA>((float *)pDstLine, in, info.dims(), nDstPitch); break;
-                default: TYPE_ERROR(1, type);
+            switch(in_type) {
+                case u8:  save_t<uchar , AFFI_RGBA>((uchar *)pDstLine, in, in_info.dims(), nDstPitch); break;
+                case u16: save_t<ushort, AFFI_RGBA>((ushort*)pDstLine, in, in_info.dims(), nDstPitch); break;
+                case f32: save_t<float , AFFI_RGBA>((float *)pDstLine, in, in_info.dims(), nDstPitch); break;
+                default: TYPE_ERROR(in);
             }
         }
 

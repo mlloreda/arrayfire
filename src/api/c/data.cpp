@@ -73,7 +73,7 @@ af_err af_constant(af_array *result, const double value,
         case u64:   out = createHandleFromValue<uintl  >(d, value); break;
         case s16:   out = createHandleFromValue<short  >(d, value); break;
         case u16:   out = createHandleFromValue<ushort >(d, value); break;
-        default:    TYPE_ERROR(4, type);
+        default:    UNSUPPORTED_TYPE(type);
         }
         std::swap(*result, out);
     }
@@ -97,7 +97,7 @@ af_err af_constant_complex(af_array *result, const double real, const double ima
         AF_CHECK(af_init());
 
         dim4 d(1, 1, 1, 1);
-        if(ndims <= 0) {
+        if (ndims <= 0) {
             return af_create_handle(result, 0, nullptr, type);
         } else {
             d = verifyDims(ndims, dims);
@@ -106,7 +106,7 @@ af_err af_constant_complex(af_array *result, const double real, const double ima
         switch (type) {
         case c32: out = createCplx<cfloat , float >(d, real, imag); break;
         case c64: out = createCplx<cdouble, double>(d, real, imag); break;
-        default:   TYPE_ERROR(5, type);
+        default:   UNSUPPORTED_TYPE(type);
         }
 
         std::swap(*result, out);
@@ -190,7 +190,7 @@ af_err af_identity(af_array *out, const unsigned ndims, const dim_t * const dims
         case s16:   result = identity_<short  >(d);    break;
             // Removed because of bool type. Functions implementations exist.
         case b8:    result = identity_<char   >(d);    break;
-        default:    TYPE_ERROR(3, type);
+        default:    UNSUPPORTED_TYPE(type);
         }
         std::swap(*out, result);
     }
@@ -229,7 +229,7 @@ af_err af_range(af_array *result, const unsigned ndims, const dim_t * const dims
         case s16:   out = range_<short  >(d, seq_dim); break;
         case u16:   out = range_<ushort >(d, seq_dim); break;
         case u8:    out = range_<uchar  >(d, seq_dim); break;
-        default:    TYPE_ERROR(4, type);
+        default:    UNSUPPORTED_TYPE(type);
         }
         std::swap(*result, out);
     }
@@ -271,7 +271,7 @@ af_err af_iota(af_array *result, const unsigned ndims, const dim_t * const dims,
         case s16:   out = iota_<short  >(d, t); break;
         case u16:   out = iota_<ushort >(d, t); break;
         case u8:    out = iota_<uchar  >(d, t); break;
-        default:    TYPE_ERROR(4, type);
+        default:    UNSUPPORTED_TYPE(type);
         }
         std::swap(*result, out);
     }
@@ -294,17 +294,17 @@ static inline af_array diagExtract(const af_array in, const int num)
 af_err af_diag_create(af_array *out, const af_array in, const int num)
 {
     try {
-        const ArrayInfo& in_info = getInfo(in);
+        ARG_SETUP(in);
+        const af_dtype in_type = in_info.getType();
         DIM_ASSERT(1, in_info.ndims() <= 2);
-        af_dtype type = in_info.getType();
 
-        af_array result;
 
-        if(in_info.dims()[0] == 0) {
-            return af_create_handle(out, 0, nullptr, type);
+        if (in_info.dims()[0] == 0) {
+            return af_create_handle(out, 0, nullptr, in_type);
         }
 
-        switch(type) {
+        af_array result;
+        switch(in_type) {
         case f32:   result = diagCreate<float  >(in, num);    break;
         case c32:   result = diagCreate<cfloat >(in, num);    break;
         case f64:   result = diagCreate<double >(in, num);    break;
@@ -318,7 +318,7 @@ af_err af_diag_create(af_array *out, const af_array in, const int num)
         case u8:    result = diagCreate<uchar  >(in, num);    break;
             // Removed because of bool type. Functions implementations exist.
         case b8:    result = diagCreate<char   >(in, num);    break;
-        default:    TYPE_ERROR(1, type);
+        default:    TYPE_ERROR(in);
         }
 
         std::swap(*out, result);
@@ -330,17 +330,17 @@ af_err af_diag_extract(af_array *out, const af_array in, const int num)
 {
 
     try {
-        const ArrayInfo& in_info = getInfo(in);
-        af_dtype type = in_info.getType();
+        ARG_SETUP(in);
+        const af_dtype in_type = in_info.getType();
 
         if(in_info.ndims() == 0) {
-            return af_create_handle(out, 0, nullptr, type);
+            return af_create_handle(out, 0, nullptr, in_type);
         }
 
         DIM_ASSERT(1, in_info.ndims() >= 2);
 
         af_array result;
-        switch(type) {
+        switch(in_type) {
         case f32:   result = diagExtract<float  >(in, num);    break;
         case c32:   result = diagExtract<cfloat >(in, num);    break;
         case f64:   result = diagExtract<double >(in, num);    break;
@@ -354,7 +354,7 @@ af_err af_diag_extract(af_array *out, const af_array in, const int num)
         case u8:    result = diagExtract<uchar  >(in, num);    break;
             // Removed because of bool type. Functions implementations exist.
         case b8:    result = diagExtract<char   >(in, num);    break;
-        default:    TYPE_ERROR(1, type);
+        default:    TYPE_ERROR(in);
         }
 
         std::swap(*out, result);
@@ -375,15 +375,14 @@ af_array triangle(const af_array in, bool is_unit_diag)
 af_err af_lower(af_array *out, const af_array in, bool is_unit_diag)
 {
     try {
-        const ArrayInfo& info = getInfo(in);
-        af_dtype type = info.getType();
+        ARG_SETUP(in);
 
-        if(info.ndims() == 0) {
+        if (in_info.ndims() == 0) {
             return af_retain_array(out, in);
         }
 
         af_array res;
-        switch(type) {
+        switch(in_info.getType()) {
         case f32: res = triangle<float   , false>(in, is_unit_diag); break;
         case f64: res = triangle<double  , false>(in, is_unit_diag); break;
         case c32: res = triangle<cfloat  , false>(in, is_unit_diag); break;
@@ -396,6 +395,7 @@ af_err af_lower(af_array *out, const af_array in, bool is_unit_diag)
         case u16: res = triangle<ushort  , false>(in, is_unit_diag); break;
         case u8 : res = triangle<uchar   , false>(in, is_unit_diag); break;
         case b8 : res = triangle<char    , false>(in, is_unit_diag); break;
+        default: TYPE_ERROR(in);
         }
         std::swap(*out, res);
     }
@@ -407,15 +407,14 @@ af_err af_lower(af_array *out, const af_array in, bool is_unit_diag)
 af_err af_upper(af_array *out, const af_array in, bool is_unit_diag)
 {
     try {
-        const ArrayInfo& info = getInfo(in);
-        af_dtype type = info.getType();
+        ARG_SETUP(in);
 
-        if(info.ndims() == 0) {
+        if (in_info.ndims() == 0) {
             return af_retain_array(out, in);
         }
 
         af_array res;
-        switch(type) {
+        switch(in_info.getType()) {
         case f32: res = triangle<float   , true>(in, is_unit_diag); break;
         case f64: res = triangle<double  , true>(in, is_unit_diag); break;
         case c32: res = triangle<cfloat  , true>(in, is_unit_diag); break;
@@ -428,6 +427,7 @@ af_err af_upper(af_array *out, const af_array in, bool is_unit_diag)
         case u16: res = triangle<ushort  , true>(in, is_unit_diag); break;
         case u8 : res = triangle<uchar   , true>(in, is_unit_diag); break;
         case b8 : res = triangle<char    , true>(in, is_unit_diag); break;
+        default: TYPE_ERROR(in);
         }
         std::swap(*out, res);
     }

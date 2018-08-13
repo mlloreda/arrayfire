@@ -41,10 +41,9 @@ static inline void moments(af_array *out, const af_array in, af_moment_type mome
 af_err af_moments(af_array *out, const af_array in, const af_moment_type moment)
 {
     try {
-        const ArrayInfo& in_info = getInfo(in);
-        af_dtype type = in_info.getType();
+        ARG_SETUP(in);
 
-        switch(type) {
+        switch(in_info.getType()) {
             case f32: moments<float>          (out, in, moment); break;
             case f64: moments<double>         (out, in, moment); break;
             case u32: moments<unsigned>       (out, in, moment); break;
@@ -52,7 +51,7 @@ af_err af_moments(af_array *out, const af_array in, const af_moment_type moment)
             case u16: moments<unsigned short> (out, in, moment); break;
             case s16: moments<short>          (out, in, moment); break;
             case b8:  moments<char>           (out, in, moment); break;
-            default:  TYPE_ERROR(1, type);
+            default:  TYPE_ERROR(in);
         }
     }
     CATCHALL;
@@ -63,8 +62,8 @@ af_err af_moments(af_array *out, const af_array in, const af_moment_type moment)
 template<typename T>
 static inline void moment_copy(double* out, const af_array moments)
 {
-    auto info = getInfo(moments);
-    vector<T> h_moments(info.elements());
+    ARG_SETUP(moments);
+    vector<T> h_moments(moments_info.elements());
     copyData(h_moments.data(), moments);
 
     // convert to double
@@ -74,7 +73,7 @@ static inline void moment_copy(double* out, const af_array moments)
 af_err af_moments_all(double* out, const af_array in, const af_moment_type moment)
 {
     try {
-        const ArrayInfo& in_info = getInfo(in);
+        ARG_SETUP(in);
         dim4 idims = in_info.dims();
         DIM_ASSERT(1, idims[2] == 1 && idims[3] == 1);
 

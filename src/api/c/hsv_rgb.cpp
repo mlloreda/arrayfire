@@ -34,21 +34,22 @@ template<bool isHSV2RGB>
 af_err convert(af_array* out, const af_array& in)
 {
     try {
-        const ArrayInfo& info = getInfo(in);
-        af_dtype iType = info.getType();
-        af::dim4 inputDims = info.dims();
+        ARG_SETUP(in);
 
-        if(info.ndims() == 0) {
-            return af_create_handle(out, 0, nullptr, iType);
+        const af_dtype in_type = in_info.getType();
+        af::dim4 inputDims = in_info.dims();
+
+        if (in_info.ndims() == 0) {
+            return af_create_handle(out, 0, nullptr, in_type);
         }
 
         ARG_ASSERT(1, (inputDims.ndims() >= 3));
 
         af_array output = 0;
-        switch (iType) {
+        switch (in_type) {
             case f64: output = convert<double, isHSV2RGB>(in); break;
             case f32: output = convert<float , isHSV2RGB>(in); break;
-            default: TYPE_ERROR(1, iType); break;
+            default: TYPE_ERROR(in); break;
         }
         std::swap(*out, output);
     }

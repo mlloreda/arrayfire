@@ -124,20 +124,18 @@ template<dim_t baseDim>
 af_err fft_convolve(af_array *out, const af_array signal, const af_array filter, const bool expand)
 {
     try {
-        const ArrayInfo& sInfo = getInfo(signal);
-        const ArrayInfo& fInfo = getInfo(filter);
+        ARG_SETUP(signal);
+        ARG_SETUP(filter);
 
-        af_dtype stype  = sInfo.getType();
-
-        dim4 sdims = sInfo.dims();
-        dim4 fdims = fInfo.dims();
+        dim4 sdims = signal_info.dims();
+        dim4 fdims = filter_info.dims();
 
         AF_BATCH_KIND convBT = identifyBatchKind<baseDim>(sdims, fdims);
 
         ARG_ASSERT(1, (convBT != AF_BATCH_UNSUPPORTED));
 
         af_array output;
-        switch(stype) {
+        switch(signal_info.getType()) {
             case f64: output = fftconvolve<double, double, cdouble, true , false, baseDim>(signal, filter, expand, convBT); break;
             case f32: output = fftconvolve<float , float,  cfloat,  false, false, baseDim>(signal, filter, expand, convBT); break;
             case u32: output = fftconvolve<uint  , float,  cfloat,  false, true,  baseDim>(signal, filter, expand, convBT); break;
@@ -150,9 +148,9 @@ af_err fft_convolve(af_array *out, const af_array signal, const af_array filter,
             case b8:  output = fftconvolve<char  , float,  cfloat,  false, true,  baseDim>(signal, filter, expand, convBT); break;
             case c32: output = fftconvolve_fallback<cfloat , cfloat , cfloat , baseDim>(signal, filter, expand); break;
             case c64: output = fftconvolve_fallback<cdouble, cdouble, cdouble, baseDim>(signal, filter, expand); break;
-            default: TYPE_ERROR(1, stype);
+            default: TYPE_ERROR(signal);
         }
-        std::swap(*out,output);
+        std::swap(*out, output);
     }
     CATCHALL;
 

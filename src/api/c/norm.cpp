@@ -126,26 +126,26 @@ af_err af_norm(double *out, const af_array in,
 {
 
     try {
-        const ArrayInfo& i_info = getInfo(in);
+        ARG_SETUP(in);
 
-        if (i_info.ndims() > 2) {
+        if (in_info.ndims() > 2) {
             AF_ERROR("solve can not be used in batch mode", AF_ERR_BATCH);
         }
 
-        af_dtype i_type = i_info.getType();
-
-        ARG_ASSERT(1, i_info.isFloating());                       // Only floating and complex types
+        ARG_ASSERT(1, in_info.isFloating());                       // Only floating and complex types
 
         *out = 0;
 
-        if(i_info.ndims() == 0) { return AF_SUCCESS; }
+        if (in_info.ndims() == 0) {
+            return AF_SUCCESS;
+        }
 
-        switch(i_type) {
+        switch(in_info.getType()) {
         case f32: *out = norm<float  >(in, type, p, q);  break;
         case f64: *out = norm<double >(in, type, p, q);  break;
         case c32: *out = norm<cfloat >(in, type, p, q);  break;
         case c64: *out = norm<cdouble>(in, type, p, q);  break;
-        default:  TYPE_ERROR(1, i_type);
+        default:  TYPE_ERROR(in);
         }
     }
     CATCHALL;

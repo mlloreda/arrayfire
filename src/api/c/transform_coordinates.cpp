@@ -65,16 +65,15 @@ static af_array transform_coordinates(const af_array& tf_, const float d0_, cons
 af_err af_transform_coordinates(af_array *out, const af_array tf, const float d0_, const float d1_)
 {
     try {
-        const ArrayInfo& tfInfo = getInfo(tf);
-        dim4 tfDims = tfInfo.dims();
+        ARG_SETUP(tf);
+        dim4 tfDims = tf_info.dims();
         ARG_ASSERT(1, (tfDims[0]==3 && tfDims[1]==3 && tfDims.ndims()==2));
 
         af_array output;
-        af_dtype type  = tfInfo.getType();
-        switch(type) {
+        switch(tf_info.getType()) {
             case f32: output = transform_coordinates<float >(tf, d0_, d1_); break;
             case f64: output = transform_coordinates<double>(tf, d0_, d1_); break;
-            default : TYPE_ERROR(1, type);
+            default : TYPE_ERROR(tf);
         }
         std::swap(*out, output);
     }

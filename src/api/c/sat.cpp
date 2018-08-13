@@ -30,15 +30,13 @@ static af_array sat(const af_array& in)
 af_err af_sat(af_array* out, const af_array in)
 {
     try{
-        const ArrayInfo& info = getInfo(in);
-        const dim4 dims = info.dims();
+        ARG_SETUP(in);
+        const dim4 dims = in_info.dims();
 
         ARG_ASSERT(1, (dims.ndims() >= 2));
 
-        af_dtype inputType = info.getType();
-
         af_array output = 0;
-        switch(inputType) {
+        switch(in_info.getType()) {
             case f64: output = sat<double, double>(in); break;
             case f32: output = sat<float , float >(in); break;
             case s32: output = sat<int   , int   >(in); break;
@@ -49,7 +47,7 @@ af_err af_sat(af_array* out, const af_array in)
             case u64: output = sat<uintl , uintl >(in); break;
             case s16: output = sat<int   , short >(in); break;
             case u16: output = sat<uint  , ushort>(in); break;
-            default: TYPE_ERROR(1, inputType);
+            default: TYPE_ERROR(in);
         }
         std::swap(*out, output);
     }

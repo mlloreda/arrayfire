@@ -67,17 +67,16 @@ af_err af_det(double *real_val, double *imag_val, const af_array in)
 {
 
     try {
-        const ArrayInfo& i_info = getInfo(in);
+        ARG_SETUP(in);
 
-        if (i_info.ndims() > 2) {
+        if (in_info.ndims() > 2) {
             AF_ERROR("solve can not be used in batch mode", AF_ERR_BATCH);
         }
 
-        af_dtype type = i_info.getType();
-
-        if(i_info.dims()[0])
-          DIM_ASSERT(1, i_info.dims()[0] == i_info.dims()[1]);      // Only square matrices
-        ARG_ASSERT(1, i_info.isFloating());                       // Only floating and complex types
+        if (in_info.dims()[0]) {
+          DIM_ASSERT(1, in_info.dims()[0] == in_info.dims()[1]);      // Only square matrices
+        }
+        ARG_ASSERT(1, in_info.isFloating());                       // Only floating and complex types
 
         *real_val = 0;
         *imag_val = 0;
@@ -85,7 +84,7 @@ af_err af_det(double *real_val, double *imag_val, const af_array in)
         cfloat cfval;
         cdouble cdval;
 
-        switch(type) {
+        switch(in_info.getType()) {
         case f32: *real_val = det<float  >(in);  break;
         case f64: *real_val = det<double >(in);  break;
         case c32:
@@ -98,7 +97,7 @@ af_err af_det(double *real_val, double *imag_val, const af_array in)
             *real_val = real(cdval);
             *imag_val = imag(cdval);
             break;
-        default:  TYPE_ERROR(1, type);
+        default:  TYPE_ERROR(in);
         }
     }
     CATCHALL;

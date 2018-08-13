@@ -41,18 +41,18 @@ af_err af_topk(af_array *values, af_array *indices, const af_array in,
     try {
         af::topkFunction ord = (order == AF_TOPK_DEFAULT ? AF_TOPK_MAX : order);
 
-        ArrayInfo inInfo = getInfo(in);
+        ARG_SETUP(in);
 
-        ARG_ASSERT(1, (inInfo.ndims()>0));
+        ARG_ASSERT(1, (in_info.ndims()>0));
 
-        if (inInfo.elements() == 1) {
+        if (in_info.elements() == 1) {
             dim_t dims[1] = {1};
             af_err errValue = af_constant(indices, 0, 1, dims, u32);
             return errValue==AF_SUCCESS ? af_retain_array(values, in) : errValue;
         }
 
         int rdim = dim;
-        auto &inDims = inInfo.dims();
+        auto &inDims = in_info.dims();
 
         if (rdim==-1) {
             for (dim_t d = 0; d < 4; d++) {
@@ -66,15 +66,13 @@ af_err af_topk(af_array *values, af_array *indices, const af_array in,
         if (rdim!=0)
             AF_ERROR("topk is supported along dimenion 0 only.", AF_ERR_NOT_SUPPORTED);
 
-        af_dtype type  = inInfo.getType();
-
-        switch(type) {
+        switch(in_info.getType()) {
             // TODO(umar): FIX RETURN VALUES HERE
             case f32: topk<float >(values, indices, in, k, rdim, ord); break;
             case f64: topk<double>(values, indices, in, k, rdim, ord); break;
             case u32: topk<uint  >(values, indices, in, k, rdim, ord); break;
             case s32: topk<int   >(values, indices, in, k, rdim, ord); break;
-            default : TYPE_ERROR(1, type);
+            default : TYPE_ERROR(in);
         }
     }
     CATCHALL;

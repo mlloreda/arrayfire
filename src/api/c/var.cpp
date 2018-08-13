@@ -164,15 +164,14 @@ static af_array var_(const af_array& in, const af_array& weights,
 af_err af_var(af_array *out, const af_array in, const bool isbiased, const dim_t dim)
 {
     try {
+        ARG_SETUP(in);
+
         ARG_ASSERT(3, (dim>=0 && dim<=3));
 
         af_array output = 0;
-        const ArrayInfo& info = getInfo(in);
-        af_dtype type = info.getType();
-
         af_array no_weights = 0;
         af_var_bias bias = (isbiased) ? AF_VARIANCE_POPULATION : AF_VARIANCE_SAMPLE;
-        switch(type) {
+        switch(in_info.getType()) {
             case f32: output = var_<float ,  float >(in, no_weights, bias, dim); break;
             case f64: output = var_<double,  double>(in, no_weights, bias, dim); break;
             case s32: output = var_<int   ,  float >(in, no_weights, bias, dim); break;
@@ -185,7 +184,7 @@ af_err af_var(af_array *out, const af_array in, const bool isbiased, const dim_t
             case  b8: output = var_<char  ,  float >(in, no_weights, bias, dim); break;
             case c32: output = var_<cfloat,  cfloat>(in, no_weights, bias, dim); break;
             case c64: output = var_<cdouble,cdouble>(in, no_weights, bias, dim); break;
-            default : TYPE_ERROR(1, type);
+            default : TYPE_ERROR(in);
         }
         std::swap(*out, output);
     }
@@ -196,17 +195,14 @@ af_err af_var(af_array *out, const af_array in, const bool isbiased, const dim_t
 af_err af_var_weighted(af_array *out, const af_array in, const af_array weights, const dim_t dim)
 {
     try {
+        ARG_SETUP(in);
+        ARG_SETUP(weights);
+
         ARG_ASSERT(3, (dim>=0 && dim<=3));
+        ASSERT_TYPE(weights, TYPES(f32, f64)); /* verify that weights are non-complex real numbers */
 
         af_array output = 0;
-        const ArrayInfo& iInfo = getInfo(in);
-        const ArrayInfo& wInfo = getInfo(weights);
-        af_dtype iType  = iInfo.getType();
-        af_dtype wType  = wInfo.getType();
-
-        ARG_ASSERT(2, (wType==f32 || wType==f64)); /* verify that weights are non-complex real numbers */
-
-        switch(iType) {
+        switch(in_info.getType()) {
             case f64: output = var_<double,  double>(in, weights, AF_VARIANCE_POPULATION, dim); break;
             case f32: output = var_<float ,  float >(in, weights, AF_VARIANCE_POPULATION, dim); break;
             case s32: output = var_<int   ,  float >(in, weights, AF_VARIANCE_POPULATION, dim); break;
@@ -219,7 +215,7 @@ af_err af_var_weighted(af_array *out, const af_array in, const af_array weights,
             case  b8: output = var_<char  ,  float >(in, weights, AF_VARIANCE_POPULATION, dim); break;
             case c32: output = var_<cfloat,  cfloat>(in, weights, AF_VARIANCE_POPULATION, dim); break;
             case c64: output = var_<cdouble,cdouble>(in, weights, AF_VARIANCE_POPULATION, dim); break;
-            default : TYPE_ERROR(1, iType);
+            default : TYPE_ERROR(in);
         }
         std::swap(*out, output);
     }
@@ -230,9 +226,8 @@ af_err af_var_weighted(af_array *out, const af_array in, const af_array weights,
 af_err af_var_all(double *realVal, double *imagVal, const af_array in, const bool isbiased)
 {
     try {
-        const ArrayInfo& info = getInfo(in);
-        af_dtype type = info.getType();
-        switch(type) {
+        ARG_SETUP(in);
+        switch(in_info.getType()) {
             case f64: *realVal = varAll<double, double>(in, isbiased); break;
             case f32: *realVal = varAll<float , float >(in, isbiased); break;
             case s32: *realVal = varAll<int   , float >(in, isbiased); break;
@@ -253,7 +248,7 @@ af_err af_var_all(double *realVal, double *imagVal, const af_array in, const boo
                 *realVal = real(tmp);
                 *imagVal = imag(tmp);
                 } break;
-            default : TYPE_ERROR(1, type);
+            default : TYPE_ERROR(in);
         }
     }
     CATCHALL;
@@ -263,14 +258,11 @@ af_err af_var_all(double *realVal, double *imagVal, const af_array in, const boo
 af_err af_var_all_weighted(double *realVal, double *imagVal, const af_array in, const af_array weights)
 {
     try {
-        const ArrayInfo& iInfo = getInfo(in);
-        const ArrayInfo& wInfo = getInfo(weights);
-        af_dtype iType  = iInfo.getType();
-        af_dtype wType  = wInfo.getType();
+        ARG_SETUP(weights);
+        ASSERT_TYPE(weights, TYPES(f32, f64)); /* verify that weights are non-complex real numbers */
 
-        ARG_ASSERT(3, (wType==f32 || wType==f64)); /* verify that weights are non-complex real numbers */
-
-        switch(iType) {
+        ARG_SETUP(in);
+        switch(in_info.getType()) {
             case f64: *realVal = varAll<double, double>(in, weights); break;
             case f32: *realVal = varAll<float , float >(in, weights); break;
             case s32: *realVal = varAll<int   , float >(in, weights); break;
@@ -291,7 +283,7 @@ af_err af_var_all_weighted(double *realVal, double *imagVal, const af_array in, 
                 *realVal = real(tmp);
                 *imagVal = imag(tmp);
                 } break;
-            default : TYPE_ERROR(1, iType);
+            default : TYPE_ERROR(in);
         }
     }
     CATCHALL;
@@ -302,16 +294,14 @@ af_err af_meanvar(af_array *mean, af_array *var, const af_array in,
                   const af_array weights, const af_var_bias bias, const dim_t dim) {
 
   try {
-      af_array output = 0;
-      const ArrayInfo& iInfo = getInfo(in);
-      if(weights != 0) {
-        const ArrayInfo& wInfo = getInfo(weights);
-        af_dtype wType  = wInfo.getType();
-        ARG_ASSERT(3, (wType==f32 || wType==f64));
+      if (weights != 0) {
+          ARG_SETUP(weights);
+          ASSERT_TYPE(weights, TYPES(f32, f64));
       }
-      af_dtype iType  = iInfo.getType();
 
-      switch(iType) {
+      ARG_SETUP(in);
+
+      switch(in_info.getType()) {
         case f32: tie(*mean, *var) = meanvar<float,   float>(in, weights, bias, dim); break;
         case f64: tie(*mean, *var) = meanvar<double, double>(in, weights, bias, dim); break;
         case s32: tie(*mean, *var) = meanvar<int,     float>(in, weights, bias, dim); break;
@@ -324,7 +314,7 @@ af_err af_meanvar(af_array *mean, af_array *var, const af_array in,
         case  b8: tie(*mean, *var) = meanvar<char  ,  float >(in, weights, bias, dim); break;
         case c32: tie(*mean, *var) = meanvar<cfloat,  cfloat>(in, weights, bias, dim); break;
         case c64: tie(*mean, *var) = meanvar<cdouble,cdouble>(in, weights, bias, dim); break;
-        default : TYPE_ERROR(1, iType);
+        default : TYPE_ERROR(in);
       }
   }
   CATCHALL;

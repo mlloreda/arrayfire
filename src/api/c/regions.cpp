@@ -27,18 +27,16 @@ static af_array regions(af_array const &in, af_connectivity connectivity)
 af_err af_regions(af_array *out, const af_array in, const af_connectivity connectivity, const af_dtype type)
 {
     try {
+        ARG_SETUP(in); // in_info
+
+
         ARG_ASSERT(2, (connectivity==AF_CONNECTIVITY_4 || connectivity==AF_CONNECTIVITY_8));
 
-        const ArrayInfo& info = getInfo(in);
-        af::dim4 dims  = info.dims();
-
+        dim4 dims  = in_info.dims();
         dim_t in_ndims = dims.ndims();
         DIM_ASSERT(1, (in_ndims <= 3 && in_ndims >= 2));
 
-        af_dtype in_type = info.getType();
-        if (in_type != b8) {
-            TYPE_ERROR(1, in_type);
-        }
+        ASSERT_TYPE(in, TYPES(b8));
 
         af_array output;
         switch(type) {
@@ -48,8 +46,9 @@ af_err af_regions(af_array *out, const af_array in, const af_connectivity connec
             case u32: output = regions<uint  >(in, connectivity); break;
             case s16: output = regions<short >(in, connectivity); break;
             case u16: output = regions<ushort>(in, connectivity); break;
-            default : TYPE_ERROR(0, type);
+            default : UNSUPPORTED_TYPE(type);
         }
+
         std::swap(*out, output);
     }
     CATCHALL;

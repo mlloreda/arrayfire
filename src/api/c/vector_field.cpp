@@ -119,24 +119,22 @@ forge::Chart* setup_vector_field(const forge::Window* const window,
 af_err vectorFieldWrapper(const af_window wind, const af_array points, const af_array directions,
                           const af_cell* const props)
 {
-    if(wind==0) {
+    if (wind == 0) {
         AF_RETURN_ERROR("Not a valid window", AF_SUCCESS);
     }
 
     try {
-        const ArrayInfo& pInfo = getInfo(points);
-        af::dim4 pDims  = pInfo.dims();
-        af_dtype pType  = pInfo.getType();
+        ARG_SETUP(points);
+        ARG_SETUP(directions);
 
-        const ArrayInfo& dInfo = getInfo(directions);
-        af::dim4 dDims  = dInfo.dims();
-        af_dtype dType  = dInfo.getType();
+        af::dim4 pDims  = points_info.dims();
+        af::dim4 dDims  = directions_info.dims();
 
         DIM_ASSERT(0, pDims == dDims);
         DIM_ASSERT(0, pDims.ndims() == 2);
         DIM_ASSERT(0, pDims[1] == 2 || pDims[1] == 3); // Columns:P 2 means 2D and 3 means 3D
 
-        TYPE_ASSERT(pType == dType);
+        ASSERT_TYPE_EQ(points, directions);
 
         forge::Window* window = reinterpret_cast<forge::Window*>(wind);
         makeContextCurrent(window);
@@ -149,14 +147,14 @@ af_err vectorFieldWrapper(const af_window wind, const af_array points, const af_
         vector<af_array> dirs;
         dirs.push_back(directions);
 
-        switch(pType) {
+        switch(points_info.getType()) {
             case f32: chart = setup_vector_field<float  >(window, pnts, dirs, props); break;
             case s32: chart = setup_vector_field<int    >(window, pnts, dirs, props); break;
             case u32: chart = setup_vector_field<uint   >(window, pnts, dirs, props); break;
             case s16: chart = setup_vector_field<short  >(window, pnts, dirs, props); break;
             case u16: chart = setup_vector_field<ushort >(window, pnts, dirs, props); break;
             case u8 : chart = setup_vector_field<uchar  >(window, pnts, dirs, props); break;
-            default:  TYPE_ERROR(1, pType);
+            default:  TYPE_ERROR(points);
         }
 
         auto gridDims = ForgeManager::getInstance().getWindowGrid(window);
@@ -182,29 +180,19 @@ af_err vectorFieldWrapper(const af_window wind,
     }
 
     try {
-        const ArrayInfo& xpInfo = getInfo(xPoints);
-        const ArrayInfo& ypInfo = getInfo(yPoints);
-        const ArrayInfo& zpInfo = getInfo(zPoints);
+        ARG_SETUP(xPoints);
+        ARG_SETUP(yPoints);
+        ARG_SETUP(zPoints);
+        ARG_SETUP(xDirs);
+        ARG_SETUP(yDirs);
+        ARG_SETUP(zDirs);
 
-        af::dim4 xpDims  = xpInfo.dims();
-        af::dim4 ypDims  = ypInfo.dims();
-        af::dim4 zpDims  = zpInfo.dims();
-
-        af_dtype xpType  = xpInfo.getType();
-        af_dtype ypType  = ypInfo.getType();
-        af_dtype zpType  = zpInfo.getType();
-
-        const ArrayInfo& xdInfo = getInfo(xDirs);
-        const ArrayInfo& ydInfo = getInfo(yDirs);
-        const ArrayInfo& zdInfo = getInfo(zDirs);
-
-        af::dim4 xdDims  = xdInfo.dims();
-        af::dim4 ydDims  = ydInfo.dims();
-        af::dim4 zdDims  = zdInfo.dims();
-
-        af_dtype xdType  = xdInfo.getType();
-        af_dtype ydType  = ydInfo.getType();
-        af_dtype zdType  = zdInfo.getType();
+        af::dim4 xpDims  = xPoints_info.dims();
+        af::dim4 ypDims  = yPoints_info.dims();
+        af::dim4 zpDims  = zPoints_info.dims();
+        af::dim4 xdDims  = xDirs_info.dims();
+        af::dim4 ydDims  = yDirs_info.dims();
+        af::dim4 zdDims  = zDirs_info.dims();
 
         // Assert all arrays are equal dimensions
         DIM_ASSERT(1, xpDims == xdDims);
@@ -218,12 +206,11 @@ af_err vectorFieldWrapper(const af_window wind,
         DIM_ASSERT(1, xpDims.ndims() == 1);
 
         // Assert all arrays are equal types
-        DIM_ASSERT(1, xpType == xdType);
-        DIM_ASSERT(2, ypType == ydType);
-        DIM_ASSERT(3, zpType == zdType);
-
-        DIM_ASSERT(1, xpType == ypType);
-        DIM_ASSERT(1, xpType == zpType);
+        ASSERT_TYPE_EQ(xPoints, xDirs);
+        ASSERT_TYPE_EQ(yPoints, yDirs);
+        ASSERT_TYPE_EQ(zPoints, zDirs);
+        ASSERT_TYPE_EQ(xPoints, yPoints);
+        ASSERT_TYPE_EQ(xPoints, zPoints);
 
         forge::Window* window = reinterpret_cast<forge::Window*>(wind);
         makeContextCurrent(window);
@@ -240,14 +227,14 @@ af_err vectorFieldWrapper(const af_window wind,
         directions.push_back(yDirs);
         directions.push_back(zDirs);
 
-        switch(xpType) {
+        switch(xPoints_info.getType()) {
             case f32: chart = setup_vector_field<float  >(window, points, directions, props); break;
             case s32: chart = setup_vector_field<int    >(window, points, directions, props); break;
             case u32: chart = setup_vector_field<uint   >(window, points, directions, props); break;
             case s16: chart = setup_vector_field<short  >(window, points, directions, props); break;
             case u16: chart = setup_vector_field<ushort >(window, points, directions, props); break;
             case u8 : chart = setup_vector_field<uchar  >(window, points, directions, props); break;
-            default:  TYPE_ERROR(1, xpType);
+            default:  TYPE_ERROR(xPoints);
         }
 
         auto gridDims = ForgeManager::getInstance().getWindowGrid(window);
@@ -268,43 +255,33 @@ af_err vectorFieldWrapper(const af_window wind,
                           const af_array xDirs, const af_array yDirs,
                           const af_cell* const props)
 {
-    if(wind==0) {
+    if (wind == 0) {
         AF_RETURN_ERROR("Not a valid window", AF_SUCCESS);
     }
 
     try {
-        const ArrayInfo& xpInfo = getInfo(xPoints);
-        const ArrayInfo& ypInfo = getInfo(yPoints);
+        ARG_SETUP(xPoints);
+        ARG_SETUP(yPoints);
+        ARG_SETUP(xDirs);
+        ARG_SETUP(yDirs);
 
-        af::dim4 xpDims  = xpInfo.dims();
-        af::dim4 ypDims  = ypInfo.dims();
-
-        af_dtype xpType  = xpInfo.getType();
-        af_dtype ypType  = ypInfo.getType();
-
-        const ArrayInfo& xdInfo = getInfo(xDirs);
-        const ArrayInfo& ydInfo = getInfo(yDirs);
-
-        af::dim4 xdDims  = xdInfo.dims();
-        af::dim4 ydDims  = ydInfo.dims();
-
-        af_dtype xdType  = xdInfo.getType();
-        af_dtype ydType  = ydInfo.getType();
+        af::dim4 xpDims = xPoints_info.dims();
+        af::dim4 ypDims = yPoints_info.dims();
+        af::dim4 xdDims = xDirs_info.dims();
+        af::dim4 ydDims = yDirs_info.dims();
 
         // Assert all arrays are equal dimensions
         DIM_ASSERT(1, xpDims == xdDims);
         DIM_ASSERT(2, ypDims == ydDims);
-
         DIM_ASSERT(1, xpDims == ypDims);
 
         // Verify vector
         DIM_ASSERT(1, xpDims.ndims() == 1);
 
         // Assert all arrays are equal types
-        DIM_ASSERT(1, xpType == xdType);
-        DIM_ASSERT(2, ypType == ydType);
-
-        DIM_ASSERT(1, xpType == ypType);
+        ASSERT_TYPE_EQ(xPoints, xDirs);
+        ASSERT_TYPE_EQ(yPoints, yDirs);
+        ASSERT_TYPE_EQ(xPoints, yPoints);
 
         forge::Window* window = reinterpret_cast<forge::Window*>(wind);
         makeContextCurrent(window);
@@ -319,14 +296,14 @@ af_err vectorFieldWrapper(const af_window wind,
         directions.push_back(xDirs);
         directions.push_back(yDirs);
 
-        switch(xpType) {
+        switch(xPoints_info.getType()) {
             case f32: chart = setup_vector_field<float  >(window, points, directions, props); break;
             case s32: chart = setup_vector_field<int    >(window, points, directions, props); break;
             case u32: chart = setup_vector_field<uint   >(window, points, directions, props); break;
             case s16: chart = setup_vector_field<short  >(window, points, directions, props); break;
             case u16: chart = setup_vector_field<ushort >(window, points, directions, props); break;
             case u8 : chart = setup_vector_field<uchar  >(window, points, directions, props); break;
-            default:  TYPE_ERROR(1, xpType);
+            default:  TYPE_ERROR(xPoints);
         }
 
         auto gridDims = ForgeManager::getInstance().getWindowGrid(window);

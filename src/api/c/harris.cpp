@@ -52,8 +52,8 @@ af_err af_harris(af_features *out, const af_array in, const unsigned max_corners
                  const unsigned block_size, const float k_thr)
 {
     try {
-        const ArrayInfo& info = getInfo(in);
-        af::dim4 dims  = info.dims();
+        ARG_SETUP(in);
+        af::dim4 dims  = in_info.dims();
         dim_t in_ndims = dims.ndims();
 
         unsigned filter_len = (block_size == 0) ? floor(6.f * sigma) : block_size;
@@ -71,11 +71,10 @@ af_err af_harris(af_features *out, const af_array in, const unsigned max_corners
         ARG_ASSERT(4, (block_size > 2) || (sigma >= 0.5f && sigma <= 5.f));
         ARG_ASSERT(5, (block_size <= 32));
 
-        af_dtype type  = info.getType();
-        switch(type) {
+        switch(in_info.getType()) {
             case f64: *out = harris<double, double>(in, max_corners, min_response, sigma, filter_len, k_thr); break;
             case f32: *out = harris<float , float >(in, max_corners, min_response, sigma, filter_len, k_thr); break;
-            default : TYPE_ERROR(1, type);
+            default : TYPE_ERROR(in);
         }
     }
     CATCHALL;

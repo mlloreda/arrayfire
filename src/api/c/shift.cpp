@@ -26,17 +26,15 @@ static inline af_array shift(const af_array in, const int sdims[4])
 af_err af_shift(af_array *out, const af_array in, const int sdims[4])
 {
     try {
-        const ArrayInfo& info = getInfo(in);
-        af_dtype type = info.getType();
+        ARG_SETUP(in);
 
-        if(info.ndims() == 0) {
+        if (in_info.ndims() == 0) {
             return af_retain_array(out, in);
         }
-        DIM_ASSERT(1, info.elements() > 0);
+        DIM_ASSERT(1, in_info.elements() > 0);
 
         af_array output;
-
-        switch(type) {
+        switch(in_info.getType()) {
             case f32: output = shift<float  >(in, sdims);  break;
             case c32: output = shift<cfloat >(in, sdims);  break;
             case f64: output = shift<double >(in, sdims);  break;
@@ -49,9 +47,9 @@ af_err af_shift(af_array *out, const af_array in, const int sdims[4])
             case s16: output = shift<short  >(in, sdims);  break;
             case u16: output = shift<ushort >(in, sdims);  break;
             case u8:  output = shift<uchar  >(in, sdims);  break;
-            default:  TYPE_ERROR(1, type);
+            default:  TYPE_ERROR(in);
         }
-        std::swap(*out,output);
+        std::swap(*out, output);
     }
     CATCHALL;
 

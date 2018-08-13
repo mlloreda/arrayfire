@@ -30,17 +30,16 @@ static inline af_array scan(const af_array in, const int dim, bool inclusive_sca
 template<af_op_t op, typename Ti, typename To>
 static inline af_array scan_key(const af_array key, const af_array in, const int dim, bool inclusive_scan = true)
 {
-    const ArrayInfo& key_info = getInfo(key);
-    af_dtype type = key_info.getType();
-    af_array out;
+    ARG_SETUP(key);
 
-    switch(type) {
+    af_array out;
+    switch(key_info.getType()) {
         case    s32:   out = getHandle(scan<op, Ti,   int, To>(getArray<  int>(key), castArray<Ti>(in), dim, inclusive_scan)); break;
         case    u32:   out = getHandle(scan<op, Ti,  uint, To>(getArray< uint>(key), castArray<Ti>(in), dim, inclusive_scan)); break;
         case    s64:   out = getHandle(scan<op, Ti,  intl, To>(getArray< intl>(key), castArray<Ti>(in), dim, inclusive_scan)); break;
         case    u64:   out = getHandle(scan<op, Ti, uintl, To>(getArray<uintl>(key), castArray<Ti>(in), dim, inclusive_scan)); break;
         default:
-            TYPE_ERROR(1, type);
+            TYPE_ERROR(key);
     }
     return out;
 }
@@ -83,17 +82,15 @@ af_err af_accum(af_array *out, const af_array in, const int dim)
         ARG_ASSERT(2, dim >= 0);
         ARG_ASSERT(2, dim <  4);
 
-        const ArrayInfo& in_info = getInfo(in);
+        ARG_SETUP(in);
 
         if (dim >= (int)in_info.ndims()) {
             *out = retain(in);
             return AF_SUCCESS;
         }
 
-        af_dtype type = in_info.getType();
         af_array res;
-
-        switch(type) {
+        switch(in_info.getType()) {
         case f32:  res = scan<af_add_t, float  , float  >(in, dim); break;
         case f64:  res = scan<af_add_t, double , double >(in, dim); break;
         case c32:  res = scan<af_add_t, cfloat , cfloat >(in, dim); break;
@@ -107,8 +104,7 @@ af_err af_accum(af_array *out, const af_array in, const int dim)
         case u8:   res = scan<af_add_t, uchar  , uint   >(in, dim); break;
         // Make sure you are adding only "1" for every non zero value, even if op == af_add_t
         case b8:   res = scan<af_notzero_t, char  , uint   >(in, dim); break;
-        default:
-            TYPE_ERROR(1, type);
+        default: TYPE_ERROR(in);
         }
 
         std::swap(*out, res);
@@ -124,17 +120,15 @@ af_err af_scan(af_array *out, const af_array in, const int dim, af_binary_op op,
         ARG_ASSERT(2, dim >= 0);
         ARG_ASSERT(2, dim <  4);
 
-        const ArrayInfo& in_info = getInfo(in);
+        ARG_SETUP(in);
 
         if (dim >= (int)in_info.ndims()) {
             *out = retain(in);
             return AF_SUCCESS;
         }
 
-        af_dtype type = in_info.getType();
         af_array res;
-
-        switch(type) {
+        switch(in_info.getType()) {
         case f32:  res = scan_op<float  , float  >(in, dim, op, inclusive_scan); break;
         case f64:  res = scan_op<double , double >(in, dim, op, inclusive_scan); break;
         case c32:  res = scan_op<cfloat , cfloat >(in, dim, op, inclusive_scan); break;
@@ -147,8 +141,7 @@ af_err af_scan(af_array *out, const af_array in, const int dim, af_binary_op op,
         case s16:  res = scan_op<short  , int    >(in, dim, op, inclusive_scan); break;
         case u8:   res = scan_op<uchar  , uint   >(in, dim, op, inclusive_scan); break;
         case b8:   res = scan_op<char   , uint   >(in, dim, op, inclusive_scan); break;
-        default:
-            TYPE_ERROR(1, type);
+        default: TYPE_ERROR(in);
         }
 
         std::swap(*out, res);
@@ -164,8 +157,8 @@ af_err af_scan_by_key(af_array *out, const af_array key, const af_array in, cons
         ARG_ASSERT(2, dim >= 0);
         ARG_ASSERT(2, dim <  4);
 
-        const ArrayInfo& in_info = getInfo(in);
-        const ArrayInfo& key_info = getInfo(key);
+        ARG_SETUP(in);
+        ARG_SETUP(key);
 
         if (dim >= (int)in_info.ndims()) {
             *out = retain(in);
@@ -174,10 +167,8 @@ af_err af_scan_by_key(af_array *out, const af_array key, const af_array in, cons
 
         ARG_ASSERT(2, in_info.dims() == key_info.dims());
 
-        af_dtype type = in_info.getType();
         af_array res;
-
-        switch(type) {
+        switch(in_info.getType()) {
         case f32:  res = scan_op<float  , float  >(key, in, dim, op, inclusive_scan); break;
         case f64:  res = scan_op<double , double >(key, in, dim, op, inclusive_scan); break;
         case c32:  res = scan_op<cfloat , cfloat >(key, in, dim, op, inclusive_scan); break;
@@ -190,8 +181,7 @@ af_err af_scan_by_key(af_array *out, const af_array key, const af_array in, cons
         case s16:  res = scan_op<int    , int    >(key, in, dim, op, inclusive_scan); break;
         case u8:   res = scan_op<uint   , uint   >(key, in, dim, op, inclusive_scan); break;
         case b8:   res = scan_op<uint   , uint   >(key, in, dim, op, inclusive_scan); break;
-        default:
-            TYPE_ERROR(1, type);
+        default: TYPE_ERROR(in);
         }
 
         std::swap(*out, res);

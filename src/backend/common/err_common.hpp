@@ -11,6 +11,7 @@
 
 #include <af/defines.h>
 #include <common/defines.hpp>
+#include "ArrayInfo.hpp"
 
 #include <cassert>
 #include <sstream>
@@ -138,7 +139,56 @@ public:
 
 af_err processException();
 
+std::string getEnumString(const af_dtype type);
+
 void print_error(const std::string &msg);
+
+////////////////
+// Type asserts
+////////////////
+
+// ASSERT_TYPE(ARR, vector<af_dtype>)
+void assert_type(const af_dtype in_type, const char * in_str,
+                const std::vector<af_dtype> types,
+                const char * file, const char * function, const int line);
+
+// ASSERT_TYPE_EQ(af_array, af_array)
+void assert_type_eq(const af_dtype lhs_type, const af_dtype rhs_type,
+              const char * lhs_str, const char * rhs_str,
+              const char * file, const char * function, const int line);
+
+// TYPE_ERROR(af_array)
+void type_error(const ArrayInfo &in_info, const char * in_str,
+                const char * file, const char * function, const int line);
+
+// UNSUPPORTED_TYPE(af_dtype)
+void unsupported_type(const af_dtype in, const char * in_str,
+                      const char * file, const char * function, const int line);
+
+#define ARG_SETUP(arg) \
+     const ArrayInfo& arg##_info = getInfo(arg)
+
+#define TYPES(...) __VA_ARGS__
+
+// Types
+#define ASSERT_TYPE(ARR, ...) do {                                  \
+        assert_type(getInfo(ARR).getType(), #ARR, {__VA_ARGS__},    \
+                    __FILE__, __FUNCTION__, __LINE__);              \
+    } while(0)
+#define ASSERT_TYPE_EQ(LHS, RHS) do {                                   \
+        assert_type_eq(getInfo(LHS).getType(), getInfo(RHS).getType(),  \
+                       #LHS, #RHS,                                      \
+                       __FILE__, __FUNCTION__, __LINE__);               \
+    } while(0)
+#define TYPE_ERROR(...) do {                            \
+        type_error(getInfo(__VA_ARGS__), #__VA_ARGS__,  \
+                   __FILE__, __FUNCTION__, __LINE__);   \
+    } while(0)
+#define UNSUPPORTED_TYPE(...) do {                          \
+        unsupported_type(__VA_ARGS__, #__VA_ARGS__,         \
+                         __FILE__, __FUNCTION__, __LINE__); \
+    } while (0)
+
 
 #define DIM_ASSERT(INDEX, COND) do {                        \
         if((COND) == false) {                               \
@@ -155,13 +205,6 @@ void print_error(const std::string &msg);
                                 INDEX, #COND);              \
         }                                                   \
     } while(0)
-
-#define TYPE_ERROR(INDEX, type) do {                        \
-        throw TypeError(__PRETTY_FUNCTION__,                \
-                        __AF_FILENAME__, __LINE__,          \
-                        INDEX, type);                       \
-    } while(0)                                              \
-
 
 #define AF_ERROR(MSG, ERR_TYPE) do {                        \
         throw AfError(__PRETTY_FUNCTION__,                  \

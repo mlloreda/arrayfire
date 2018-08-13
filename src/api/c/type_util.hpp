@@ -11,6 +11,8 @@
 #include <string>
 #include <af/defines.h>
 
+
+// \TODO remove?
 const char *getName(af_dtype type);
 
 //uchar to number converters

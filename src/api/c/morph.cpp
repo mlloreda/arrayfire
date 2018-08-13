@@ -40,10 +40,11 @@ template<bool isDilation>
 static af_err morph(af_array *out, const af_array &in, const af_array &mask)
 {
     try {
-        const ArrayInfo& info = getInfo(in);
-        const ArrayInfo& mInfo= getInfo(mask);
-        af::dim4 dims  = info.dims();
-        af::dim4 mdims = mInfo.dims();
+        ARG_SETUP(in);
+        ARG_SETUP(mask);
+
+        af::dim4 dims  = in_info.dims();
+        af::dim4 mdims = mask_info.dims();
         dim_t in_ndims = dims.ndims();
         dim_t mask_ndims = mdims.ndims();
 
@@ -51,8 +52,7 @@ static af_err morph(af_array *out, const af_array &in, const af_array &mask)
         DIM_ASSERT(2, (mask_ndims == 2));
 
         af_array output;
-        af_dtype type  = info.getType();
-        switch(type) {
+        switch(in_info.getType()) {
             case f32: output = morph<float , isDilation>(in, mask);      break;
             case f64: output = morph<double, isDilation>(in, mask);      break;
             case b8 : output = morph<char  , isDilation>(in, mask);      break;
@@ -61,7 +61,7 @@ static af_err morph(af_array *out, const af_array &in, const af_array &mask)
             case s16: output = morph<short , isDilation>(in, mask);      break;
             case u16: output = morph<ushort, isDilation>(in, mask);      break;
             case u8 : output = morph<uchar , isDilation>(in, mask);      break;
-            default : TYPE_ERROR(1, type);
+            default : TYPE_ERROR(in);
         }
         std::swap(*out, output);
     }
@@ -74,10 +74,11 @@ template<bool isDilation>
 static af_err morph3d(af_array *out, const af_array &in, const af_array &mask)
 {
     try {
-        const ArrayInfo& info = getInfo(in);
-        const ArrayInfo& mInfo= getInfo(mask);
-        af::dim4 dims  = info.dims();
-        af::dim4 mdims = mInfo.dims();
+        ARG_SETUP(in);
+        ARG_SETUP(mask);
+
+        af::dim4 dims  = in_info.dims();
+        af::dim4 mdims = mask_info.dims();
         dim_t in_ndims = dims.ndims();
         dim_t mask_ndims = mdims.ndims();
 
@@ -85,8 +86,7 @@ static af_err morph3d(af_array *out, const af_array &in, const af_array &mask)
         DIM_ASSERT(2, (mask_ndims == 3));
 
         af_array output;
-        af_dtype type  = info.getType();
-        switch(type) {
+        switch(in_info.getType()) {
             case f32: output = morph3d<float , isDilation>(in, mask);       break;
             case f64: output = morph3d<double, isDilation>(in, mask);       break;
             case b8 : output = morph3d<char  , isDilation>(in, mask);       break;
@@ -95,7 +95,7 @@ static af_err morph3d(af_array *out, const af_array &in, const af_array &mask)
             case s16: output = morph3d<short , isDilation>(in, mask);       break;
             case u16: output = morph3d<ushort, isDilation>(in, mask);       break;
             case u8 : output = morph3d<uchar , isDilation>(in, mask);       break;
-            default : TYPE_ERROR(1, type);
+            default : TYPE_ERROR(in);
         }
         std::swap(*out, output);
     }

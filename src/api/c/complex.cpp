@@ -34,7 +34,6 @@ static inline af_array cplx(const af_array lhs, const af_array rhs,
 af_err af_cplx2(af_array *out, const af_array lhs, const af_array rhs, bool batchMode)
 {
     try {
-
         af_dtype type = implicit(lhs, rhs);
 
         if (type == c32 || type == c64) {
@@ -49,7 +48,7 @@ af_err af_cplx2(af_array *out, const af_array lhs, const af_array rhs, bool batc
         switch (type) {
         case f32: res = cplx<cfloat , float >(lhs, rhs, odims); break;
         case f64: res = cplx<cdouble, double>(lhs, rhs, odims); break;
-        default: TYPE_ERROR(0, type);
+        default: UNSUPPORTED_TYPE(type);
         }
 
         std::swap(*out, res);
@@ -61,27 +60,26 @@ af_err af_cplx2(af_array *out, const af_array lhs, const af_array rhs, bool batc
 af_err af_cplx(af_array *out, const af_array in)
 {
     try {
+        ARG_SETUP(in);
 
-        const ArrayInfo& info = getInfo(in);
-        af_dtype type = info.getType();
+        af_dtype in_type = in_info.getType();
+        ASSERT_TYPE(in, TYPES(c32, c64));
 
-        if (type == c32 || type == c64) {
+        if (in_type == c32 || in_type == c64) { // \TODO(miguel)
             AF_ERROR("Inputs to cplx2 can not be of complex type", AF_ERR_ARG);
         }
 
         af_array tmp;
         AF_CHECK(af_constant(&tmp,
-                             0, info.ndims(),
-                             info.dims().get(),
-                             type));
+                             0, in_info.ndims(),
+                             in_info.dims().get(),
+                             in_type));
 
         af_array res;
-        switch (type) {
-
-        case f32: res = cplx<cfloat , float >(in, tmp, info.dims()); break;
-        case f64: res = cplx<cdouble, double>(in, tmp, info.dims()); break;
-
-        default: TYPE_ERROR(0, type);
+        switch (in_type) {
+        case f32: res = cplx<cfloat , float >(in, tmp, in_info.dims()); break;
+        case f64: res = cplx<cdouble, double>(in, tmp, in_info.dims()); break;
+        default: TYPE_ERROR(in);
         }
 
         AF_CHECK(af_release_array(tmp));
@@ -95,21 +93,18 @@ af_err af_cplx(af_array *out, const af_array in)
 af_err af_real(af_array *out, const af_array in)
 {
     try {
+        ARG_SETUP(in);
 
-        const ArrayInfo& info = getInfo(in);
-        af_dtype type = info.getType();
-
-        if (type != c32 && type != c64) {
+        const af_dtype in_type = in_info.getType();
+        if (in_type != c32 && in_type != c64) {
             return af_retain_array(out, in);
         }
 
         af_array res;
-        switch (type) {
-
+        switch (in_type) {
         case c32: res = getHandle(real<float , cfloat >(getArray<cfloat >(in))); break;
         case c64: res = getHandle(real<double, cdouble>(getArray<cdouble>(in))); break;
-
-        default: TYPE_ERROR(0, type);
+        default: TYPE_ERROR(in);
         }
 
         std::swap(*out, res);
@@ -121,21 +116,18 @@ af_err af_real(af_array *out, const af_array in)
 af_err af_imag(af_array *out, const af_array in)
 {
     try {
+        ARG_SETUP(in);
 
-        const ArrayInfo& info = getInfo(in);
-        af_dtype type = info.getType();
-
-        if (type != c32 && type != c64) {
-            return af_constant(out, 0, info.ndims(), info.dims().get(), type);
+        af_dtype in_type = in_info.getType();
+        if (in_type != c32 && in_type != c64) {
+            return af_constant(out, 0, in_info.ndims(), in_info.dims().get(), in_type);
         }
 
         af_array res;
-        switch (type) {
-
+        switch (in_type) {
         case c32: res = getHandle(imag<float , cfloat >(getArray<cfloat >(in))); break;
         case c64: res = getHandle(imag<double, cdouble>(getArray<cdouble>(in))); break;
-
-        default: TYPE_ERROR(0, type);
+        default: TYPE_ERROR(in);
         }
 
         std::swap(*out, res);
@@ -147,21 +139,18 @@ af_err af_imag(af_array *out, const af_array in)
 af_err af_conjg(af_array *out, const af_array in)
 {
     try {
+        ARG_SETUP(in);
 
-        const ArrayInfo& info = getInfo(in);
-        af_dtype type = info.getType();
-
-        if (type != c32 && type != c64) {
+        af_dtype in_type = in_info.getType();
+        if (in_type != c32 && in_type != c64) {
             return af_retain_array(out, in);
         }
 
         af_array res;
-        switch (type) {
-
+        switch (in_type) {
         case c32: res = getHandle(conj<cfloat >(getArray<cfloat >(in))); break;
         case c64: res = getHandle(conj<cdouble>(getArray<cdouble>(in))); break;
-
-        default: TYPE_ERROR(0, type);
+        default: TYPE_ERROR(in);
         }
 
         std::swap(*out, res);
@@ -173,21 +162,20 @@ af_err af_conjg(af_array *out, const af_array in)
 af_err af_abs(af_array *out, const af_array in)
 {
     try {
+        ARG_SETUP(in);
 
-        const ArrayInfo& in_info = getInfo(in);
         af_dtype in_type = in_info.getType();
-        af_array res;
 
         // Convert all inputs to floats / doubles
         af_dtype type = implicit(in_type, f32);
 
+        af_array res;
         switch (type) {
         case f32: res = getHandle(abs<float ,  float >(castArray<float  >(in))); break;
         case f64: res = getHandle(abs<double,  double>(castArray<double >(in))); break;
         case c32: res = getHandle(abs<float , cfloat >(castArray<cfloat >(in))); break;
         case c64: res = getHandle(abs<double, cdouble>(castArray<cdouble>(in))); break;
-        default:
-            TYPE_ERROR(1, in_type); break;
+        default: UNSUPPORTED_TYPE(in_type); break; // \TODO(miguel) correct type?
         }
 
         std::swap(*out, res);

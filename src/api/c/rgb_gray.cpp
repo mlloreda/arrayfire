@@ -105,13 +105,14 @@ template<bool isRGB2GRAY>
 af_err convert(af_array* out, const af_array in, const float r, const float g, const float b)
 {
     try {
-        const ArrayInfo& info     = getInfo(in);
-        af_dtype iType     = info.getType();
-        af::dim4 inputDims = info.dims();
+        ARG_SETUP(in);
+
+        const af_dtype in_type     = in_info.getType();
+        af::dim4 inputDims = in_info.dims();
 
         // 2D is not required.
-        if(info.elements() == 0) {
-            return af_create_handle(out, 0, nullptr, iType);
+        if (in_info.elements() == 0) {
+            return af_create_handle(out, 0, nullptr, in_type);
         }
 
         // If RGB is input, then assert 3 channels
@@ -120,7 +121,7 @@ af_err convert(af_array* out, const af_array in, const float r, const float g, c
         else            ARG_ASSERT(1, (inputDims[2]==1));
 
         af_array output = 0;
-        switch(iType) {
+        switch(in_type) {
             case f64: output = convert<double, double, isRGB2GRAY>(in, r, g, b); break;
             case f32: output = convert<float , float , isRGB2GRAY>(in, r, g, b); break;
             case u32: output = convert<uint  , float , isRGB2GRAY>(in, r, g, b); break;
@@ -128,7 +129,7 @@ af_err convert(af_array* out, const af_array in, const float r, const float g, c
             case u16: output = convert<ushort, float , isRGB2GRAY>(in, r, g, b); break;
             case s16: output = convert<short , float , isRGB2GRAY>(in, r, g, b); break;
             case u8:  output = convert<uchar , float , isRGB2GRAY>(in, r, g, b); break;
-            default: TYPE_ERROR(1, iType); break;
+            default: TYPE_ERROR(in); break;
         }
         std::swap(*out, output);
     }

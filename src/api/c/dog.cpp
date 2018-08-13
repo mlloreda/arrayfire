@@ -46,14 +46,13 @@ static af_array dog(const af_array& in, const int radius1, const int radius2)
 af_err af_dog(af_array *out, const af_array in, const int radius1, const int radius2)
 {
     try {
-        const ArrayInfo& info = getInfo(in);
-        dim4 inDims = info.dims();
+        ARG_SETUP(in);
+        dim4 inDims = in_info.dims();
         ARG_ASSERT(1, (inDims.ndims()>=2));
         ARG_ASSERT(1, (inDims.ndims()<=3));
 
         af_array output;
-        af_dtype type  = info.getType();
-        switch(type) {
+        switch(in_info.getType()) {
             case f32: output = dog<float , float>(in, radius1, radius2); break;
             case f64: output = dog<double,double>(in, radius1, radius2); break;
             case b8 : output = dog<char  , float>(in, radius1, radius2); break;
@@ -62,7 +61,7 @@ af_err af_dog(af_array *out, const af_array in, const int radius1, const int rad
             case s16: output = dog<short , float>(in, radius1, radius2); break;
             case u16: output = dog<ushort, float>(in, radius1, radius2); break;
             case u8 : output = dog<uchar , float>(in, radius1, radius2); break;
-            default : TYPE_ERROR(1, type);
+            default : TYPE_ERROR(in);
         }
         std::swap(*out, output);
     }

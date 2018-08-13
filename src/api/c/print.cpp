@@ -136,19 +136,18 @@ static void printSparse(const char *exp, af_array arr, const int precision,
 af_err af_print_array(af_array arr)
 {
     try {
-        const ArrayInfo& info = getInfo(arr, false);   // Don't assert sparse/dense
-        af_dtype type = info.getType();
+        const ArrayInfo& arr_info = getInfo(arr, false);   // Don't assert sparse/dense
 
-        if(info.isSparse()) {
-            switch(type) {
+        if(arr_info.isSparse()) {
+            switch(arr_info.getType()) {
                 case f32: printSparse<float  >(NULL, arr, 4); break;
                 case f64: printSparse<double >(NULL, arr, 4); break;
                 case c32: printSparse<cfloat >(NULL, arr, 4); break;
                 case c64: printSparse<cdouble>(NULL, arr, 4); break;
-                default : TYPE_ERROR(0, type);
+                default : TYPE_ERROR(arr);
             }
         } else {
-            switch(type)
+            switch(arr_info.getType())
             {
                 case f32:   print<float>   (NULL, arr, 4);   break;
                 case c32:   print<cfloat>  (NULL, arr, 4);   break;
@@ -162,7 +161,7 @@ af_err af_print_array(af_array arr)
                 case u64:   print<uintl>   (NULL, arr, 4);   break;
                 case s16:   print<short>   (NULL, arr, 4);   break;
                 case u16:   print<ushort>  (NULL, arr, 4);   break;
-                default:    TYPE_ERROR(1, type);
+                default:    TYPE_ERROR(arr);
             }
         }
     }
@@ -174,19 +173,18 @@ af_err af_print_array_gen(const char *exp, const af_array arr, const int precisi
 {
     try {
         ARG_ASSERT(0, exp != NULL);
-        const ArrayInfo& info = getInfo(arr, false);   // Don't assert sparse/dense
-        af_dtype type = info.getType();
+        const ArrayInfo& arr_info = getInfo(arr, false);   // Don't assert sparse/dense
 
-        if(info.isSparse()) {
-            switch(type) {
+        if(arr_info.isSparse()) {
+            switch(arr_info.getType()) {
                 case f32: printSparse<float  >(exp, arr, precision); break;
                 case f64: printSparse<double >(exp, arr, precision); break;
                 case c32: printSparse<cfloat >(exp, arr, precision); break;
                 case c64: printSparse<cdouble>(exp, arr, precision); break;
-                default : TYPE_ERROR(0, type);
+                default : TYPE_ERROR(arr);
             }
         } else {
-            switch(type)
+            switch(arr_info.getType())
             {
                 case f32:   print<float   >(exp, arr, precision);   break;
                 case c32:   print<cfloat  >(exp, arr, precision);   break;
@@ -200,7 +198,7 @@ af_err af_print_array_gen(const char *exp, const af_array arr, const int precisi
                 case u64:   print<uintl   >(exp, arr, precision);   break;
                 case s16:   print<short   >(exp, arr, precision);   break;
                 case u16:   print<ushort  >(exp, arr, precision);   break;
-                default:    TYPE_ERROR(1, type);
+                default:    TYPE_ERROR(arr);
             }
         }
     }
@@ -213,20 +211,19 @@ af_err af_array_to_string(char **output, const char *exp, const af_array arr,
 {
     try {
         ARG_ASSERT(0, exp != NULL);
-        const ArrayInfo& info = getInfo(arr, false);   // Don't assert sparse/dense
-        af_dtype type = info.getType();
-        std::stringstream ss;
+        const ArrayInfo& arr_info = getInfo(arr, false);   // Don't assert sparse/dense
 
-        if(info.isSparse()) {
-            switch(type) {
+        std::stringstream ss;
+        if(arr_info.isSparse()) {
+            switch(arr_info.getType()) {
                 case f32: printSparse<float  >(exp, arr, precision, ss, transpose); break;
                 case f64: printSparse<double >(exp, arr, precision, ss, transpose); break;
                 case c32: printSparse<cfloat >(exp, arr, precision, ss, transpose); break;
                 case c64: printSparse<cdouble>(exp, arr, precision, ss, transpose); break;
-                default : TYPE_ERROR(0, type);
+                default : TYPE_ERROR(arr);
             }
         } else {
-            switch(type)
+            switch(arr_info.getType())
             {
                 case f32:   print<float   >(exp, arr, precision, ss, transpose);   break;
                 case c32:   print<cfloat  >(exp, arr, precision, ss, transpose);   break;
@@ -240,7 +237,7 @@ af_err af_array_to_string(char **output, const char *exp, const af_array arr,
                 case u64:   print<uintl   >(exp, arr, precision, ss, transpose);   break;
                 case s16:   print<short   >(exp, arr, precision, ss, transpose);   break;
                 case u16:   print<ushort  >(exp, arr, precision, ss, transpose);   break;
-                default:    TYPE_ERROR(1, type);
+                default:    TYPE_ERROR(arr);
             }
         }
         std::string str = ss.str();

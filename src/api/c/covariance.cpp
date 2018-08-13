@@ -54,21 +54,21 @@ static af_array cov(const af_array& X, const af_array& Y, const bool isbiased)
 af_err af_cov(af_array* out, const af_array X, const af_array Y, const bool isbiased)
 {
     try {
-        const ArrayInfo& xInfo = getInfo(X);
-        const ArrayInfo& yInfo = getInfo(Y);
-        dim4 xDims      = xInfo.dims();
-        dim4 yDims      = yInfo.dims();
-        af_dtype xType  = xInfo.getType();
-        af_dtype yType  = yInfo.getType();
+        ARG_SETUP(X);
+        ARG_SETUP(Y);;
+
+        dim4 xDims      = X_info.dims();
+        dim4 yDims      = Y_info.dims();
 
         ARG_ASSERT(1, (xDims.ndims()<=2));
         ARG_ASSERT(2, (xDims.ndims()==yDims.ndims()));
         ARG_ASSERT(2, (xDims[0]==yDims[0]));
         ARG_ASSERT(2, (xDims[1]==yDims[1]));
-        ARG_ASSERT(2, (xType==yType));
+
+        ASSERT_TYPE_EQ(X, Y);
 
         af_array output = 0;
-        switch(xType) {
+        switch(X_info.getType()) {
             case f64: output = cov<double, double>(X, Y, isbiased); break;
             case f32: output = cov<float , float >(X, Y, isbiased); break;
             case s32: output = cov<int   , float >(X, Y, isbiased); break;
@@ -78,7 +78,7 @@ af_err af_cov(af_array* out, const af_array X, const af_array Y, const bool isbi
             case s16: output = cov<short , float >(X, Y, isbiased); break;
             case u16: output = cov<ushort, float >(X, Y, isbiased); break;
             case  u8: output = cov<uchar , float >(X, Y, isbiased); break;
-            default : TYPE_ERROR(1, xType);
+            default : TYPE_ERROR(X);
         }
         std::swap(*out, output);
     }

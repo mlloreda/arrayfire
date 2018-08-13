@@ -37,17 +37,15 @@ static af_err reduce_type(af_array *out, const af_array in, const int dim)
         ARG_ASSERT(2, dim >= 0);
         ARG_ASSERT(2, dim <  4);
 
-        const ArrayInfo& in_info = getInfo(in);
+        ARG_SETUP(in);
 
         if (dim >= (int)in_info.ndims()) {
             *out = retain(in);
             return AF_SUCCESS;
         }
 
-        af_dtype type = in_info.getType();
         af_array res;
-
-        switch(type) {
+        switch(in_info.getType()) {
         case f32:  res = reduce<op, float  , To>(in, dim); break;
         case f64:  res = reduce<op, double , To>(in, dim); break;
         case c32:  res = reduce<op, cfloat , To>(in, dim); break;
@@ -60,7 +58,7 @@ static af_err reduce_type(af_array *out, const af_array in, const int dim)
         case s16:  res = reduce<op, short  , To>(in, dim); break;
         case b8:   res = reduce<op, char   , To>(in, dim); break;
         case u8:   res = reduce<op, uchar  , To>(in, dim); break;
-        default:   TYPE_ERROR(1, type);
+        default:   TYPE_ERROR(in);
         }
 
         std::swap(*out, res);
@@ -78,16 +76,15 @@ static af_err reduce_common(af_array *out, const af_array in, const int dim)
         ARG_ASSERT(2, dim >= 0);
         ARG_ASSERT(2, dim <  4);
 
-        const ArrayInfo& in_info = getInfo(in);
+        ARG_SETUP(in);
 
         if (dim >= (int)in_info.ndims()) {
             return af_retain_array(out, in);
         }
 
-        af_dtype type = in_info.getType();
-        af_array res;
 
-        switch(type) {
+        af_array res;
+        switch(in_info.getType()) {
         case f32:  res = reduce<op, float  , float  >(in, dim); break;
         case f64:  res = reduce<op, double , double >(in, dim); break;
         case c32:  res = reduce<op, cfloat , cfloat >(in, dim); break;
@@ -100,7 +97,7 @@ static af_err reduce_common(af_array *out, const af_array in, const int dim)
         case s16:  res = reduce<op, short  , short  >(in, dim); break;
         case b8:   res = reduce<op, char   , char   >(in, dim); break;
         case u8:   res = reduce<op, uchar  , uchar  >(in, dim); break;
-        default:   TYPE_ERROR(1, type);
+        default:   TYPE_ERROR(in);
         }
 
         std::swap(*out, res);
@@ -119,17 +116,15 @@ static af_err reduce_promote(af_array *out, const af_array in, const int dim,
         ARG_ASSERT(2, dim >= 0);
         ARG_ASSERT(2, dim <  4);
 
-        const ArrayInfo& in_info = getInfo(in);
+        ARG_SETUP(in);
 
         if (dim >= (int)in_info.ndims()) {
             *out = retain(in);
             return AF_SUCCESS;
         }
 
-        af_dtype type = in_info.getType();
         af_array res;
-
-        switch(type) {
+        switch(in_info.getType()) {
         case f32:  res = reduce<op, float  , float  >(in, dim, change_nan, nanval); break;
         case f64:  res = reduce<op, double , double >(in, dim, change_nan, nanval); break;
         case c32:  res = reduce<op, cfloat , cfloat >(in, dim, change_nan, nanval); break;
@@ -143,7 +138,7 @@ static af_err reduce_promote(af_array *out, const af_array in, const int dim,
         case u8:   res = reduce<op, uchar  , uint   >(in, dim, change_nan, nanval); break;
             // Make sure you are adding only "1" for every non zero value, even if op == af_add_t
         case b8:   res = reduce<af_notzero_t, char  , uint   >(in, dim, change_nan, nanval); break;
-        default:   TYPE_ERROR(1, type);
+        default:   TYPE_ERROR(in);
         }
         std::swap(*out, res);
     }
@@ -208,14 +203,13 @@ static af_err reduce_all_type(double *real, double *imag, const af_array in)
 {
     try {
 
-        const ArrayInfo& in_info = getInfo(in);
-        af_dtype type = in_info.getType();
+        ARG_SETUP(in);
 
         ARG_ASSERT(0, real != NULL);
         *real = 0;
         if (imag) *imag = 0;
 
-        switch(type) {
+        switch(in_info.getType()) {
         case f32:  *real = (double)reduce_all<op, float  , To>(in); break;
         case f64:  *real = (double)reduce_all<op, double , To>(in); break;
         case c32:  *real = (double)reduce_all<op, cfloat , To>(in); break;
@@ -228,7 +222,7 @@ static af_err reduce_all_type(double *real, double *imag, const af_array in)
         case s16:  *real = (double)reduce_all<op, short  , To>(in); break;
         case b8:   *real = (double)reduce_all<op, char   , To>(in); break;
         case u8:   *real = (double)reduce_all<op, uchar  , To>(in); break;
-        default:   TYPE_ERROR(1, type);
+        default:   TYPE_ERROR(in);
         }
 
     }
@@ -242,8 +236,7 @@ static af_err reduce_all_common(double *real_val, double *imag_val, const af_arr
 {
     try {
 
-        const ArrayInfo& in_info = getInfo(in);
-        af_dtype type = in_info.getType();
+        ARG_SETUP(in);
 
         ARG_ASSERT(2, in_info.ndims() > 0);
         ARG_ASSERT(0, real_val != NULL);
@@ -253,7 +246,7 @@ static af_err reduce_all_common(double *real_val, double *imag_val, const af_arr
         cfloat  cfval;
         cdouble cdval;
 
-        switch(type) {
+        switch(in_info.getType()) {
         case f32:  *real_val = (double)reduce_all<op, float  , float  >(in); break;
         case f64:  *real_val = (double)reduce_all<op, double , double >(in); break;
         case u32:  *real_val = (double)reduce_all<op, uint   , uint   >(in); break;
@@ -279,7 +272,7 @@ static af_err reduce_all_common(double *real_val, double *imag_val, const af_arr
             *imag_val = imag(cdval);
             break;
 
-        default:   TYPE_ERROR(1, type);
+        default:   TYPE_ERROR(in);
         }
 
     }
@@ -294,8 +287,7 @@ static af_err reduce_all_promote(double *real_val, double *imag_val, const af_ar
 {
     try {
 
-        const ArrayInfo& in_info = getInfo(in);
-        af_dtype type = in_info.getType();
+        ARG_SETUP(in);
 
         ARG_ASSERT(0, real_val != NULL);
         *real_val = 0;
@@ -304,7 +296,7 @@ static af_err reduce_all_promote(double *real_val, double *imag_val, const af_ar
         cfloat  cfval;
         cdouble cdval;
 
-        switch(type) {
+        switch(in_info.getType()) {
         case f32: *real_val = (double)reduce_all<op, float  , float  >(in, change_nan, nanval); break;
         case f64: *real_val = (double)reduce_all<op, double , double >(in, change_nan, nanval); break;
         case u32: *real_val = (double)reduce_all<op, uint   , uint   >(in, change_nan, nanval); break;
@@ -331,7 +323,7 @@ static af_err reduce_all_promote(double *real_val, double *imag_val, const af_ar
             *imag_val = imag(cdval);
             break;
 
-        default:   TYPE_ERROR(1, type);
+        default:   TYPE_ERROR(in);
         }
     }
     CATCHALL;
@@ -398,7 +390,7 @@ static af_err ireduce_common(af_array *val, af_array *idx, const af_array in, co
         ARG_ASSERT(3, dim >= 0);
         ARG_ASSERT(3, dim <  4);
 
-        const ArrayInfo& in_info = getInfo(in);
+        ARG_SETUP(in);
         ARG_ASSERT(2, in_info.ndims() > 0);
 
         if (dim >= (int)in_info.ndims()) {
@@ -407,10 +399,9 @@ static af_err ireduce_common(af_array *val, af_array *idx, const af_array in, co
             return AF_SUCCESS;
         }
 
-        af_dtype type = in_info.getType();
-        af_array res, loc;
 
-        switch(type) {
+        af_array res, loc;
+        switch(in_info.getType()) {
         case f32:  ireduce<op, float  >(&res, &loc, in, dim); break;
         case f64:  ireduce<op, double >(&res, &loc, in, dim); break;
         case c32:  ireduce<op, cfloat >(&res, &loc, in, dim); break;
@@ -423,7 +414,7 @@ static af_err ireduce_common(af_array *val, af_array *idx, const af_array in, co
         case s16:  ireduce<op, short  >(&res, &loc, in, dim); break;
         case b8:   ireduce<op, char   >(&res, &loc, in, dim); break;
         case u8:   ireduce<op, uchar  >(&res, &loc, in, dim); break;
-        default:   TYPE_ERROR(1, type);
+        default:   TYPE_ERROR(in);
         }
 
         std::swap(*val, res);
@@ -455,9 +446,7 @@ static af_err ireduce_all_common(double *real_val, double *imag_val,
                                  unsigned *loc, const af_array in)
 {
     try {
-
-        const ArrayInfo& in_info = getInfo(in);
-        af_dtype type = in_info.getType();
+        ARG_SETUP(in);
 
         ARG_ASSERT(3, in_info.ndims() > 0);
         ARG_ASSERT(0, real_val != NULL);
@@ -467,7 +456,7 @@ static af_err ireduce_all_common(double *real_val, double *imag_val,
         cfloat  cfval;
         cdouble cdval;
 
-        switch(type) {
+        switch(in_info.getType()) {
         case f32:  *real_val = (double)ireduce_all<op, float >(loc, in); break;
         case f64:  *real_val = (double)ireduce_all<op, double>(loc, in); break;
         case u32:  *real_val = (double)ireduce_all<op, uint  >(loc, in); break;
@@ -493,7 +482,7 @@ static af_err ireduce_all_common(double *real_val, double *imag_val,
             *imag_val = imag(cdval);
             break;
 
-        default:   TYPE_ERROR(1, type);
+        default:   TYPE_ERROR(in);
         }
 
     }

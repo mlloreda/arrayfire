@@ -48,8 +48,8 @@ af_err af_susan(af_features* out, const af_array in,
                 const float feature_ratio, const unsigned edge)
 {
     try {
-        const ArrayInfo& info = getInfo(in);
-        af::dim4 dims  = info.dims();
+        ARG_SETUP(in);
+        af::dim4 dims  = in_info.dims();
 
         ARG_ASSERT(1, dims.ndims()==2);
         ARG_ASSERT(2, radius < 10);
@@ -59,8 +59,7 @@ af_err af_susan(af_features* out, const af_array in,
         ARG_ASSERT(5, (feature_ratio > 0.0f && feature_ratio <= 1.0f));
         ARG_ASSERT(6, (dims[0] >= (dim_t)(2*edge+1) || dims[1] >= (dim_t)(2*edge+1)));
 
-        af_dtype type  = info.getType();
-        switch(type) {
+        switch(in_info.getType()) {
             case f32: *out = susan<float >(in, radius, diff_thr, geom_thr, feature_ratio, edge); break;
             case f64: *out = susan<double>(in, radius, diff_thr, geom_thr, feature_ratio, edge); break;
             case b8 : *out = susan<char  >(in, radius, diff_thr, geom_thr, feature_ratio, edge); break;
@@ -69,7 +68,7 @@ af_err af_susan(af_features* out, const af_array in,
             case s16: *out = susan<short >(in, radius, diff_thr, geom_thr, feature_ratio, edge); break;
             case u16: *out = susan<ushort>(in, radius, diff_thr, geom_thr, feature_ratio, edge); break;
             case u8 : *out = susan<uchar >(in, radius, diff_thr, geom_thr, feature_ratio, edge); break;
-            default : TYPE_ERROR(1, type);
+            default : TYPE_ERROR(in);
         }
     }
     CATCHALL;

@@ -198,8 +198,8 @@ af_err af_canny(af_array* out, const af_array in, const af_canny_threshold ct,
                 const float t1, const float t2, const unsigned sw, const bool isf)
 {
     try {
-        const ArrayInfo& info = getInfo(in);
-        af::dim4 dims  = info.dims();
+        ARG_SETUP(in);
+        af::dim4 dims  = in_info.dims();
 
         DIM_ASSERT(2, (dims.ndims() >= 2));
         // Input should be a minimum of 5x5 image
@@ -210,9 +210,7 @@ af_err af_canny(af_array* out, const af_array in, const af_canny_threshold ct,
         ARG_ASSERT(5, (sw==3));
 
         af_array output;
-
-        af_dtype type  = info.getType();
-        switch(type) {
+        switch(in_info.getType()) {
             case f32: output = cannyHelper<float >(getArray<float >(in), t1, ct, t2, sw, isf); break;
             case f64: output = cannyHelper<double>(getArray<double>(in), t1, ct, t2, sw, isf); break;
             case s32: output = cannyHelper<int   >(getArray<int   >(in), t1, ct, t2, sw, isf); break;
@@ -220,7 +218,7 @@ af_err af_canny(af_array* out, const af_array in, const af_canny_threshold ct,
             case s16: output = cannyHelper<short >(getArray<short >(in), t1, ct, t2, sw, isf); break;
             case u16: output = cannyHelper<ushort>(getArray<ushort>(in), t1, ct, t2, sw, isf); break;
             case u8:  output = cannyHelper<uchar >(getArray<uchar >(in), t1, ct, t2, sw, isf); break;
-            default : TYPE_ERROR(1, type);
+            default : TYPE_ERROR(in);
         }
         // output array is binary array
         std::swap(output, *out);

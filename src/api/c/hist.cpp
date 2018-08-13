@@ -82,30 +82,29 @@ af_err af_draw_hist(const af_window wind, const af_array X, const double minval,
                     const af_cell* const props)
 {
 #if defined(WITH_GRAPHICS)
-    if(wind==0) {
-        std::cerr<<"Not a valid window"<<std::endl;
+    if (wind == 0) {
+        std::cerr << "Not a valid window" << std::endl;
         return AF_SUCCESS;
     }
 
     try {
-        const ArrayInfo& Xinfo = getInfo(X);
-        af_dtype Xtype  = Xinfo.getType();
+        ARG_SETUP(X);
 
-        ARG_ASSERT(0, Xinfo.isVector());
+        ARG_ASSERT(0, X_info.isVector());
 
         forge::Window* window = reinterpret_cast<forge::Window*>(wind);
         makeContextCurrent(window);
 
         forge::Chart* chart = NULL;
 
-        switch(Xtype) {
+        switch(X_info.getType()) {
             case f32: chart = setup_histogram<float  >(window, X, minval, maxval, props); break;
             case s32: chart = setup_histogram<int    >(window, X, minval, maxval, props); break;
             case u32: chart = setup_histogram<uint   >(window, X, minval, maxval, props); break;
             case s16: chart = setup_histogram<short  >(window, X, minval, maxval, props); break;
             case u16: chart = setup_histogram<ushort >(window, X, minval, maxval, props); break;
             case u8 : chart = setup_histogram<uchar  >(window, X, minval, maxval, props); break;
-            default:  TYPE_ERROR(1, Xtype);
+            default:  TYPE_ERROR(X);
         }
 
         auto gridDims = ForgeManager::getInstance().getWindowGrid(window);

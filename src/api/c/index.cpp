@@ -74,9 +74,9 @@ af_err af_index(af_array *result, const af_array in,
                 const unsigned ndims, const af_seq* indices)
 {
     try {
-        const ArrayInfo& inInfo = getInfo(in);
-        af_dtype type = inInfo.getType();
-        const dim4& iDims = inInfo.dims();
+        ARG_SETUP(in);
+
+        const dim4& iDims = in_info.dims();
 
         vector<af_seq> indices_(ndims, af_span);
         for (unsigned i=0; i<ndims; ++i) {
@@ -91,8 +91,7 @@ af_err af_index(af_array *result, const af_array in,
         }
 
         af_array out = 0;
-
-        switch(type) {
+        switch(in_info.getType()) {
             case f32: out = indexBySeqs<float>   (in, indices_);  break;
             case c32: out = indexBySeqs<cfloat>  (in, indices_);  break;
             case f64: out = indexBySeqs<double>  (in, indices_);  break;
@@ -105,7 +104,7 @@ af_err af_index(af_array *result, const af_array in,
             case s64: out = indexBySeqs<intl>    (in, indices_);  break;
             case u64: out = indexBySeqs<uintl>   (in, indices_);  break;
             case u8:  out = indexBySeqs<uchar>   (in, indices_);  break;
-            default:    TYPE_ERROR(1, type);
+            default:    TYPE_ERROR(in);
         }
         swap(*result, out);
     }
@@ -124,10 +123,9 @@ template<typename idx_t>
 static
 af_array lookup(const af_array& in, const af_array& idx, const unsigned dim)
 {
-    const ArrayInfo& inInfo = getInfo(in);
-    af_dtype inType = inInfo.getType();
+    ARG_SETUP(in);
 
-    switch(inType) {
+    switch(in_info.getType()) {
         case f32: return lookup<float   , idx_t>(in, idx, dim);
         case c32: return lookup<cfloat  , idx_t>(in, idx, dim);
         case f64: return lookup<double  , idx_t>(in, idx, dim);
@@ -140,7 +138,7 @@ af_array lookup(const af_array& in, const af_array& idx, const unsigned dim)
         case u16: return lookup<ushort  , idx_t>(in, idx, dim);
         case  u8: return lookup<uchar   , idx_t>(in, idx, dim);
         case  b8: return lookup<char    , idx_t>(in, idx, dim);
-        default : TYPE_ERROR(1, inType);
+        default : TYPE_ERROR(in);
     }
 }
 
@@ -148,25 +146,23 @@ af_err af_lookup(af_array *out, const af_array in,
                  const af_array indices, const unsigned dim)
 {
     try {
-        const ArrayInfo& idxInfo = getInfo(indices);
+        ARG_SETUP(indices);
 
-        if (idxInfo.ndims() == 0) {
+        if (indices_info.ndims() == 0) {
             *out = retain(indices);
             return AF_SUCCESS;
         }
 
         ARG_ASSERT(3, (dim >= 0 && dim <= 3));
-        ARG_ASSERT(2, idxInfo.isVector() || idxInfo.isScalar());
+        ARG_ASSERT(2, indices_info.isVector() || indices_info.isScalar());
 
-        af_dtype idxType = idxInfo.getType();
-
-        ARG_ASSERT(2, (idxType != c32));
-        ARG_ASSERT(2, (idxType != c64));
-        ARG_ASSERT(2, (idxType != b8));
+        const af_dtype indices_type = indices_info.getType();
+        ARG_ASSERT(2, (indices_type != c32));
+        ARG_ASSERT(2, (indices_type != c64));
+        ARG_ASSERT(2, (indices_type != b8));
 
         af_array output = 0;
-
-        switch(idxType) {
+        switch(indices_type) {
             case f32: output = lookup<float   >(in, indices, dim); break;
             case f64: output = lookup<double  >(in, indices, dim); break;
             case s32: output = lookup<int     >(in, indices, dim); break;
@@ -176,7 +172,7 @@ af_err af_lookup(af_array *out, const af_array in,
             case s64: output = lookup<intl    >(in, indices, dim); break;
             case u64: output = lookup<uintl   >(in, indices, dim); break;
             case  u8: output = lookup<uchar   >(in, indices, dim); break;
-            default : TYPE_ERROR(1, idxType);
+            default : TYPE_ERROR(indices);
         }
         std::swap(*out, output);
     }
@@ -201,16 +197,17 @@ af_err af_index_gen(af_array *out, const af_array in,
         ARG_ASSERT(2, (ndims>0));
         ARG_ASSERT(3, (indexs != NULL));
 
-        const ArrayInfo& iInfo  = getInfo(in);
-        const dim4& iDims  = iInfo.dims();
-        af_dtype inType = getInfo(in).getType();
+        ARG_SETUP(in);
+
+        const dim4& iDims  = in_info.dims();
+        const af_dtype in_type = in_info.getType();
 
         if (iDims.ndims() <= 0) {
-            *out = createHandle(dim4(0), inType);
+            *out = createHandle(dim4(0), in_type);
             return AF_SUCCESS;
         }
 
-        if (ndims == 1 && ndims != (dim_t)iInfo.ndims()) {
+        if (ndims == 1 && ndims != (dim_t)in_info.ndims()) {
             af_array in_ = 0;
             AF_CHECK(af_flat(&in_, in));
             AF_CHECK(af_index_gen(out, in_, ndims, indexs));
@@ -269,7 +266,7 @@ af_err af_index_gen(af_array *out, const af_array in,
         af_index_t* ptr = idxrs.data();
 
         af_array output = 0;
-        switch(inType) {
+        switch(in_type) {
             case c64: output = genIndex<cdouble>(in, ptr); break;
             case f64: output = genIndex<double >(in, ptr); break;
             case c32: output = genIndex<cfloat >(in, ptr); break;
@@ -282,7 +279,7 @@ af_err af_index_gen(af_array *out, const af_array in,
             case s16: output = genIndex<short  >(in, ptr); break;
             case  u8: output = genIndex<uchar  >(in, ptr); break;
             case  b8: output = genIndex<char   >(in, ptr); break;
-            default: TYPE_ERROR(1, inType);
+            default: TYPE_ERROR(in);
         }
         std::swap(*out, output);
     }

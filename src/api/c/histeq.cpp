@@ -63,16 +63,14 @@ static af_array hist_equal(const af_array& in, const af_array& hist)
 af_err af_hist_equal(af_array *out, const af_array in, const af_array hist)
 {
     try {
-        const ArrayInfo& dataInfo = getInfo(in);
-        const ArrayInfo& histInfo = getInfo(hist);
+        ARG_SETUP(in);
+        ARG_SETUP(hist);
 
-        af_dtype dataType  = dataInfo.getType();
-        af::dim4 histDims  = histInfo.dims();
-
+        af::dim4 histDims  = hist_info.dims();
         ARG_ASSERT(2, (histDims.ndims()==1));
 
         af_array output = 0;
-        switch(dataType) {
+        switch(in_info.getType()) {
             case f64: output = hist_equal<double, uint>(in, hist); break;
             case f32: output = hist_equal<float , uint>(in, hist); break;
             case s32: output = hist_equal<int   , uint>(in, hist); break;
@@ -82,9 +80,9 @@ af_err af_hist_equal(af_array *out, const af_array in, const af_array hist)
             case s64: output = hist_equal<intl  , uint>(in, hist); break;
             case u64: output = hist_equal<uintl , uint>(in, hist); break;
             case u8 : output = hist_equal<uchar , uint>(in, hist); break;
-            default : TYPE_ERROR(1, dataType);
+            default : TYPE_ERROR(in);
         }
-        std::swap(*out,output);
+        std::swap(*out, output);
     }
     CATCHALL;
 

@@ -66,7 +66,7 @@ af_err af_create_strided_array(af_array *arr,
         case s16: res = getHandle(Array<short  >(dims, strides, offset, (short   *)data, isdev)); break;
         case b8 : res = getHandle(Array<char   >(dims, strides, offset, (char    *)data, isdev)); break;
         case u8 : res = getHandle(Array<uchar  >(dims, strides, offset, (uchar   *)data, isdev)); break;
-        default: TYPE_ERROR(6, ty);
+        default: UNSUPPORTED_TYPE(ty);
         }
 
         std::swap(*arr, res);
@@ -78,11 +78,11 @@ af_err af_create_strided_array(af_array *arr,
 af_err af_get_strides(dim_t *s0, dim_t *s1, dim_t *s2, dim_t *s3, const af_array in)
 {
     try {
-        const ArrayInfo& info = getInfo(in);
-        *s0 = info.strides()[0];
-        *s1 = info.strides()[1];
-        *s2 = info.strides()[2];
-        *s3 = info.strides()[3];
+        ARG_SETUP(in);
+        *s0 = in_info.strides()[0];
+        *s1 = in_info.strides()[1];
+        *s2 = in_info.strides()[2];
+        *s3 = in_info.strides()[3];
     }
     CATCHALL
     return AF_SUCCESS;
@@ -106,9 +106,9 @@ af_err af_get_raw_ptr(void **ptr, const af_array arr)
 
         void *res = NULL;
 
-        af_dtype ty = getInfo(arr).getType();
+        ARG_SETUP(arr);
 
-        switch (ty) {
+        switch (arr_info.getType()) {
         case f32: res = (void *)getRawPtr(getArray<float  >(arr)); break;
         case f64: res = (void *)getRawPtr(getArray<double >(arr)); break;
         case c32: res = (void *)getRawPtr(getArray<cfloat >(arr)); break;
@@ -121,7 +121,7 @@ af_err af_get_raw_ptr(void **ptr, const af_array arr)
         case s16: res = (void *)getRawPtr(getArray<short  >(arr)); break;
         case b8 : res = (void *)getRawPtr(getArray<char   >(arr)); break;
         case u8 : res = (void *)getRawPtr(getArray<uchar  >(arr)); break;
-        default: TYPE_ERROR(6, ty);
+        default: TYPE_ERROR(arr);
         }
 
         std::swap(*ptr, res);
@@ -145,9 +145,9 @@ af_err af_is_owner(bool *result, const af_array arr)
 
         bool res = false;
 
-        af_dtype ty = getInfo(arr).getType();
+        ARG_SETUP(arr);
 
-        switch (ty) {
+        switch (arr_info.getType()) {
         case f32: res = (void *)getArray<float  >(arr).isOwner(); break;
         case f64: res = (void *)getArray<double >(arr).isOwner(); break;
         case c32: res = (void *)getArray<cfloat >(arr).isOwner(); break;
@@ -160,7 +160,7 @@ af_err af_is_owner(bool *result, const af_array arr)
         case s16: res = (void *)getArray<short  >(arr).isOwner(); break;
         case b8 : res = (void *)getArray<char   >(arr).isOwner(); break;
         case u8 : res = (void *)getArray<uchar  >(arr).isOwner(); break;
-        default: TYPE_ERROR(6, ty);
+        default: TYPE_ERROR(arr);
         }
 
         std::swap(*result, res);
@@ -172,11 +172,11 @@ af_err af_is_owner(bool *result, const af_array arr)
 af_err af_get_allocated_bytes(size_t *bytes, const af_array arr)
 {
     try {
-        af_dtype ty = getInfo(arr).getType();
+        ARG_SETUP(arr);
 
         size_t res = 0;
 
-        switch (ty) {
+        switch (arr_info.getType()) {
         case f32: res = getArray<float  >(arr).getAllocatedBytes(); break;
         case f64: res = getArray<double >(arr).getAllocatedBytes(); break;
         case c32: res = getArray<cfloat >(arr).getAllocatedBytes(); break;
@@ -189,7 +189,7 @@ af_err af_get_allocated_bytes(size_t *bytes, const af_array arr)
         case s16: res = getArray<short  >(arr).getAllocatedBytes(); break;
         case b8 : res = getArray<char   >(arr).getAllocatedBytes(); break;
         case u8 : res = getArray<uchar  >(arr).getAllocatedBytes(); break;
-        default: TYPE_ERROR(6, ty);
+        default: TYPE_ERROR(arr);
         }
 
         std::swap(*bytes, res);

@@ -87,7 +87,7 @@ af_err af_sparse_matmul(af_array *out,
             case c32: output = sparseMatmul<cfloat >(lhs, rhs, optLhs, optRhs);   break;
             case f64: output = sparseMatmul<double >(lhs, rhs, optLhs, optRhs);   break;
             case c64: output = sparseMatmul<cdouble>(lhs, rhs, optLhs, optRhs);   break;
-            default:  TYPE_ERROR(1, lhs_type);
+            default:  UNSUPPORTED_TYPE(lhs_type);
         }
         std::swap(*out, output);
 
@@ -103,14 +103,11 @@ af_err af_matmul(af_array *out,
     using namespace detail;
 
     try {
-        const ArrayInfo& lhsInfo = getInfo(lhs, false, true);
-        const ArrayInfo& rhsInfo = getInfo(rhs, true, true);
+        const ArrayInfo& lhs_info = getInfo(lhs, false, true);
+        const ArrayInfo& rhs_info = getInfo(rhs, true, true);
 
-        if(lhsInfo.isSparse())
+        if(lhs_info.isSparse())
             return af_sparse_matmul(out, lhs, rhs, optLhs, optRhs);
-
-        af_dtype lhs_type = lhsInfo.getType();
-        af_dtype rhs_type = rhsInfo.getType();
 
         if (!(optLhs == AF_MAT_NONE ||
               optLhs == AF_MAT_TRANS ||
@@ -124,8 +121,8 @@ af_err af_matmul(af_array *out,
             AF_ERROR("Using this property is not yet supported in matmul", AF_ERR_NOT_SUPPORTED);
         }
 
-        dim4 lDims = lhsInfo.dims();
-        dim4 rDims = rhsInfo.dims();
+        dim4 lDims = lhs_info.dims();
+        dim4 rDims = rhs_info.dims();
 
         if (lDims.ndims() > 2 || rDims.ndims() > 2) {
             DIM_ASSERT(1, lDims.ndims() == rDims.ndims());
@@ -137,20 +134,19 @@ af_err af_matmul(af_array *out,
             }
         }
 
-        TYPE_ASSERT(lhs_type == rhs_type);
-        af_array output = 0;
+        ASSERT_TYPE_EQ(lhs, rhs);
 
         int aColDim = (optLhs == AF_MAT_NONE) ? 1 : 0;
         int bRowDim = (optRhs == AF_MAT_NONE) ? 0 : 1;
+        DIM_ASSERT(1, lhs_info.dims()[aColDim] == rhs_info.dims()[bRowDim]);
 
-        DIM_ASSERT(1, lhsInfo.dims()[aColDim] == rhsInfo.dims()[bRowDim]);
-
-        switch(lhs_type) {
+        af_array output = 0;
+        switch(lhs_info.getType()) {
             case f32: output = matmul<float  >(lhs, rhs, optLhs, optRhs);   break;
             case c32: output = matmul<cfloat >(lhs, rhs, optLhs, optRhs);   break;
             case f64: output = matmul<double >(lhs, rhs, optLhs, optRhs);   break;
             case c64: output = matmul<cdouble>(lhs, rhs, optLhs, optRhs);   break;
-            default:  TYPE_ERROR(1, lhs_type);
+            default:  TYPE_ERROR(lhs);
         }
         std::swap(*out, output);
     }
@@ -165,8 +161,8 @@ af_err af_dot(af_array *out,
     using namespace detail;
 
     try {
-        const ArrayInfo& lhsInfo = getInfo(lhs);
-        const ArrayInfo& rhsInfo = getInfo(rhs);
+        ARG_SETUP(lhs);
+        ARG_SETUP(rhs);
 
         if (optLhs != AF_MAT_NONE && optLhs != AF_MAT_CONJ) {
             AF_ERROR("Using this property is not yet supported in dot", AF_ERR_NOT_SUPPORTED);
@@ -176,28 +172,28 @@ af_err af_dot(af_array *out,
             AF_ERROR("Using this property is not yet supported in dot", AF_ERR_NOT_SUPPORTED);
         }
 
-        DIM_ASSERT(1, lhsInfo.dims()[0] == rhsInfo.dims()[0]);
-        af_dtype lhs_type = lhsInfo.getType();
-        af_dtype rhs_type = rhsInfo.getType();
+        DIM_ASSERT(1, lhs_info.dims()[0] == rhs_info.dims()[0]);
+        af_dtype lhs_type = lhs_info.getType();
+        af_dtype rhs_type = rhs_info.getType();
 
-        if(lhsInfo.ndims() == 0) {
+        if (lhs_info.ndims() == 0) {
             return af_retain_array(out, lhs);
         }
-        if (lhsInfo.ndims() > 1 ||
-            rhsInfo.ndims() > 1) {
+        if (lhs_info.ndims() > 1 ||
+            rhs_info.ndims() > 1) {
             AF_ERROR("dot can not be used in batch mode", AF_ERR_BATCH);
         }
 
-        TYPE_ASSERT(lhs_type == rhs_type);
+        ASSERT_TYPE_EQ(lhs, rhs);
 
         af_array output = 0;
 
-        switch(lhs_type) {
+        switch(lhs_info.getType()) {
         case f32: output = dot<float  >(lhs, rhs, optLhs, optRhs);    break;
         case c32: output = dot<cfloat >(lhs, rhs, optLhs, optRhs);    break;
         case f64: output = dot<double >(lhs, rhs, optLhs, optRhs);    break;
         case c64: output = dot<cdouble>(lhs, rhs, optLhs, optRhs);    break;
-        default:  TYPE_ERROR(1, lhs_type);
+        default:  TYPE_ERROR(lhs);
         }
         std::swap(*out, output);
     }
@@ -228,10 +224,9 @@ af_err af_dot_all(double *rval, double *ival,
         af_array out = 0;
         AF_CHECK(af_dot(&out, lhs, rhs, optLhs, optRhs));
 
-        ArrayInfo lhsInfo = getInfo(lhs);
-        af_dtype lhs_type = lhsInfo.getType();
+        ARG_SETUP(lhs);
 
-        switch(lhs_type) {
+        switch(lhs_info.getType()) {
         case f32: *rval = dotAll<float >(out); break;
         case f64: *rval = dotAll<double>(out); break;
         case c32:
@@ -246,7 +241,7 @@ af_err af_dot_all(double *rval, double *ival,
                       *rval = real(temp);
             if (ival) *ival = imag(temp);
         } break;
-        default: TYPE_ERROR(1, lhs_type);
+        default: TYPE_ERROR(lhs);
         }
 
         if(out != 0) AF_CHECK(af_release_array(out));

@@ -55,8 +55,8 @@ af_err af_orb(af_features* feat, af_array* desc,
               const unsigned levels, const bool blur_img)
 {
     try {
-        const ArrayInfo& info = getInfo(in);
-        af::dim4 dims  = info.dims();
+        ARG_SETUP(in);
+        af::dim4 dims  = in_info.dims();
 
         ARG_ASSERT(2, (dims[0] >= 7 && dims[1] >= 7 && dims[2] == 1 && dims[3] == 1));
         ARG_ASSERT(3, fast_thr > 0.0f);
@@ -68,13 +68,12 @@ af_err af_orb(af_features* feat, af_array* desc,
         DIM_ASSERT(1, (in_ndims <= 3 && in_ndims >= 2));
 
         af_array tmp_desc;
-        af_dtype type  = info.getType();
-        switch(type) {
+        switch(in_info.getType()) {
             case f32: orb<float , float >(*feat, tmp_desc, in, fast_thr, max_feat,
                                           scl_fctr, levels, blur_img); break;
             case f64: orb<double, double>(*feat, tmp_desc, in, fast_thr, max_feat,
                                           scl_fctr, levels, blur_img); break;
-            default : TYPE_ERROR(1, type);
+            default : TYPE_ERROR(in);
         }
         std::swap(*desc, tmp_desc);
     }

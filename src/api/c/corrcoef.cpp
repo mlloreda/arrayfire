@@ -51,20 +51,20 @@ static To corrcoef(const af_array& X, const af_array& Y)
 af_err af_corrcoef(double *realVal, double *imagVal, const af_array X, const af_array Y)
 {
     try {
-        const ArrayInfo& xInfo = getInfo(X);
-        const ArrayInfo& yInfo = getInfo(Y);
-        dim4 xDims      = xInfo.dims();
-        dim4 yDims      = yInfo.dims();
-        af_dtype xType  = xInfo.getType();
-        af_dtype yType  = yInfo.getType();
+        ARG_SETUP(X);
+        ARG_SETUP(Y);
 
-        ARG_ASSERT(2, (xType==yType));
+        dim4 xDims      = X_info.dims();
+        dim4 yDims      = Y_info.dims();
+
+        ASSERT_TYPE_EQ(X, Y);
+
         ARG_ASSERT(2, (xDims.ndims()==yDims.ndims()));
 
         for (dim_t i=0; i<xDims.ndims(); ++i)
             ARG_ASSERT(2, (xDims[i]==yDims[i]));
 
-        switch(xType) {
+        switch(X_info.getType()) {
             case f64: *realVal = corrcoef<double, double>(X, Y); break;
             case f32: *realVal = corrcoef<float , float >(X, Y); break;
             case s32: *realVal = corrcoef<int   , float >(X, Y); break;
@@ -75,7 +75,7 @@ af_err af_corrcoef(double *realVal, double *imagVal, const af_array X, const af_
             case u16: *realVal = corrcoef<ushort, float >(X, Y); break;
             case  u8: *realVal = corrcoef<uchar , float >(X, Y); break;
             case  b8: *realVal = corrcoef<char  , float >(X, Y); break;
-            default : TYPE_ERROR(1, xType);
+            default : TYPE_ERROR(X);
         }
     }
     CATCHALL;

@@ -33,22 +33,21 @@ static inline af_array diff2(const af_array in, const int dim)
 af_err af_diff1(af_array *out, const af_array in, const int dim)
 {
     try {
-
         ARG_ASSERT(2, ((dim >= 0) && (dim < 4)));
 
-        const ArrayInfo& info = getInfo(in);
-        af_dtype type = info.getType();
+        ARG_SETUP(in);
 
-        af::dim4 in_dims = info.dims();
-        if(in_dims[dim] < 2) {
-            return af_create_handle(out, 0, nullptr, type);
+        const af_dtype in_type = in_info.getType();
+
+        af::dim4 in_dims = in_info.dims();
+        if (in_dims[dim] < 2) {
+            return af_create_handle(out, 0, nullptr, in_type);
         }
 
         DIM_ASSERT(1, in_dims[dim] >= 2);
 
         af_array output;
-
-        switch(type) {
+        switch(in_type) {
             case f32: output = diff1<float  >(in,dim);  break;
             case c32: output = diff1<cfloat >(in,dim);  break;
             case f64: output = diff1<double >(in,dim);  break;
@@ -61,9 +60,9 @@ af_err af_diff1(af_array *out, const af_array in, const int dim)
             case s16: output = diff1<short  >(in,dim);  break;
             case u16: output = diff1<ushort >(in,dim);  break;
             case u8:  output = diff1<uchar  >(in,dim);  break;
-            default:  TYPE_ERROR(1, type);
+            default:  TYPE_ERROR(in);
         }
-        std::swap(*out,output);
+        std::swap(*out, output);
     }
     CATCHALL;
 
@@ -74,21 +73,21 @@ af_err af_diff2(af_array *out, const af_array in, const int dim)
 {
 
     try {
-
         ARG_ASSERT(2, ((dim >= 0) && (dim < 4)));
 
-        const ArrayInfo& info = getInfo(in);
-        af_dtype type = info.getType();
+        ARG_SETUP(in);
 
-        af::dim4 in_dims = info.dims();
-        if(in_dims[dim] < 3) {
-            return af_create_handle(out, 0, nullptr, type);
+        const af_dtype in_type = in_info.getType();
+
+        af::dim4 in_dims = in_info.dims();
+        if (in_dims[dim] < 3) {
+            return af_create_handle(out, 0, nullptr, in_type);
         }
+
         DIM_ASSERT(1, in_dims[dim] >= 3);
 
         af_array output;
-
-        switch(type) {
+        switch(in_type) {
             case f32: output = diff2<float  >(in,dim);  break;
             case c32: output = diff2<cfloat >(in,dim);  break;
             case f64: output = diff2<double >(in,dim);  break;
@@ -101,9 +100,9 @@ af_err af_diff2(af_array *out, const af_array in, const int dim)
             case s16: output = diff2<short  >(in,dim);  break;
             case u16: output = diff2<ushort >(in,dim);  break;
             case u8:  output = diff2<uchar  >(in,dim);  break;
-            default:  TYPE_ERROR(1, type);
+            default:  TYPE_ERROR(in);
         }
-        std::swap(*out,output);
+        std::swap(*out, output);
     }
     CATCHALL;
 

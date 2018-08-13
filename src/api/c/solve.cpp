@@ -28,16 +28,13 @@ static inline af_array solve(const af_array a, const af_array b, const af_mat_pr
 af_err af_solve(af_array *out, const af_array a, const af_array b, const af_mat_prop options)
 {
     try {
-        const ArrayInfo& a_info = getInfo(a);
-        const ArrayInfo& b_info = getInfo(b);
+        ARG_SETUP(a);
+        ARG_SETUP(b);
 
         if (a_info.ndims() > 2 ||
             b_info.ndims() > 2) {
             AF_ERROR("solve can not be used in batch mode", AF_ERR_BATCH);
         }
-
-        af_dtype a_type = a_info.getType();
-        af_dtype b_type = b_info.getType();
 
         dim4 adims = a_info.dims();
         dim4 bdims = b_info.dims();
@@ -45,17 +42,17 @@ af_err af_solve(af_array *out, const af_array a, const af_array b, const af_mat_
         ARG_ASSERT(1, a_info.isFloating());                       // Only floating and complex types
         ARG_ASSERT(2, b_info.isFloating());                       // Only floating and complex types
 
-        TYPE_ASSERT(a_type == b_type);
+        ASSERT_TYPE_EQ(a, b);
 
         DIM_ASSERT(1, bdims[0] == adims[0]);
         DIM_ASSERT(1, bdims[2] == adims[2]);
         DIM_ASSERT(1, bdims[3] == adims[3]);
 
-        if(a_info.ndims() == 0 || b_info.ndims() == 0) {
-            return af_create_handle(out, 0, nullptr, a_type);
+        if (a_info.ndims() == 0 || b_info.ndims() == 0) {
+            return af_create_handle(out, 0, nullptr, a_info.getType());
         }
 
-        bool is_triangle_solve = (options & AF_MAT_LOWER) || (options & AF_MAT_UPPER);
+        const bool is_triangle_solve = (options & AF_MAT_LOWER) || (options & AF_MAT_UPPER);
 
         if (options != AF_MAT_NONE && !is_triangle_solve) {
             AF_ERROR("Using this property is not yet supported in solve", AF_ERR_NOT_SUPPORTED);
@@ -69,13 +66,12 @@ af_err af_solve(af_array *out, const af_array a, const af_array b, const af_mat_
         }
 
         af_array output;
-
-        switch(a_type) {
+        switch(a_info.getType()) {
             case f32: output = solve<float  >(a, b, options);  break;
             case f64: output = solve<double >(a, b, options);  break;
             case c32: output = solve<cfloat >(a, b, options);  break;
             case c64: output = solve<cdouble>(a, b, options);  break;
-            default:  TYPE_ERROR(1, a_type);
+            default:  TYPE_ERROR(a);
         }
         std::swap(*out, output);
     }
@@ -97,27 +93,24 @@ af_err af_solve_lu(af_array *out, const af_array a,
                    const af_mat_prop options)
 {
     try {
-        const ArrayInfo& a_info = getInfo(a);
-        const ArrayInfo& b_info = getInfo(b);
+        ARG_SETUP(a);
+        ARG_SETUP(b);
 
         if (a_info.ndims() > 2 ||
             b_info.ndims() > 2) {
             AF_ERROR("solveLU can not be used in batch mode", AF_ERR_BATCH);
         }
 
-        af_dtype a_type = a_info.getType();
-        af_dtype b_type = b_info.getType();
-
         dim4 adims = a_info.dims();
         dim4 bdims = b_info.dims();
-        if(a_info.ndims() == 0 || b_info.ndims() == 0) {
-          return af_create_handle(out, 0, nullptr, a_type);
+        if (a_info.ndims() == 0 || b_info.ndims() == 0) {
+            return af_create_handle(out, 0, nullptr, a_info.getType());
         }
 
         ARG_ASSERT(1, a_info.isFloating());                       // Only floating and complex types
         ARG_ASSERT(2, b_info.isFloating());                       // Only floating and complex types
 
-        TYPE_ASSERT(a_type == b_type);
+        ASSERT_TYPE_EQ(a, b);
 
         DIM_ASSERT(1, adims[0] == adims[1]);
         DIM_ASSERT(1, bdims[0] == adims[0]);
@@ -130,12 +123,12 @@ af_err af_solve_lu(af_array *out, const af_array a,
 
         af_array output;
 
-        switch(a_type) {
+        switch(a_info.getType()) {
         case f32: output = solve_lu<float  >(a, piv, b, options);  break;
         case f64: output = solve_lu<double >(a, piv, b, options);  break;
         case c32: output = solve_lu<cfloat >(a, piv, b, options);  break;
         case c64: output = solve_lu<cdouble>(a, piv, b, options);  break;
-        default:  TYPE_ERROR(1, a_type);
+        default:  TYPE_ERROR(a);
         }
         std::swap(*out, output);
     }

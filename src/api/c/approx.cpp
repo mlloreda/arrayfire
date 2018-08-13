@@ -38,20 +38,20 @@ af_err af_approx1(af_array *out, const af_array in, const af_array pos,
                   const af_interp_type method, const float offGrid)
 {
     try {
-        const ArrayInfo& i_info = getInfo(in);
-        const ArrayInfo& p_info = getInfo(pos);
+        ARG_SETUP(in);
+        ARG_SETUP(pos);
 
-        dim4 idims = i_info.dims();
-        dim4 pdims = p_info.dims();
+        dim4 idims = in_info.dims();
+        dim4 pdims = pos_info.dims();
 
-        af_dtype itype = i_info.getType();
+        af_dtype in_type = in_info.getType();
 
-        ARG_ASSERT(1, i_info.isFloating());                       // Only floating and complex types
-        ARG_ASSERT(2, p_info.isRealFloating());                   // Only floating types
-        ARG_ASSERT(1, i_info.isSingle() == p_info.isSingle());    // Must have same precision
-        ARG_ASSERT(1, i_info.isDouble() == p_info.isDouble());    // Must have same precision
+        ARG_ASSERT(1, in_info.isFloating());                       // Only floating and complex types
+        ARG_ASSERT(2, pos_info.isRealFloating());                   // Only floating types
+        ARG_ASSERT(1, in_info.isSingle() == pos_info.isSingle());    // Must have same precision
+        ARG_ASSERT(1, in_info.isDouble() == pos_info.isDouble());    // Must have same precision
         // POS should either be (x, 1, 1, 1) or (1, idims[1], idims[2], idims[3])
-        DIM_ASSERT(2, p_info.isColumn() ||
+        DIM_ASSERT(2, pos_info.isColumn() ||
                       (pdims[1] == idims[1] && pdims[2] == idims[2] && pdims[3] == idims[3]));
         ARG_ASSERT(3, (method == AF_INTERP_LINEAR  ||
                        method == AF_INTERP_NEAREST ||
@@ -61,17 +61,17 @@ af_err af_approx1(af_array *out, const af_array in, const af_array pos,
                        method == AF_INTERP_LOWER));
 
         if(idims.ndims() == 0 || pdims.ndims() ==  0) {
-            return af_create_handle(out, 0, nullptr, itype);
+            return af_create_handle(out, 0, nullptr, in_type);
         }
 
         af_array output;
 
-        switch(itype) {
+        switch(in_type) {
             case f32: output = approx1<float  , float >(in, pos, method, offGrid);  break;
             case f64: output = approx1<double , double>(in, pos, method, offGrid);  break;
             case c32: output = approx1<cfloat , float >(in, pos, method, offGrid);  break;
             case c64: output = approx1<cdouble, double>(in, pos, method, offGrid);  break;
-            default:  TYPE_ERROR(1, itype);
+            default:  TYPE_ERROR(in);
         }
         std::swap(*out,output);
     }
@@ -84,40 +84,39 @@ af_err af_approx2(af_array *out, const af_array in, const af_array pos0, const a
                   const af_interp_type method, const float offGrid)
 {
     try {
-        const ArrayInfo& i_info = getInfo(in);
-        const ArrayInfo& p_info = getInfo(pos0);
-        const ArrayInfo& q_info = getInfo(pos1);
+        ARG_SETUP(in);
+        ARG_SETUP(pos0);
+        ARG_SETUP(pos1);
 
-        dim4 idims = i_info.dims();
-        dim4 pdims = p_info.dims();
-        dim4 qdims = q_info.dims();
+        dim4 idims = in_info.dims();
+        dim4 pdims = pos0_info.dims();
+        dim4 qdims = pos1_info.dims();
 
-        af_dtype itype = i_info.getType();
+        const af_dtype in_type = in_info.getType();
 
-        ARG_ASSERT(1, i_info.isFloating());                     // Only floating and complex types
-        ARG_ASSERT(2, p_info.isRealFloating());                 // Only floating types
-        ARG_ASSERT(3, q_info.isRealFloating());                 // Only floating types
-        ARG_ASSERT(1, p_info.getType() == q_info.getType());    // Must have same type
-        ARG_ASSERT(1, i_info.isSingle() == p_info.isSingle());  // Must have same precision
-        ARG_ASSERT(1, i_info.isDouble() == p_info.isDouble());  // Must have same precision
+        ARG_ASSERT(1, in_info.isFloating());                     // Only floating and complex types
+        ARG_ASSERT(2, pos0_info.isRealFloating());                 // Only floating types
+        ARG_ASSERT(3, pos1_info.isRealFloating());                 // Only floating types
+        ARG_ASSERT(1, pos0_info.getType() == pos1_info.getType());    // Must have same type
+        ARG_ASSERT(1, in_info.isSingle() == pos0_info.isSingle());  // Must have same precision
+        ARG_ASSERT(1, in_info.isDouble() == pos0_info.isDouble());  // Must have same precision
         DIM_ASSERT(2, pdims == qdims);                          // POS0 and POS1 must have same dims
 
         // POS should either be (x, y, 1, 1) or (x, y, idims[2], idims[3])
         DIM_ASSERT(2, (pdims[2] == 1        && pdims[3] == 1) ||
                       (pdims[2] == idims[2] && pdims[3] == idims[3]));
 
-        if(idims.ndims() == 0 || pdims.ndims() ==  0 || qdims.ndims() == 0) {
-            return af_create_handle(out, 0, nullptr, itype);
+        if (idims.ndims() == 0 || pdims.ndims() ==  0 || qdims.ndims() == 0) {
+            return af_create_handle(out, 0, nullptr, in_type);
         }
 
         af_array output;
-
-        switch(itype) {
+        switch(in_type) {
             case f32: output = approx2<float  , float >(in, pos0, pos1, method, offGrid);  break;
             case f64: output = approx2<double , double>(in, pos0, pos1, method, offGrid);  break;
             case c32: output = approx2<cfloat , float >(in, pos0, pos1, method, offGrid);  break;
             case c64: output = approx2<cdouble, double>(in, pos0, pos1, method, offGrid);  break;
-            default:  TYPE_ERROR(1, itype);
+            default:  TYPE_ERROR(in);
         }
         std::swap(*out,output);
     }

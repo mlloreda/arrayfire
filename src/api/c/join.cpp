@@ -39,23 +39,24 @@ static inline af_array join_many(const int dim, const unsigned n_arrays, const a
 af_err af_join(af_array *out, const int dim, const af_array first, const af_array second)
 {
     try {
-        const ArrayInfo& finfo = getInfo(first);
-        const ArrayInfo& sinfo = getInfo(second);
-        af::dim4  fdims = finfo.dims();
-        af::dim4  sdims = sinfo.dims();
+        ARG_SETUP(first);
+        ARG_SETUP(second);
+
+        af::dim4  fdims = first_info.dims();
+        af::dim4  sdims = second_info.dims();
 
         ARG_ASSERT(1, dim >= 0 && dim < 4);
-        ARG_ASSERT(2, finfo.getType() == sinfo.getType());
-        if(sinfo.elements() == 0) {
+        ASSERT_TYPE_EQ(first, second);
+
+        if (second_info.elements() == 0) {
             return af_retain_array(out, first);
         }
-
-        if(finfo.elements() == 0) {
+        if (first_info.elements() == 0) {
             return af_retain_array(out, second);
         }
 
-        DIM_ASSERT(2, sinfo.elements() > 0);
-        DIM_ASSERT(3, finfo.elements() > 0);
+        DIM_ASSERT(2, second_info.elements() > 0);
+        DIM_ASSERT(3, first_info.elements() > 0);
 
         // All dimensions except join dimension must be equal
         // Compute output dims
@@ -65,7 +66,7 @@ af_err af_join(af_array *out, const int dim, const af_array first, const af_arra
 
         af_array output;
 
-        switch(finfo.getType()) {
+        switch(first_info.getType()) {
             case f32: output = join<float  , float  >(dim, first, second);  break;
             case c32: output = join<cfloat , cfloat >(dim, first, second);  break;
             case f64: output = join<double , double >(dim, first, second);  break;
@@ -78,9 +79,9 @@ af_err af_join(af_array *out, const int dim, const af_array first, const af_arra
             case s16: output = join<short  , short  >(dim, first, second);  break;
             case u16: output = join<ushort , ushort >(dim, first, second);  break;
             case u8:  output = join<uchar  , uchar  >(dim, first, second);  break;
-            default:  TYPE_ERROR(1, finfo.getType());
+            default:  TYPE_ERROR(first);
         }
-        std::swap(*out,output);
+        std::swap(*out, output);
     }
     CATCHALL;
 
@@ -132,9 +133,9 @@ af_err af_join_many(af_array *out, const int dim, const unsigned n_arrays, const
             case s16: output = join_many<short  >(dim, n_arrays, inputs);  break;
             case u16: output = join_many<ushort >(dim, n_arrays, inputs);  break;
             case u8:  output = join_many<uchar  >(dim, n_arrays, inputs);  break;
-            default:  TYPE_ERROR(1, info[0].getType());
+            default:  UNSUPPORTED_TYPE(info[0].getType());
         }
-        std::swap(*out,output);
+        std::swap(*out, output);
     }
     CATCHALL;
 

@@ -124,15 +124,14 @@ af_err plotWrapper(const af_window wind, const af_array in, const int order_dim,
                    const af_cell* const props,
                    forge::PlotType ptype = FG_PLOT_LINE, forge::MarkerType marker = FG_MARKER_NONE)
 {
-    if(wind==0) {
-        std::cerr<<"Not a valid window"<<std::endl;
+    if (wind == 0) {
+        std::cerr << "Not a valid window" << std::endl;
         return AF_SUCCESS;
     }
 
     try {
-        const ArrayInfo& info = getInfo(in);
-        af::dim4  dims = info.dims();
-        af_dtype  type = info.getType();
+        ARG_SETUP(in);
+        af::dim4  dims = in_info.dims();
 
         DIM_ASSERT(0, dims.ndims() == 2);
         DIM_ASSERT(0, dims[order_dim] == 2 || dims[order_dim] == 3);
@@ -142,14 +141,14 @@ af_err plotWrapper(const af_window wind, const af_array in, const int order_dim,
 
         forge::Chart* chart = NULL;
 
-        switch(type) {
+        switch(in_info.getType()) {
             case f32: chart = setup_plot<float  >(window, in, dims[order_dim], props, ptype, marker); break;
             case s32: chart = setup_plot<int    >(window, in, dims[order_dim], props, ptype, marker); break;
             case u32: chart = setup_plot<uint   >(window, in, dims[order_dim], props, ptype, marker); break;
             case s16: chart = setup_plot<short  >(window, in, dims[order_dim], props, ptype, marker); break;
             case u16: chart = setup_plot<ushort >(window, in, dims[order_dim], props, ptype, marker); break;
             case u8 : chart = setup_plot<uchar  >(window, in, dims[order_dim], props, ptype, marker); break;
-            default:  TYPE_ERROR(1, type);
+            default:  TYPE_ERROR(in);
         }
 
         auto gridDims = ForgeManager::getInstance().getWindowGrid(window);
@@ -170,30 +169,26 @@ af_err plotWrapper(const af_window wind, const af_array X, const af_array Y, con
                    forge::PlotType ptype = FG_PLOT_LINE,
                    forge::MarkerType marker = FG_MARKER_NONE)
 {
-    if(wind==0) {
-        std::cerr<<"Not a valid window"<<std::endl;
+    if (wind == 0) {
+        std::cerr << "Not a valid window" << std::endl;
         return AF_SUCCESS;
     }
 
     try {
-        const ArrayInfo& xInfo = getInfo(X);
-        af::dim4  xDims = xInfo.dims();
-        af_dtype  xType = xInfo.getType();
+        ARG_SETUP(X);
+        ARG_SETUP(Y);
+        ARG_SETUP(Z);
 
-        const ArrayInfo& yInfo = getInfo(Y);
-        af::dim4  yDims = yInfo.dims();
-        af_dtype  yType = yInfo.getType();
-
-        const ArrayInfo& zInfo = getInfo(Z);
-        af::dim4  zDims = zInfo.dims();
-        af_dtype  zType = zInfo.getType();
+        af::dim4  xDims = X_info.dims();
+        af::dim4  yDims = Y_info.dims();
+        af::dim4  zDims = Z_info.dims();
 
         DIM_ASSERT(0, xDims == yDims);
         DIM_ASSERT(0, xDims == zDims);
-        DIM_ASSERT(0, xInfo.isVector());
+        DIM_ASSERT(0, X_info.isVector());
 
-        TYPE_ASSERT(xType == yType);
-        TYPE_ASSERT(xType == zType);
+        ASSERT_TYPE_EQ(X, Y);
+        ASSERT_TYPE_EQ(X, Z);
 
         // Join for set up vector
         af_array in = 0;
@@ -205,14 +200,14 @@ af_err plotWrapper(const af_window wind, const af_array X, const af_array Y, con
 
         forge::Chart* chart = NULL;
 
-        switch(xType) {
+        switch(X_info.getType()) {
             case f32: chart = setup_plot<float  >(window, in, 3, props, ptype, marker); break;
             case s32: chart = setup_plot<int    >(window, in, 3, props, ptype, marker); break;
             case u32: chart = setup_plot<uint   >(window, in, 3, props, ptype, marker); break;
             case s16: chart = setup_plot<short  >(window, in, 3, props, ptype, marker); break;
             case u16: chart = setup_plot<ushort >(window, in, 3, props, ptype, marker); break;
             case u8 : chart = setup_plot<uchar  >(window, in, 3, props, ptype, marker); break;
-            default:  TYPE_ERROR(1, xType);
+            default:  TYPE_ERROR(X);
         }
 
         auto gridDims = ForgeManager::getInstance().getWindowGrid(window);
@@ -240,18 +235,16 @@ af_err plotWrapper(const af_window wind, const af_array X, const af_array Y,
     }
 
     try {
-        const ArrayInfo& xInfo = getInfo(X);
-        af::dim4  xDims = xInfo.dims();
-        af_dtype  xType = xInfo.getType();
+        ARG_SETUP(X);
+        ARG_SETUP(Y);
 
-        const ArrayInfo& yInfo = getInfo(Y);
-        af::dim4  yDims = yInfo.dims();
-        af_dtype  yType = yInfo.getType();
+        af::dim4  xDims = X_info.dims();
+        af::dim4  yDims = Y_info.dims();
 
         DIM_ASSERT(0, xDims == yDims);
-        DIM_ASSERT(0, xInfo.isVector());
+        DIM_ASSERT(0, X_info.isVector());
 
-        TYPE_ASSERT(xType == yType);
+        ASSERT_TYPE_EQ(X, Y);
 
         // Join for set up vector
         af_array in = 0;
@@ -262,14 +255,14 @@ af_err plotWrapper(const af_window wind, const af_array X, const af_array Y,
 
         forge::Chart* chart = NULL;
 
-        switch(xType) {
+        switch(X_info.getType()) {
             case f32: chart = setup_plot<float  >(window, in, 2, props, ptype, marker); break;
             case s32: chart = setup_plot<int    >(window, in, 2, props, ptype, marker); break;
             case u32: chart = setup_plot<uint   >(window, in, 2, props, ptype, marker); break;
             case s16: chart = setup_plot<short  >(window, in, 2, props, ptype, marker); break;
             case u16: chart = setup_plot<ushort >(window, in, 2, props, ptype, marker); break;
             case u8 : chart = setup_plot<uchar  >(window, in, 2, props, ptype, marker); break;
-            default:  TYPE_ERROR(1, xType);
+            default:  TYPE_ERROR(X);
         }
 
         auto gridDims = ForgeManager::getInstance().getWindowGrid(window);
@@ -390,8 +383,9 @@ af_err af_draw_plot3(const af_window wind, const af_array P, const af_cell* cons
 {
 #if defined(WITH_GRAPHICS)
     try {
-        const ArrayInfo& info = getInfo(P);
-        af::dim4  dims = info.dims();
+        ARG_SETUP(P);
+
+        af::dim4  dims = P_info.dims();
 
         if(dims.ndims() == 2 && dims[1] == 3) {
             return plotWrapper(wind, P, 1, props);
@@ -472,8 +466,8 @@ af_err af_draw_scatter3(const af_window wind, const af_array P, const af_marker_
 #if defined(WITH_GRAPHICS)
     forge::MarkerType fg_marker = getFGMarker(af_marker);
     try {
-        const ArrayInfo& info = getInfo(P);
-        af::dim4  dims = info.dims();
+        ARG_SETUP(P);
+        af::dim4  dims = P_info.dims();
 
         if(dims.ndims() == 2 && dims[1] == 3) {
             return plotWrapper(wind, P, 1, props, FG_PLOT_SCATTER, fg_marker);

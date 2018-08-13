@@ -122,10 +122,10 @@ af_err af_save_array(int *index, const char *key, const af_array arr, const char
         ARG_ASSERT(0, key != NULL);
         ARG_ASSERT(2, filename != NULL);
 
-        const ArrayInfo& info = getInfo(arr);
-        af_dtype type = info.getType();
+        ARG_SETUP(arr);
+
         int id = -1;
-        switch(type) {
+        switch(arr_info.getType()) {
             case f32:   id = save<float>   (key, arr, filename, append);   break;
             case c32:   id = save<cfloat>  (key, arr, filename, append);   break;
             case f64:   id = save<double>  (key, arr, filename, append);   break;
@@ -138,7 +138,7 @@ af_err af_save_array(int *index, const char *key, const af_array arr, const char
             case u64:   id = save<uintl>   (key, arr, filename, append);   break;
             case s16:   id = save<short>   (key, arr, filename, append);   break;
             case u16:   id = save<ushort>  (key, arr, filename, append);   break;
-            default:    TYPE_ERROR(1, type);
+            default:    TYPE_ERROR(arr);
         }
         std::swap(*index, id);
     }
@@ -241,7 +241,7 @@ static af_array readArrayV1(const char *filename, const unsigned index)
         case u64 : out = readDataToArray<uintl>  (fs);  break;
         case s16 : out = readDataToArray<short>  (fs);  break;
         case u16 : out = readDataToArray<ushort> (fs);  break;
-        default:    TYPE_ERROR(1, type);
+        default:    UNSUPPORTED_TYPE(type);
     }
     fs.close();
 

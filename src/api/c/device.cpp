@@ -175,19 +175,18 @@ static inline void sparseEval(af_array arr)
 af_err af_eval(af_array arr)
 {
     try {
-        const ArrayInfo& info = getInfo(arr, false);
-        af_dtype type = info.getType();
+        const ArrayInfo& arr_info = getInfo(arr, false);
 
-        if(info.isSparse()) {
-            switch(type) {
+        if(arr_info.isSparse()) {
+            switch(arr_info.getType()) {
                 case f32: sparseEval<float  >(arr); break;
                 case f64: sparseEval<double >(arr); break;
                 case c32: sparseEval<cfloat >(arr); break;
                 case c64: sparseEval<cdouble>(arr); break;
-                default : TYPE_ERROR(0, type);
+                default : TYPE_ERROR(arr);
             }
         } else {
-            switch (type) {
+            switch (arr_info.getType()) {
                 case f32: eval<float  >(arr); break;
                 case f64: eval<double >(arr); break;
                 case c32: eval<cfloat >(arr); break;
@@ -200,7 +199,7 @@ af_err af_eval(af_array arr)
                 case u64: eval<uintl  >(arr); break;
                 case s16: eval<short  >(arr); break;
                 case u16: eval<ushort >(arr); break;
-                default: TYPE_ERROR(0, type);
+                default: TYPE_ERROR(arr);
             }
         }
     } CATCHALL;
@@ -226,7 +225,7 @@ af_err af_eval_multiple(int num, af_array *arrays)
 {
     try {
         const ArrayInfo& info = getInfo(arrays[0]);
-        af_dtype type = info.getType();
+        const af_dtype type = info.getType();
         dim4 dims = info.dims();
 
         for (int i = 1; i < num; i++) {
@@ -256,7 +255,7 @@ af_err af_eval_multiple(int num, af_array *arrays)
         case s16: evalMultiple<short  >(num, arrays); break;
         case u16: evalMultiple<ushort >(num, arrays); break;
         default:
-            TYPE_ERROR(0, type);
+            UNSUPPORTED_TYPE(type); // \TODO(miguel) ?
         }
     } CATCHALL;
 

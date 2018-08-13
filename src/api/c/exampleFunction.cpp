@@ -52,7 +52,7 @@ af_err af_example_function(af_array* out, const af_array a, const af_someenum_t 
 {
     try {
         af_array output = 0;
-        const ArrayInfo& info = getInfo(a);        // ArrayInfo is the base class which
+        const ArrayInfo& info = getInfo(a); // ArrayInfo is the base class which
                                             // each backend specific Array inherits
                                             // This class stores the basic array meta-data
                                             // such as type of data, dimensions,
@@ -78,7 +78,7 @@ af_err af_example_function(af_array* out, const af_array a, const af_someenum_t 
             case  b8: output = example<char   >(a, a, param); break;
             case c32: output = example<cfloat >(a, a, param); break;
             case c64: output = example<cdouble>(a, a, param); break;
-            default : TYPE_ERROR(1, type);  // Another helpful macro from err_common.hpp
+            default : TYPE_ERROR(a);  // Another helpful macro from err_common.hpp
                                             // that helps throw type based error messages
         }
 

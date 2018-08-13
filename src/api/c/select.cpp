@@ -31,19 +31,18 @@ af_array select(const af_array cond, const af_array a, const af_array b, const d
 af_err af_select(af_array *out, const af_array cond, const af_array a, const af_array b)
 {
     try {
-        const ArrayInfo& ainfo = getInfo(a);
-        const ArrayInfo& binfo = getInfo(b);
-        const ArrayInfo& cond_info = getInfo(cond);
+        ARG_SETUP(a);
+        ARG_SETUP(b);
+        ARG_SETUP(cond);
 
-        if(cond_info.ndims() == 0) {
+        if (cond_info.ndims() == 0) {
             return af_retain_array(out, cond);
         }
+        ASSERT_TYPE_EQ(a, b);
+        ASSERT_TYPE(cond, TYPES(b8));
 
-        ARG_ASSERT(2, ainfo.getType() == binfo.getType());
-        ARG_ASSERT(1, cond_info.getType() == b8);
-
-        dim4 adims = ainfo.dims();
-        dim4 bdims = binfo.dims();
+        dim4 adims = a_info.dims();
+        dim4 bdims = b_info.dims();
         dim4 cond_dims = cond_info.dims();
         dim4 odims(1, 1, 1, 1);
 
@@ -55,7 +54,7 @@ af_err af_select(af_array *out, const af_array cond, const af_array a, const af_
 
         af_array res;
 
-        switch (ainfo.getType()) {
+        switch (a_info.getType()) {
         case f32: res = select<float  >(cond, a, b, odims); break;
         case f64: res = select<double >(cond, a, b, odims); break;
         case c32: res = select<cfloat >(cond, a, b, odims); break;
@@ -68,7 +67,7 @@ af_err af_select(af_array *out, const af_array cond, const af_array a, const af_
         case u16: res = select<ushort >(cond, a, b, odims); break;
         case u8:  res = select<uchar  >(cond, a, b, odims); break;
         case b8:  res = select<char   >(cond, a, b, odims); break;
-        default:  TYPE_ERROR(2, ainfo.getType());
+        default:  TYPE_ERROR(a);
         }
 
         std::swap(*out, res);
@@ -86,13 +85,13 @@ af_array select_scalar(const af_array cond, const af_array a, const double b, co
 af_err af_select_scalar_r(af_array *out, const af_array cond, const af_array a, const double b)
 {
     try {
-        const ArrayInfo& ainfo = getInfo(a);
-        const ArrayInfo& cinfo = getInfo(cond);
+        ARG_SETUP(a);
+        ARG_SETUP(cond);
 
-        ARG_ASSERT(1, cinfo.getType() == b8);
+        ASSERT_TYPE(cond, TYPES(b8));
 
-        dim4 adims = ainfo.dims();
-        dim4 cond_dims = cinfo.dims();
+        dim4 adims = a_info.dims();
+        dim4 cond_dims = cond_info.dims();
         dim4 odims(1);
 
         for (int i = 0; i < 4; i++) {
@@ -102,7 +101,7 @@ af_err af_select_scalar_r(af_array *out, const af_array cond, const af_array a, 
 
         af_array res;
 
-        switch (ainfo.getType()) {
+        switch (a_info.getType()) {
         case f32: res = select_scalar<float  , false>(cond, a, b, odims); break;
         case f64: res = select_scalar<double , false>(cond, a, b, odims); break;
         case c32: res = select_scalar<cfloat , false>(cond, a, b, odims); break;
@@ -115,7 +114,7 @@ af_err af_select_scalar_r(af_array *out, const af_array cond, const af_array a, 
         case u64: res = select_scalar<uintl  , false>(cond, a, b, odims); break;
         case u8:  res = select_scalar<uchar  , false>(cond, a, b, odims); break;
         case b8:  res = select_scalar<char   , false>(cond, a, b, odims); break;
-        default:  TYPE_ERROR(2, ainfo.getType());
+        default:  TYPE_ERROR(a);
         }
 
         std::swap(*out, res);
@@ -126,13 +125,13 @@ af_err af_select_scalar_r(af_array *out, const af_array cond, const af_array a, 
 af_err af_select_scalar_l(af_array *out, const af_array cond, const double a, const af_array b)
 {
     try {
-        const ArrayInfo& binfo = getInfo(b);
-        const ArrayInfo& cinfo = getInfo(cond);
+        ARG_SETUP(b);
+        ARG_SETUP(cond);
 
-        ARG_ASSERT(1, cinfo.getType() == b8);
+        ASSERT_TYPE(cond, TYPES(b8));
 
-        dim4 bdims = binfo.dims();
-        dim4 cond_dims = cinfo.dims();
+        dim4 bdims = b_info.dims();
+        dim4 cond_dims = cond_info.dims();
         dim4 odims(1);
 
         for (int i = 0; i < 4; i++) {
@@ -142,7 +141,7 @@ af_err af_select_scalar_l(af_array *out, const af_array cond, const double a, co
 
         af_array res;
 
-        switch (binfo.getType()) {
+        switch (b_info.getType()) {
         case f32: res = select_scalar<float  , true >(cond, b, a, odims); break;
         case f64: res = select_scalar<double , true >(cond, b, a, odims); break;
         case c32: res = select_scalar<cfloat , true >(cond, b, a, odims); break;
@@ -155,7 +154,7 @@ af_err af_select_scalar_l(af_array *out, const af_array cond, const double a, co
         case u64: res = select_scalar<uintl  , true >(cond, b, a, odims); break;
         case u8:  res = select_scalar<uchar  , true >(cond, b, a, odims); break;
         case b8:  res = select_scalar<char   , true >(cond, b, a, odims); break;
-        default:  TYPE_ERROR(2, binfo.getType());
+        default:  TYPE_ERROR(b);
         }
 
         std::swap(*out, res);

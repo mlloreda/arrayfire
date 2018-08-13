@@ -37,9 +37,9 @@ af_err af_wrap(af_array *out, const af_array in,
                const bool is_column)
 {
     try {
-        const ArrayInfo& info = getInfo(in);
-        af_dtype type = info.getType();
-        af::dim4 idims = info.dims();
+        ARG_SETUP(in);
+
+        af::dim4 idims = in_info.dims();
 
         ARG_ASSERT(2, wx > 0);
         ARG_ASSERT(3, wx > 0);
@@ -56,8 +56,7 @@ af_err af_wrap(af_array *out, const af_array in,
         DIM_ASSERT(1, num_patches == nx * ny);
 
         af_array output;
-
-        switch(type) {
+        switch(in_info.getType()) {
             case f32: output = wrap<float  >(in, ox, oy, wx, wy, sx, sy, px, py, is_column);  break;
             case f64: output = wrap<double >(in, ox, oy, wx, wy, sx, sy, px, py, is_column);  break;
             case c32: output = wrap<cfloat >(in, ox, oy, wx, wy, sx, sy, px, py, is_column);  break;
@@ -70,7 +69,7 @@ af_err af_wrap(af_array *out, const af_array in,
             case u16: output = wrap<ushort >(in, ox, oy, wx, wy, sx, sy, px, py, is_column);  break;
             case u8:  output = wrap<uchar  >(in, ox, oy, wx, wy, sx, sy, px, py, is_column);  break;
             case b8:  output = wrap<char   >(in, ox, oy, wx, wy, sx, sy, px, py, is_column);  break;
-            default:  TYPE_ERROR(1, type);
+            default:  TYPE_ERROR(in);
         }
         std::swap(*out,output);
     }

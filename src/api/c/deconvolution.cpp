@@ -189,10 +189,10 @@ af_err af_iterative_deconv(af_array* out, const af_array in, const af_array ker,
                            const af_iterative_deconv_algo algo)
 {
     try {
-        const ArrayInfo& inputInfo  = getInfo(in);
-        const dim4& inputDims  = inputInfo.dims();
-        const ArrayInfo& kernelInfo = getInfo(ker);
-        const dim4& kernelDims = kernelInfo.dims();
+        ARG_SETUP(in);
+        ARG_SETUP(ker);
+        const dim4& inputDims = in_info.dims();
+        const dim4& kernelDims = ker_info.dims();
 
         DIM_ASSERT(2, (inputDims.ndims() == 2));
         DIM_ASSERT(3, (kernelDims.ndims() == 2));
@@ -202,17 +202,16 @@ af_err af_iterative_deconv(af_array* out, const af_array in, const af_array ker,
         ARG_ASSERT(6, (algo==AF_ITERATIVE_DECONV_DEFAULT ||
                        algo==AF_ITERATIVE_DECONV_LANDWEBER ||
                        algo==AF_ITERATIVE_DECONV_RICHARDSONLUCY));
-        af_array res   = 0;
-        unsigned iters = iterations;
-        float rfac     = relax_factor;
 
-        af_dtype inputType  = inputInfo.getType();
-        switch(inputType) {
+        af_array res   = 0;
+        const unsigned iters = iterations;
+        const float rfac     = relax_factor;
+        switch(in_info.getType()) {
             case f32: res = iterDeconv<float >(in,ker,iters,rfac,algo); break;
             case s16: res = iterDeconv<short >(in,ker,iters,rfac,algo); break;
             case u16: res = iterDeconv<ushort>(in,ker,iters,rfac,algo); break;
             case u8:  res = iterDeconv<uchar >(in,ker,iters,rfac,algo); break;
-            default : TYPE_ERROR(1, inputType);
+            default : TYPE_ERROR(in);
         }
         std::swap(res, *out);
     }
@@ -294,10 +293,11 @@ af_err af_inverse_deconv(af_array* out, const af_array in, const af_array psf,
                          const float gamma, const af_inverse_deconv_algo algo)
 {
     try {
-        const ArrayInfo& inputInfo = getInfo(in);
-        const dim4& inputDims = inputInfo.dims();
-        const ArrayInfo& psfInfo   = getInfo(psf);
-        const dim4& psfDims   = psfInfo.dims();
+        ARG_SETUP(in);
+        ARG_SETUP(psf);
+
+        const dim4& inputDims = in_info.dims();
+        const dim4& psfDims   = psf_info.dims();
 
         DIM_ASSERT(2, (inputDims.ndims() == 2));
         DIM_ASSERT(3, (psfDims.ndims() == 2));
@@ -305,15 +305,14 @@ af_err af_inverse_deconv(af_array* out, const af_array in, const af_array psf,
         ARG_ASSERT(4, (gamma > 0));
         ARG_ASSERT(5, (algo==AF_INVERSE_DECONV_DEFAULT ||
                        algo==AF_INVERSE_DECONV_TIKHONOV));
-        af_array res = 0;
 
-        af_dtype inputType  = inputInfo.getType();
-        switch(inputType) {
+        af_array res = 0;
+        switch(in_info.getType()) {
             case f32: res = invDeconv<float >(in, psf, gamma, algo); break;
             case s16: res = invDeconv<short >(in, psf, gamma, algo); break;
             case u16: res = invDeconv<ushort>(in, psf, gamma, algo); break;
             case u8:  res = invDeconv<uchar >(in, psf, gamma, algo); break;
-            default : TYPE_ERROR(1, inputType);
+            default : TYPE_ERROR(in);
         }
         std::swap(res, *out);
     }

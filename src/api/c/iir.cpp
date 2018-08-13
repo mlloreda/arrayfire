@@ -18,6 +18,7 @@
 
 #include <cstdio>
 
+using std::vector;
 using af::dim4;
 using namespace detail;
 
@@ -27,7 +28,9 @@ af_err af_fir(af_array *y, const af_array b, const af_array x)
         af_array out;
         AF_CHECK(af_convolve1(&out, x, b, AF_CONV_EXPAND, AF_CONV_AUTO));
 
-        dim4 xdims = getInfo(x).dims();
+        ARG_SETUP(x);
+
+        dim4 xdims = x_info.dims();
         af_seq seqs[] = {af_span, af_span, af_span, af_span};
         seqs[0].begin = 0;
         seqs[0].end = xdims[0] - 1;
@@ -52,34 +55,30 @@ inline static af_array iir(const af_array b, const af_array a, const af_array x)
 af_err af_iir(af_array *y, const af_array b, const af_array a, const af_array x)
 {
     try {
-        const ArrayInfo& ainfo = getInfo(a);
-        const ArrayInfo& binfo = getInfo(b);
-        const ArrayInfo& xinfo = getInfo(x);
+        ARG_SETUP(a);
+        ARG_SETUP(b);
+        ARG_SETUP(x);
 
-        af_dtype xtype = xinfo.getType();
+        ASSERT_TYPE(x, TYPES(f32, f64, c32, c64));
+        ASSERT_TYPE_EQ(x, a);
+        ASSERT_TYPE_EQ(x, b);
 
-        ARG_ASSERT(1, ainfo.getType() == xtype);
-        ARG_ASSERT(2, binfo.getType() == xtype);
-        ARG_ASSERT(1, binfo.ndims() == ainfo.ndims());
+        ARG_ASSERT(1, b_info.ndims() == a_info.ndims());
 
-        dim4 adims = ainfo.dims();
-        dim4 bdims = binfo.dims();
-        dim4 xdims = xinfo.dims();
-
-        if(xinfo.ndims() == 0) {
+        if (x_info.ndims() == 0) {
             return af_retain_array(y, x);
         }
 
-        if (xinfo.ndims() > 1) {
-            if (binfo.ndims() > 1) {
+        if (x_info.ndims() > 1) {
+            if (b_info.ndims() > 1) {
                 for (int i = 1; i < 3; i++) {
-                    ARG_ASSERT(1, bdims[i] == xdims[i]);
+                    ARG_ASSERT(1, b_info.dims()[i] == x_info.dims()[i]);
                 }
             }
         }
 
         // If only a0 is available, just normalize b and perform fir
-        if (adims[0] == 1) {
+        if (a_info.dims()[0] == 1) {
             af_array bnorm = 0;
             AF_CHECK(af_div(&bnorm, b, a, true));
             AF_CHECK(af_fir(y, bnorm, x));
@@ -88,12 +87,12 @@ af_err af_iir(af_array *y, const af_array b, const af_array a, const af_array x)
         }
 
         af_array res;
-        switch (xtype) {
+        switch (x_info.getType()) {
         case f32: res = iir<float  >(b, a, x); break;
         case f64: res = iir<double >(b, a, x); break;
         case c32: res = iir<cfloat >(b, a, x); break;
         case c64: res = iir<cdouble>(b, a, x); break;
-        default: TYPE_ERROR(1, xtype);
+        default: TYPE_ERROR(x);
         }
 
         std::swap(*y, res);

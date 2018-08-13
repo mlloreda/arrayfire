@@ -75,40 +75,38 @@ af_err af_create_sparse_array(
           || stype == AF_STORAGE_COO)) {
             AF_ERROR("Storage type is out of range/unsupported", AF_ERR_ARG);
         }
+        ARG_SETUP(values);
+        ARG_SETUP(rowIdx);
+        ARG_SETUP(colIdx);
 
-        const ArrayInfo& vInfo = getInfo(values);
-        const ArrayInfo& rInfo = getInfo(rowIdx);
-        const ArrayInfo& cInfo = getInfo(colIdx);
+        TYPE_ASSERT(values_info.isFloating()); // \TODO(miguel)
+        ASSERT_TYPE(rowIdx, TYPES(s32));
+        ASSERT_TYPE(colIdx, TYPES(s32));
 
-        TYPE_ASSERT(vInfo.isFloating());
-        DIM_ASSERT(3, vInfo.isLinear());
-        ARG_ASSERT(4, rInfo.getType() == s32);
-        DIM_ASSERT(4, rInfo.isLinear());
-        ARG_ASSERT(5, cInfo.getType() == s32);
-        DIM_ASSERT(5, cInfo.isLinear());
+        DIM_ASSERT(3, values_info.isLinear());
+        DIM_ASSERT(4, rowIdx_info.isLinear());
+        DIM_ASSERT(5, colIdx_info.isLinear());
 
-        const size_t nNZ = vInfo.elements();
+        const size_t nNZ = values_info.elements();
         if(stype == AF_STORAGE_COO) {
-          DIM_ASSERT(4, rInfo.elements() == nNZ);
-          DIM_ASSERT(5, cInfo.elements() == nNZ);
+          DIM_ASSERT(4, rowIdx_info.elements() == nNZ);
+          DIM_ASSERT(5, colIdx_info.elements() == nNZ);
         } else if(stype == AF_STORAGE_CSR) {
-          DIM_ASSERT(4, rInfo.elements() == nRows + 1);
-          DIM_ASSERT(5, cInfo.elements() == nNZ);
+          DIM_ASSERT(4, rowIdx_info.elements() == nRows + 1);
+          DIM_ASSERT(5, colIdx_info.elements() == nNZ);
         } else if(stype == AF_STORAGE_CSC) {
-          DIM_ASSERT(4, rInfo.elements() == nNZ);
-          DIM_ASSERT(5, cInfo.elements() == nCols + 1);
+          DIM_ASSERT(4, rowIdx_info.elements() == nNZ);
+          DIM_ASSERT(5, colIdx_info.elements() == nCols + 1);
         }
 
         af_array output = 0;
-
         af::dim4 dims(nRows, nCols);
-
-        switch(vInfo.getType()) {
+        switch(values_info.getType()) {
             case f32: output = createSparseArrayFromData<float  >(dims, values, rowIdx, colIdx, stype); break;
             case f64: output = createSparseArrayFromData<double >(dims, values, rowIdx, colIdx, stype); break;
             case c32: output = createSparseArrayFromData<cfloat >(dims, values, rowIdx, colIdx, stype); break;
             case c64: output = createSparseArrayFromData<cdouble>(dims, values, rowIdx, colIdx, stype); break;
-            default : TYPE_ERROR(1, vInfo.getType());
+            default : TYPE_ERROR(values);
         }
         std::swap(*out, output);
 
@@ -159,6 +157,7 @@ af_err af_create_sparse_array_from_ptr(
             AF_ERROR("Storage type is out of range/unsupported", AF_ERR_ARG);
         }
 
+        // \TODO(miguel)
         TYPE_ASSERT(type == f32 || type == f64
                  || type == c32 || type == c64);
 
@@ -180,7 +179,7 @@ af_err af_create_sparse_array_from_ptr(
             case c64: output = createSparseArrayFromPtr<cdouble>
                                (dims, nNZ, static_cast<const cdouble*>(values), rowIdx, colIdx, stype, source);
                       break;
-            default : TYPE_ERROR(1, type);
+            default : UNSUPPORTED_TYPE(type);
         }
         std::swap(*out, output);
 
@@ -214,8 +213,7 @@ af_err af_create_sparse_array_from_dense(af_array *out, const af_array in,
         // Checks:
         // stype is within acceptable range
         // values is of floating point type
-
-        const ArrayInfo& info = getInfo(in);
+        ARG_SETUP(in);
 
         if(!(stype == AF_STORAGE_CSR
           || stype == AF_STORAGE_CSC
@@ -224,20 +222,18 @@ af_err af_create_sparse_array_from_dense(af_array *out, const af_array in,
         }
 
         // Only matrices allowed
-        DIM_ASSERT(1, info.ndims() == 2);
+        DIM_ASSERT(1, in_info.ndims() == 2);
 
-        TYPE_ASSERT(info.isFloating());
+        TYPE_ASSERT(in_info.isFloating()); // \TODO(miguel)
 
-        af::dim4 dims(info.dims()[0], info.dims()[1]);
-
+        af::dim4 dims(in_info.dims()[0], in_info.dims()[1]);
         af_array output = 0;
-
-        switch(info.getType()) {
+        switch(in_info.getType()) {
             case f32: output = createSparseArrayFromDense<float  >(dims, in, stype); break;
             case f64: output = createSparseArrayFromDense<double >(dims, in, stype); break;
             case c32: output = createSparseArrayFromDense<cfloat >(dims, in, stype); break;
             case c64: output = createSparseArrayFromDense<cdouble>(dims, in, stype); break;
-            default: TYPE_ERROR(1, info.getType());
+            default: TYPE_ERROR(in);
         }
         std::swap(*out, output);
 
@@ -387,7 +383,7 @@ af_err af_sparse_get_values(af_array *out, const af_array in)
             case f64: output = getSparseValues<double >(in); break;
             case c32: output = getSparseValues<cfloat >(in); break;
             case c64: output = getSparseValues<cdouble>(in); break;
-            default : TYPE_ERROR(1, base.getType());
+            default : UNSUPPORTED_TYPE(base.getType()); // \TODO(miguel) ?
         }
         std::swap(*out, output);
     }

@@ -32,8 +32,8 @@ af_err af_rotate(af_array *out, const af_array in, const float theta,
     try {
         unsigned odims0 = 0, odims1 = 0;
 
-        const ArrayInfo& info = getInfo(in);
-        af::dim4 idims = info.dims();
+        ARG_SETUP(in);
+        af::dim4 idims = in_info.dims();
 
         if(!crop) {
             odims0 = idims[0] * fabs(std::cos(theta)) + idims[1] * fabs(std::sin(theta));
@@ -43,8 +43,6 @@ af_err af_rotate(af_array *out, const af_array in, const float theta,
             odims1 = idims[1];
         }
 
-        af_dtype itype = info.getType();
-
         ARG_ASSERT(4, method == AF_INTERP_NEAREST  ||
                       method == AF_INTERP_BILINEAR ||
                       method == AF_INTERP_BILINEAR_COSINE ||
@@ -52,7 +50,7 @@ af_err af_rotate(af_array *out, const af_array in, const float theta,
                       method == AF_INTERP_BICUBIC_SPLINE ||
                       method == AF_INTERP_LOWER);
 
-        if(idims.elements() == 0) {
+        if (idims.elements() == 0) {
             return af_retain_array(out, in);
         }
         DIM_ASSERT(1, idims.elements() > 0);
@@ -60,7 +58,7 @@ af_err af_rotate(af_array *out, const af_array in, const float theta,
         af::dim4 odims(odims0, odims1, idims[2], idims[3]);
 
         af_array output = 0;
-        switch(itype) {
+        switch(in_info.getType()) {
             case f32: output = rotate<float  >(in, theta, odims, method);  break;
             case f64: output = rotate<double >(in, theta, odims, method);  break;
             case c32: output = rotate<cfloat >(in, theta, odims, method);  break;
@@ -73,7 +71,7 @@ af_err af_rotate(af_array *out, const af_array in, const float theta,
             case u16: output = rotate<ushort >(in, theta, odims, method);  break;
             case u8:  output = rotate<uchar  >(in, theta, odims, method);  break;
             case b8:  output = rotate<uchar  >(in, theta, odims, method);  break;
-            default:  TYPE_ERROR(1, itype);
+            default:  TYPE_ERROR(in);
         }
         std::swap(*out,output);
     } CATCHALL

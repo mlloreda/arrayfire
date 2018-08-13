@@ -67,7 +67,7 @@ af_array retainSparseHandle(const af_array in)
 template<typename To>
 common::SparseArray<To> castSparse(const af_array &in)
 {
-    const ArrayInfo& info = getInfo(in, false, true);
+    const ArrayInfo& in_info = getInfo(in, false, true);
     using namespace common;
 
 #define CAST_SPARSE(Ti) do {                                            \
@@ -79,12 +79,12 @@ common::SparseArray<To> castSparse(const af_array &in)
                                           sparse.getStorage());         \
     } while(0)
 
-    switch(info.getType()) {
+    switch(in_info.getType()) {
     case f32: CAST_SPARSE(float);
     case f64: CAST_SPARSE(double);
     case c32: CAST_SPARSE(cfloat);
     case c64: CAST_SPARSE(cdouble);
-    default: TYPE_ERROR(1, info.getType());
+    default: TYPE_ERROR(in);
     }
 }
 

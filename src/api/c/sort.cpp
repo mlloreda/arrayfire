@@ -34,17 +34,15 @@ static inline af_array sort(const af_array in, const unsigned dim, const bool is
 af_err af_sort(af_array *out, const af_array in, const unsigned dim, const bool isAscending)
 {
     try {
-        const ArrayInfo& info = getInfo(in);
-        af_dtype type = info.getType();
+        ARG_SETUP(in);
 
-        if(info.elements() == 0) {
+        if (in_info.elements() == 0) {
             return af_retain_array(out, in);
         }
-        DIM_ASSERT(1, info.elements() > 0);
+        DIM_ASSERT(1, in_info.elements() > 0);
 
         af_array val;
-
-        switch(type) {
+        switch(in_info.getType()) {
             case f32: val = sort<float  >(in, dim, isAscending);  break;
             case f64: val = sort<double >(in, dim, isAscending);  break;
             case s32: val = sort<int    >(in, dim, isAscending);  break;
@@ -55,7 +53,7 @@ af_err af_sort(af_array *out, const af_array in, const unsigned dim, const bool 
             case u64: val = sort<uintl  >(in, dim, isAscending);  break;
             case u8:  val = sort<uchar  >(in, dim, isAscending);  break;
             case b8:  val = sort<char   >(in, dim, isAscending);  break;
-            default:  TYPE_ERROR(1, type);
+            default:  TYPE_ERROR(in);
         }
         std::swap(*out, val);
     }
@@ -82,19 +80,18 @@ static inline void sort_index(af_array *val, af_array *idx, const af_array in,
 af_err af_sort_index(af_array *out, af_array *indices, const af_array in, const unsigned dim, const bool isAscending)
 {
     try {
-        const ArrayInfo& info = getInfo(in);
-        af_dtype type = info.getType();
+        ARG_SETUP(in);
+        const af_dtype in_type = in_info.getType();
 
-        if(info.elements() <= 0) {
-            AF_CHECK(af_create_handle(out,     0, nullptr, type));
-            AF_CHECK(af_create_handle(indices, 0, nullptr, type));
+        if (in_info.elements() <= 0) {
+            AF_CHECK(af_create_handle(out,     0, nullptr, in_type));
+            AF_CHECK(af_create_handle(indices, 0, nullptr, in_type));
             return AF_SUCCESS;
         }
 
         af_array val;
         af_array idx;
-
-        switch(type) {
+        switch(in_type) {
             case f32: sort_index<float  >(&val, &idx, in, dim, isAscending);  break;
             case f64: sort_index<double >(&val, &idx, in, dim, isAscending);  break;
             case s32: sort_index<int    >(&val, &idx, in, dim, isAscending);  break;
@@ -105,9 +102,9 @@ af_err af_sort_index(af_array *out, af_array *indices, const af_array in, const 
             case u64: sort_index<uintl  >(&val, &idx, in, dim, isAscending);  break;
             case u8:  sort_index<uchar  >(&val, &idx, in, dim, isAscending);  break;
             case b8:  sort_index<char   >(&val, &idx, in, dim, isAscending);  break;
-            default:  TYPE_ERROR(1, type);
+            default:  TYPE_ERROR(in);
         }
-        std::swap(*out , val);
+        std::swap(*out, val);
         std::swap(*indices, idx);
     }
     CATCHALL;
@@ -135,10 +132,9 @@ template<typename Tk>
 void sort_by_key_tmplt(af_array *okey, af_array *oval, const af_array ikey, const af_array ival,
                        const unsigned dim, const bool isAscending)
 {
-    const ArrayInfo& info = getInfo(ival);
-    af_dtype vtype = info.getType();
+    ARG_SETUP(ival);
 
-    switch(vtype) {
+    switch(ival_info.getType()) {
     case f32: sort_by_key<Tk, float  >(okey, oval, ikey, ival, dim, isAscending);  break;
     case f64: sort_by_key<Tk, double >(okey, oval, ikey, ival, dim, isAscending);  break;
     case c32: sort_by_key<Tk, cfloat >(okey, oval, ikey, ival, dim, isAscending);  break;
@@ -151,7 +147,7 @@ void sort_by_key_tmplt(af_array *okey, af_array *oval, const af_array ikey, cons
     case u64: sort_by_key<Tk, uintl  >(okey, oval, ikey, ival, dim, isAscending);  break;
     case u8:  sort_by_key<Tk, uchar  >(okey, oval, ikey, ival, dim, isAscending);  break;
     case b8:  sort_by_key<Tk, char   >(okey, oval, ikey, ival, dim, isAscending);  break;
-    default:  TYPE_ERROR(1, vtype);
+    default:  TYPE_ERROR(ival);
     }
 
     return;
@@ -162,24 +158,22 @@ af_err af_sort_by_key(af_array *out_keys, af_array *out_values,
                       const unsigned dim, const bool isAscending)
 {
     try {
-        const ArrayInfo& kinfo = getInfo(keys);
-        af_dtype ktype = kinfo.getType();
+        ARG_SETUP(keys);
+        ARG_SETUP(values);
+        const af_dtype keys_type = keys_info.getType();
 
-        const ArrayInfo& vinfo = getInfo(values);
-
-        DIM_ASSERT(4, kinfo.dims() == vinfo.dims());
-        if(kinfo.elements() == 0) {
-            AF_CHECK(af_create_handle(out_keys,   0, nullptr, ktype));
-            AF_CHECK(af_create_handle(out_values, 0, nullptr, ktype));
+        DIM_ASSERT(4, keys_info.dims() == values_info.dims());
+        if (keys_info.elements() == 0) {
+            AF_CHECK(af_create_handle(out_keys,   0, nullptr, keys_type));
+            AF_CHECK(af_create_handle(out_values, 0, nullptr, keys_type));
             return AF_SUCCESS;
         }
 
-        TYPE_ASSERT(kinfo.isReal());
+        TYPE_ASSERT(keys_info.isReal()); // \TODO(miguel)
 
         af_array oKey;
         af_array oVal;
-
-        switch(ktype) {
+        switch(keys_type) {
             case f32: sort_by_key_tmplt<float  >(&oKey, &oVal, keys, values, dim, isAscending);  break;
             case f64: sort_by_key_tmplt<double >(&oKey, &oVal, keys, values, dim, isAscending);  break;
             case s32: sort_by_key_tmplt<int    >(&oKey, &oVal, keys, values, dim, isAscending);  break;
@@ -190,9 +184,9 @@ af_err af_sort_by_key(af_array *out_keys, af_array *out_values,
             case u64: sort_by_key_tmplt<uintl  >(&oKey, &oVal, keys, values, dim, isAscending);  break;
             case u8:  sort_by_key_tmplt<uchar  >(&oKey, &oVal, keys, values, dim, isAscending);  break;
             case b8:  sort_by_key_tmplt<char   >(&oKey, &oVal, keys, values, dim, isAscending);  break;
-            default:  TYPE_ERROR(1, ktype);
+            default:  TYPE_ERROR(keys);
         }
-        std::swap(*out_keys , oKey);
+        std::swap(*out_keys, oKey);
         std::swap(*out_values , oVal);
     }
     CATCHALL;

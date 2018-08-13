@@ -260,7 +260,7 @@ af_err af_random_uniform(af_array *out, const unsigned ndims, const dim_t * cons
         case u16:   result = uniformDistribution_<ushort >(d, e); break;
         case u8:    result = uniformDistribution_<uchar  >(d, e); break;
         case b8:    result = uniformDistribution_<char   >(d, e); break;
-        default:    TYPE_ERROR(4, type);
+        default:    UNSUPPORTED_TYPE(type);
         }
         std::swap(*out, result);
     }
@@ -282,7 +282,7 @@ af_err af_random_normal(af_array *out, const unsigned ndims, const dim_t * const
         case c32:   result = normalDistribution_<cfloat >(d, e); break;
         case f64:   result = normalDistribution_<double >(d, e); break;
         case c64:   result = normalDistribution_<cdouble>(d, e); break;
-        default:    TYPE_ERROR(4, type);
+        default:    UNSUPPORTED_TYPE(type);
         }
         std::swap(*out, result);
     }
@@ -324,7 +324,7 @@ af_err af_randu(af_array *out, const unsigned ndims, const dim_t * const dims, c
         case u16: result = uniformDistribution_<ushort >(d, e); break;
         case u8:  result = uniformDistribution_<uchar  >(d, e); break;
         case b8:  result = uniformDistribution_<char   >(d, e); break;
-        default:  TYPE_ERROR(3, type);
+        default:  UNSUPPORTED_TYPE(type);
         }
         std::swap(*out, result);
     }
@@ -348,7 +348,7 @@ af_err af_randn(af_array *out, const unsigned ndims, const dim_t * const dims, c
         case c32: result = normalDistribution_<cfloat >(d, e); break;
         case f64: result = normalDistribution_<double >(d, e); break;
         case c64: result = normalDistribution_<cdouble>(d, e); break;
-        default:  TYPE_ERROR(3, type);
+        default:  UNSUPPORTED_TYPE(type);
         }
         std::swap(*out, result);
     }

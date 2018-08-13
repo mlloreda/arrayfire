@@ -32,28 +32,27 @@ af_err af_histogram(af_array *out, const af_array in,
                     const unsigned nbins, const double minval, const double maxval)
 {
     try {
-        const ArrayInfo& info = getInfo(in);
-        af_dtype type  = info.getType();
+        ARG_SETUP(in);
 
-        if(info.ndims() == 0) {
+        if (in_info.ndims() == 0) {
             return af_retain_array(out, in);
         }
 
         af_array output;
-        switch(type) {
-            case f32: output = histogram<float , uint>(in, nbins, minval, maxval, info.isLinear()); break;
-            case f64: output = histogram<double, uint>(in, nbins, minval, maxval, info.isLinear()); break;
-            case b8 : output = histogram<char  , uint>(in, nbins, minval, maxval, info.isLinear()); break;
-            case s32: output = histogram<int   , uint>(in, nbins, minval, maxval, info.isLinear()); break;
-            case u32: output = histogram<uint  , uint>(in, nbins, minval, maxval, info.isLinear()); break;
-            case s16: output = histogram<short , uint>(in, nbins, minval, maxval, info.isLinear()); break;
-            case u16: output = histogram<ushort, uint>(in, nbins, minval, maxval, info.isLinear()); break;
-            case s64: output = histogram<intl  , uint>(in, nbins, minval, maxval, info.isLinear()); break;
-            case u64: output = histogram<uintl , uint>(in, nbins, minval, maxval, info.isLinear()); break;
-            case u8 : output = histogram<uchar , uint>(in, nbins, minval, maxval, info.isLinear()); break;
-            default : TYPE_ERROR(1, type);
+        switch(in_info.getType()) {
+            case f32: output = histogram<float , uint>(in, nbins, minval, maxval, in_info.isLinear()); break;
+            case f64: output = histogram<double, uint>(in, nbins, minval, maxval, in_info.isLinear()); break;
+            case b8 : output = histogram<char  , uint>(in, nbins, minval, maxval, in_info.isLinear()); break;
+            case s32: output = histogram<int   , uint>(in, nbins, minval, maxval, in_info.isLinear()); break;
+            case u32: output = histogram<uint  , uint>(in, nbins, minval, maxval, in_info.isLinear()); break;
+            case s16: output = histogram<short , uint>(in, nbins, minval, maxval, in_info.isLinear()); break;
+            case u16: output = histogram<ushort, uint>(in, nbins, minval, maxval, in_info.isLinear()); break;
+            case s64: output = histogram<intl  , uint>(in, nbins, minval, maxval, in_info.isLinear()); break;
+            case u64: output = histogram<uintl , uint>(in, nbins, minval, maxval, in_info.isLinear()); break;
+            case u8 : output = histogram<uchar , uint>(in, nbins, minval, maxval, in_info.isLinear()); break;
+            default : TYPE_ERROR(in);
         }
-        std::swap(*out,output);
+        std::swap(*out, output);
     }
     CATCHALL;
 

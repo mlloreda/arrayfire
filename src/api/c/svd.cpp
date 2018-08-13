@@ -23,8 +23,8 @@ using namespace detail;
 template <typename T>
 static inline void svd(af_array *s, af_array *u, af_array *vt, const af_array in)
 {
-    const ArrayInfo& info = getInfo(in);  // ArrayInfo is the base class which
-    af::dim4 dims = info.dims();
+    ARG_SETUP(in);  // ArrayInfo is the base class which
+    af::dim4 dims = in_info.dims();
     int M = dims[0];
     int N = dims[1];
 
@@ -45,8 +45,8 @@ static inline void svd(af_array *s, af_array *u, af_array *vt, const af_array in
 template <typename T>
 static inline void svdInPlace(af_array *s, af_array *u, af_array *vt, af_array in)
 {
-    const ArrayInfo& info = getInfo(in);  // ArrayInfo is the base class which
-    af::dim4 dims = info.dims();
+    ARG_SETUP(in);  // ArrayInfo is the base class which
+    af::dim4 dims = in_info.dims();
     int M = dims[0];
     int N = dims[1];
 
@@ -67,20 +67,20 @@ static inline void svdInPlace(af_array *s, af_array *u, af_array *vt, af_array i
 af_err af_svd(af_array *u, af_array *s, af_array *vt, const af_array in)
 {
     try {
-        const ArrayInfo& info = getInfo(in);
-        af::dim4 dims = info.dims();
+        ARG_SETUP(in);
+        af::dim4 dims = in_info.dims();
 
         ARG_ASSERT(3, (dims.ndims() >= 0 && dims.ndims() <= 3));
-        af_dtype type = info.getType();
+        const af_dtype in_type = in_info.getType();
 
         if(dims.ndims() == 0) {
-            AF_CHECK(af_create_handle(u, 0, nullptr, type));
-            AF_CHECK(af_create_handle(s, 0, nullptr, type));
-            AF_CHECK(af_create_handle(vt, 0, nullptr, type));
+            AF_CHECK(af_create_handle(u, 0, nullptr, in_type));
+            AF_CHECK(af_create_handle(s, 0, nullptr, in_type));
+            AF_CHECK(af_create_handle(vt, 0, nullptr, in_type));
             return AF_SUCCESS;
         }
 
-        switch (type) {
+        switch (in_type) {
         case f64:
             svd<double>(s, u, vt, in);
             break;
@@ -94,7 +94,7 @@ af_err af_svd(af_array *u, af_array *s, af_array *vt, const af_array in)
             svd<cfloat>(s, u, vt, in);
             break;
         default:
-            TYPE_ERROR(1, type);
+            TYPE_ERROR(in);
         }
     }
     CATCHALL;
@@ -104,22 +104,21 @@ af_err af_svd(af_array *u, af_array *s, af_array *vt, const af_array in)
 af_err af_svd_inplace(af_array *u, af_array *s, af_array *vt, af_array in)
 {
     try {
-        const ArrayInfo& info = getInfo(in);
-        af::dim4 dims = info.dims();
+        ARG_SETUP(in);
+        af::dim4 dims = in_info.dims();
 
         DIM_ASSERT(3, dims[0] <= dims[1]);
         ARG_ASSERT(3, (dims.ndims() >= 0 && dims.ndims() <= 3));
-        af_dtype type = info.getType();
+        const af_dtype in_type = in_info.getType();
 
-        if(dims.ndims() == 0) {
-            AF_CHECK(af_create_handle(u, 0, nullptr, type));
-            AF_CHECK(af_create_handle(s, 0, nullptr, type));
-            AF_CHECK(af_create_handle(vt, 0, nullptr, type));
+        if (dims.ndims() == 0) {
+            AF_CHECK(af_create_handle(u, 0, nullptr, in_type));
+            AF_CHECK(af_create_handle(s, 0, nullptr, in_type));
+            AF_CHECK(af_create_handle(vt, 0, nullptr, in_type));
             return AF_SUCCESS;
         }
 
-
-        switch (type) {
+        switch (in_type) {
         case f64:
             svdInPlace<double>(s, u, vt, in);
             break;
@@ -133,7 +132,7 @@ af_err af_svd_inplace(af_array *u, af_array *s, af_array *vt, af_array in)
             svdInPlace<cfloat>(s, u, vt, in);
             break;
         default:
-            TYPE_ERROR(1, type);
+            TYPE_ERROR(in);
         }
     }
     CATCHALL;

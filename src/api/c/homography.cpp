@@ -18,6 +18,7 @@
 #include <homography.hpp>
 
 using af::dim4;
+using std::vector;
 using namespace detail;
 
 template<typename T>
@@ -49,41 +50,43 @@ af_err af_homography(af_array *H, int *inliers,
                      const unsigned iterations, const af_dtype otype)
 {
     try {
-        const ArrayInfo& xsinfo = getInfo(x_src);
-        const ArrayInfo& ysinfo = getInfo(y_src);
-        const ArrayInfo& xdinfo = getInfo(x_dst);
-        const ArrayInfo& ydinfo = getInfo(y_dst);
+        ARG_SETUP(x_src);
+        ARG_SETUP(y_src);
+        ARG_SETUP(x_dst);
+        ARG_SETUP(y_dst);
 
-        af::dim4 xsdims  = xsinfo.dims();
-        af::dim4 ysdims  = ysinfo.dims();
-        af::dim4 xddims  = xdinfo.dims();
-        af::dim4 yddims  = ydinfo.dims();
+        ASSERT_TYPE(x_src, TYPES(f32));
+        ASSERT_TYPE(y_src, TYPES(f32));
+        ASSERT_TYPE(x_dst, TYPES(f32));
+        ASSERT_TYPE(y_dst, TYPES(f32));
 
-        af_dtype xstype = xsinfo.getType();
-        af_dtype ystype = ysinfo.getType();
-        af_dtype xdtype = xdinfo.getType();
-        af_dtype ydtype = ydinfo.getType();
+        dim4 xsdims  = x_src_info.dims();
+        dim4 ysdims  = y_src_info.dims();
+        dim4 xddims  = x_dst_info.dims();
+        dim4 yddims  = y_dst_info.dims();
 
-        if (xstype != f32) { TYPE_ERROR(1, xstype); }
-        if (ystype != f32) { TYPE_ERROR(2, ystype); }
-        if (xdtype != f32) { TYPE_ERROR(3, xdtype); }
-        if (ydtype != f32) { TYPE_ERROR(4, ydtype); }
+        // \TODO enable DIM assertions!
+        // int dim_idx = 0;
+        // ASSERT_DIM_GT(dim_idx, 0, x_src);
+        // ASSERT_DIM_GT(dim_idx, 0, x_dst);
+        // ASSERT_DIM_GT(dim_idx, 0, x_src, x_dst); // TODO multiple arrays
+        // ASSERT_DIM_GT(x_src, dim_idx, 0);
+        // ASSERT_DIM(x_src[0], y_src[0]) ?????
+        // ASSERT_DIM_GT(0, 0, x_src, x_dst);
 
         ARG_ASSERT(1, (xsdims[0] > 0));
         ARG_ASSERT(2, (ysdims[0] == xsdims[0]));
         ARG_ASSERT(3, (xddims[0] > 0));
         ARG_ASSERT(4, (yddims[0] == xddims[0]));
-
         ARG_ASSERT(5, (inlier_thr >= 0.1f));
         ARG_ASSERT(6, (iterations > 0));
 
         af_array outH;
         int outInl;
-
         switch(otype) {
             case f32: homography<float >(outH, outInl, x_src, y_src, x_dst, y_dst, htype, inlier_thr, iterations);  break;
             case f64: homography<double>(outH, outInl, x_src, y_src, x_dst, y_dst, htype, inlier_thr, iterations);  break;
-            default:  TYPE_ERROR(1, otype);
+            default:  UNSUPPORTED_TYPE(otype);
         }
         std::swap(*H, outH);
         std::swap(*inliers, outInl);

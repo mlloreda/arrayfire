@@ -37,24 +37,23 @@ af_err af_moddims(af_array *out, const af_array in,
                   const unsigned ndims, const dim_t * const dims)
 {
     try {
-        if(ndims == 0) {
+        if (ndims == 0) {
             *out = retain(in);
             return AF_SUCCESS;
         }
         ARG_ASSERT(2, ndims >= 1);
         ARG_ASSERT(3, dims != NULL);
 
-        af_array output = 0;
         dim4 newDims(ndims, dims);
-        const ArrayInfo& info = getInfo(in);
-        dim_t in_elements = info.elements();
+
+        ARG_SETUP(in);
+        dim_t in_elements = in_info.elements();
         dim_t new_elements = newDims.elements();
 
         DIM_ASSERT(1, in_elements == new_elements);
 
-        af_dtype type = info.getType();
-
-        switch(type) {
+        af_array output = 0;
+        switch(in_info.getType()) {
             case f32: output = modDims<float  >(in, newDims); break;
             case c32: output = modDims<cfloat >(in, newDims); break;
             case f64: output = modDims<double >(in, newDims); break;
@@ -67,7 +66,7 @@ af_err af_moddims(af_array *out, const af_array in,
             case u64: output = modDims<uintl  >(in, newDims); break;
             case s16: output = modDims<short  >(in, newDims); break;
             case u16: output = modDims<ushort >(in, newDims); break;
-            default: TYPE_ERROR(1, type);
+            default: TYPE_ERROR(in);
         }
         std::swap(*out,output);
     }
@@ -79,15 +78,13 @@ af_err af_moddims(af_array *out, const af_array in,
 af_err af_flat(af_array *out, const af_array in)
 {
     try {
-        const ArrayInfo& info = getInfo(in);
+        ARG_SETUP(in);
 
-        if (info.ndims() == 1) {
+        if (in_info.ndims() == 1) {
             *out = retain(in);
         } else {
             af_array output = 0;
-            af_dtype type = info.getType();
-
-            switch(type) {
+            switch(in_info.getType()) {
                 case f32: output = flat<float  >(in); break;
                 case c32: output = flat<cfloat >(in); break;
                 case f64: output = flat<double >(in); break;
@@ -100,7 +97,7 @@ af_err af_flat(af_array *out, const af_array in)
                 case u64: output = flat<uintl  >(in); break;
                 case s16: output = flat<short  >(in); break;
                 case u16: output = flat<ushort >(in); break;
-                default: TYPE_ERROR(1, type);
+                default: TYPE_ERROR(in);
             }
             std::swap(*out,output);
         }

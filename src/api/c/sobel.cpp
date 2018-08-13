@@ -36,14 +36,13 @@ af_err af_sobel_operator(af_array *dx, af_array *dy, const af_array img, const u
         //ARG_ASSERT(4, (ker_size==3 || ker_size==5 || ker_size==7));
         ARG_ASSERT(4, (ker_size==3));
 
-        const ArrayInfo& info = getInfo(img);
-        af::dim4 dims  = info.dims();
+        ARG_SETUP(img);
+        af::dim4 dims  = img_info.dims();
 
         DIM_ASSERT(3, (dims.ndims() >= 2));
 
         ArrayPair output;
-        af_dtype type  = info.getType();
-        switch(type) {
+        switch(img_info.getType()) {
             case f32: output = sobelDerivatives<float , float> (img, ker_size); break;
             case f64: output = sobelDerivatives<double, double>(img, ker_size); break;
             case s32: output = sobelDerivatives<int   , int>   (img, ker_size); break;
@@ -52,7 +51,7 @@ af_err af_sobel_operator(af_array *dx, af_array *dy, const af_array img, const u
             case u16: output = sobelDerivatives<ushort, int>   (img, ker_size); break;
             case b8 : output = sobelDerivatives<char  , int>   (img, ker_size); break;
             case u8:  output = sobelDerivatives<uchar , int>   (img, ker_size); break;
-            default : TYPE_ERROR(1, type);
+            default : TYPE_ERROR(img);
         }
         std::swap(*dx, output.first);
         std::swap(*dy, output.second);

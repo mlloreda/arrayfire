@@ -56,10 +56,10 @@ af_err af_anisotropic_diffusion(af_array* out, const af_array in, const float dt
                                 const af_diffusion_eq eq)
 {
     try {
-        const ArrayInfo& info = getInfo(in);
+        ARG_SETUP(in);
 
-        const af::dim4& inputDimensions = info.dims();
-        const af_dtype  inputType       = info.getType();
+        const af::dim4& inputDimensions = in_info.dims();
+        const af_dtype  inputType       = in_info.getType();
         const unsigned  inputNumDims    = inputDimensions.ndims();
 
         DIM_ASSERT(1, (inputNumDims>=2));
@@ -67,8 +67,8 @@ af_err af_anisotropic_diffusion(af_array* out, const af_array in, const float dt
         ARG_ASSERT(3, (K>0 || K<0));
         ARG_ASSERT(4, (iterations>0));
 
-        float DT = dt;
-        float maxDt = 1.0f/std::pow(2.0f, static_cast<float>(2)+1);
+        const float DT = dt;
+        const float maxDt = 1.0f/std::pow(2.0f, static_cast<float>(2)+1);
 
         const af_flux_function F = (fftype==AF_FLUX_DEFAULT ? AF_FLUX_EXPONENTIAL : fftype);
 
@@ -83,7 +83,7 @@ af_err af_anisotropic_diffusion(af_array* out, const af_array in, const float dt
             case s16:
             case u16:
             case u8 : output = diffusion<float>(input, DT, K, iterations, F, eq); break;
-            default : TYPE_ERROR(1, inputType);
+            default : TYPE_ERROR(in);
         }
         std::swap(*out, output);
     }

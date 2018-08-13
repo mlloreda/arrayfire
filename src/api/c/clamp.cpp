@@ -40,15 +40,16 @@ af_err af_clamp(af_array *out, const af_array in,
                 const af_array lo, const af_array hi, const bool batch)
 {
     try {
-        const ArrayInfo& linfo = getInfo(lo);
-        const ArrayInfo& hinfo = getInfo(hi);
-        const ArrayInfo& iinfo = getInfo(in);
+        ARG_SETUP(in);
+        ARG_SETUP(lo);
+        ARG_SETUP(hi);
 
-        DIM_ASSERT(2, linfo.dims() == hinfo.dims());
-        TYPE_ASSERT(linfo.getType() == hinfo.getType());
+        DIM_ASSERT(2, lo_info.dims() == hi_info.dims());
 
-        dim4 odims = getOutDims(iinfo.dims(), linfo.dims(), batch);
-        const af_dtype otype = implicit(iinfo.getType(), linfo.getType());
+        ASSERT_TYPE_EQ(lo, hi);
+
+        dim4 odims = getOutDims(in_info.dims(), lo_info.dims(), batch);
+        const af_dtype otype = implicit(in_info.getType(), lo_info.getType());
 
         af_array res;
         switch (otype) {
@@ -64,7 +65,7 @@ af_err af_clamp(af_array *out, const af_array in,
         case u64: res = clampOp<uintl  >(in, lo, hi, odims); break;
         case s16: res = clampOp<short  >(in, lo, hi, odims); break;
         case u16: res = clampOp<ushort >(in, lo, hi, odims); break;
-        default: TYPE_ERROR(0, otype);
+        default: UNSUPPORTED_TYPE(otype);
         }
 
         std::swap(*out, res);

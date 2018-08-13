@@ -55,11 +55,10 @@ af_err af_mean(af_array *out, const af_array in, const dim_t dim)
 {
     try {
         ARG_ASSERT(2, (dim>=0 && dim<=3));
+        ARG_SETUP(in);
 
         af_array output = 0;
-        const ArrayInfo& info = getInfo(in);
-        af_dtype type = info.getType();
-        switch(type) {
+        switch(in_info.getType()) {
             case f64: output = mean<double  ,  double>(in, dim); break;
             case f32: output = mean<float   ,  float >(in, dim); break;
             case s32: output = mean<int     ,  float >(in, dim); break;
@@ -72,7 +71,7 @@ af_err af_mean(af_array *out, const af_array in, const dim_t dim)
             case  b8: output = mean<char    ,  float >(in, dim); break;
             case c32: output = mean<cfloat  ,  cfloat>(in, dim); break;
             case c64: output = mean<cdouble , cdouble>(in, dim); break;
-            default : TYPE_ERROR(1, type);
+            default : TYPE_ERROR(in);
         }
         std::swap(*out, output);
     }
@@ -85,19 +84,16 @@ af_err af_mean_weighted(af_array *out, const af_array in, const af_array weights
     try {
         ARG_ASSERT(3, (dim>=0 && dim<=3));
 
-        af_array output = 0;
-        const ArrayInfo& iInfo = getInfo(in);
-        const ArrayInfo& wInfo = getInfo(weights);
-        af_dtype iType  = iInfo.getType();
-        af_dtype wType  = wInfo.getType();
+        ARG_SETUP(in);
+        ARG_SETUP(weights);
 
-        ARG_ASSERT(2, (wType==f32 || wType==f64)); /* verify that weights are non-complex real numbers */
+        ASSERT_TYPE(weights, TYPES(f32, f64)); /* verify that weights are non-complex real numbers */
 
         //FIXME: We should avoid additional copies
         af_array w = weights;
-        if (iInfo.dims() != wInfo.dims()) {
-            dim4 iDims = iInfo.dims();
-            dim4 wDims = wInfo.dims();
+        if (in_info.dims() != weights_info.dims()) {
+            dim4 iDims = in_info.dims();
+            dim4 wDims = weights_info.dims();
             dim4 tDims(1,1,1,1);
             for (int i = 0; i < 4; i++) {
                 ARG_ASSERT(2, wDims[i] == 1 || wDims[i] == iDims[i]);
@@ -106,7 +102,8 @@ af_err af_mean_weighted(af_array *out, const af_array in, const af_array weights
             AF_CHECK(af_tile(&w, weights, tDims[0], tDims[1], tDims[2], tDims[3]));
         }
 
-        switch(iType) {
+        af_array output = 0;
+        switch(in_info.getType()) {
             case f64: output = mean< double>(in, w, dim); break;
             case f32: output = mean< float >(in, w, dim); break;
             case s32: output = mean< float >(in, w, dim); break;
@@ -119,7 +116,7 @@ af_err af_mean_weighted(af_array *out, const af_array in, const af_array weights
             case  b8: output = mean< float >(in, w, dim); break;
             case c32: output = mean< cfloat>(in, w, dim); break;
             case c64: output = mean<cdouble>(in, w, dim); break;
-            default : TYPE_ERROR(1, iType);
+            default : TYPE_ERROR(in);
         }
 
         if (w != weights) {
@@ -134,9 +131,9 @@ af_err af_mean_weighted(af_array *out, const af_array in, const af_array weights
 af_err af_mean_all(double *realVal, double *imagVal, const af_array in)
 {
     try {
-        const ArrayInfo& info = getInfo(in);
-        af_dtype type = info.getType();
-        switch(type) {
+        ARG_SETUP(in);
+
+        switch(in_info.getType()) {
             case f64: *realVal = mean<double  , double>(in); break;
             case f32: *realVal = mean<float   , float >(in); break;
             case s32: *realVal = mean<int     , float >(in); break;
@@ -157,7 +154,7 @@ af_err af_mean_all(double *realVal, double *imagVal, const af_array in)
                 *realVal = real(tmp);
                 *imagVal = imag(tmp);
                 } break;
-            default : TYPE_ERROR(1, type);
+            default : TYPE_ERROR(in);
         }
     }
     CATCHALL;
@@ -167,14 +164,12 @@ af_err af_mean_all(double *realVal, double *imagVal, const af_array in)
 af_err af_mean_all_weighted(double *realVal, double *imagVal, const af_array in, const af_array weights)
 {
     try {
-        const ArrayInfo& iInfo = getInfo(in);
-        const ArrayInfo& wInfo = getInfo(weights);
-        af_dtype iType  = iInfo.getType();
-        af_dtype wType  = wInfo.getType();
+        ARG_SETUP(in);
+        ARG_SETUP(weights);
 
-        ARG_ASSERT(3, (wType==f32 || wType==f64)); /* verify that weights are non-complex real numbers */
+        ASSERT_TYPE(weights, TYPES(f32, f64));
 
-        switch(iType) {
+        switch(in_info.getType()) {
             case f64: *realVal = mean<double>(in, weights); break;
             case f32: *realVal = mean< float>(in, weights); break;
             case s32: *realVal = mean< float>(in, weights); break;
@@ -195,7 +190,7 @@ af_err af_mean_all_weighted(double *realVal, double *imagVal, const af_array in,
                 *realVal = real(tmp);
                 *imagVal = imag(tmp);
                 } break;
-            default : TYPE_ERROR(1, iType);
+            default : TYPE_ERROR(in);
         }
     }
     CATCHALL;

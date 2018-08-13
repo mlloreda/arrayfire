@@ -82,15 +82,13 @@ template<dim_t baseDim, bool expand>
 af_err convolve(af_array *out, const af_array signal, const af_array filter)
 {
     try {
-        const ArrayInfo& sInfo = getInfo(signal);
-        const ArrayInfo& fInfo = getInfo(filter);
+        ARG_SETUP(signal);
+        ARG_SETUP(filter);
 
-        af_dtype stype  = sInfo.getType();
+        dim4 sdims = signal_info.dims();
+        dim4 fdims = filter_info.dims();
 
-        dim4 sdims = sInfo.dims();
-        dim4 fdims = fInfo.dims();
-
-        if(fdims.ndims() == 0 || sdims.ndims() ==  0) {
+        if (fdims.ndims() == 0 || sdims.ndims() ==  0) {
             return af_retain_array(out, signal);
         }
 
@@ -99,7 +97,7 @@ af_err convolve(af_array *out, const af_array signal, const af_array filter)
         ARG_ASSERT(1, (convBT != AF_BATCH_UNSUPPORTED && convBT != AF_BATCH_DIFF));
 
         af_array output;
-        switch(stype) {
+        switch(signal_info.getType()) {
             case c32: output = convolve<cfloat ,  cfloat, baseDim, expand>(signal, filter, convBT); break;
             case c64: output = convolve<cdouble, cdouble, baseDim, expand>(signal, filter, convBT); break;
             case f32: output = convolve<float  ,   float, baseDim, expand>(signal, filter, convBT); break;
@@ -112,9 +110,9 @@ af_err convolve(af_array *out, const af_array signal, const af_array filter)
             case s64: output = convolve<intl   ,   float, baseDim, expand>(signal, filter, convBT); break;
             case u8:  output = convolve<uchar  ,   float, baseDim, expand>(signal, filter, convBT); break;
             case b8:  output = convolve<char   ,   float, baseDim, expand>(signal, filter, convBT); break;
-            default: TYPE_ERROR(1, stype);
+            default: TYPE_ERROR(signal);
         }
-        std::swap(*out,output);
+        std::swap(*out, output);
     }
     CATCHALL;
 
@@ -125,17 +123,13 @@ template<bool expand>
 af_err convolve2_sep(af_array *out, af_array col_filter, af_array row_filter, const af_array signal)
 {
     try {
-        const ArrayInfo& sInfo = getInfo(signal);
+        ARG_SETUP(signal);
 
-        const dim4& sdims = sInfo.dims();
-
-        const af_dtype signalType  = sInfo.getType();
-
+        const dim4& sdims = signal_info.dims();
         ARG_ASSERT(1, (sdims.ndims()>=2));
 
         af_array output = 0;
-
-        switch(signalType) {
+        switch(signal_info.getType()) {
             case c32: output = convolve2<cfloat ,  cfloat, expand>(signal, col_filter, row_filter); break;
             case c64: output = convolve2<cdouble, cdouble, expand>(signal, col_filter, row_filter); break;
             case f32: output = convolve2<float  ,   float, expand>(signal, col_filter, row_filter); break;
@@ -148,9 +142,9 @@ af_err convolve2_sep(af_array *out, af_array col_filter, af_array row_filter, co
             case s64: output = convolve2<intl   ,   float, expand>(signal, col_filter, row_filter); break;
             case u8:  output = convolve2<uchar  ,   float, expand>(signal, col_filter, row_filter); break;
             case b8:  output = convolve2<char   ,   float, expand>(signal, col_filter, row_filter); break;
-            default: TYPE_ERROR(1, signalType);
+            default: TYPE_ERROR(signal);
         }
-        std::swap(*out,output);
+        std::swap(*out, output);
     }
     CATCHALL;
 
@@ -164,11 +158,11 @@ bool isFreqDomain(const af_array &signal, const af_array filter, af_conv_domain 
     if (domain == AF_CONV_FREQ) return true;
     if (domain != AF_CONV_AUTO) return false;
 
-    const ArrayInfo& sInfo = getInfo(signal);
-    const ArrayInfo& fInfo = getInfo(filter);
+    ARG_SETUP(signal);
+    ARG_SETUP(filter);
 
-    dim4 sdims = sInfo.dims();
-    dim4 fdims = fInfo.dims();
+    dim4 sdims = signal_info.dims();
+    dim4 fdims = filter_info.dims();
 
     if (identifyBatchKind<baseDim>(sdims, fdims) == AF_BATCH_DIFF) return true;
 

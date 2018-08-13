@@ -50,16 +50,14 @@ af_err af_flip(af_array *result, const af_array in, const unsigned dim)
 {
     af_array out;
     try {
-        const ArrayInfo& in_info = getInfo(in);
+        ARG_SETUP(in);
 
         if (in_info.ndims() <= dim) {
             *result = retain(in);
             return AF_SUCCESS;
         }
 
-        af_dtype in_type = in_info.getType();
-
-        switch(in_type) {
+        switch(in_info.getType()) {
         case f32:    out = flipArray<float>   (in, dim);  break;
         case c32:    out = flipArray<cfloat>  (in, dim);  break;
         case f64:    out = flipArray<double>  (in, dim);  break;
@@ -72,7 +70,7 @@ af_err af_flip(af_array *result, const af_array in, const unsigned dim)
         case s16:    out = flipArray<short>   (in, dim);  break;
         case u16:    out = flipArray<ushort>  (in, dim);  break;
         case u8:     out = flipArray<uchar>   (in, dim);  break;
-        default:    TYPE_ERROR(1, in_type);
+        default:    TYPE_ERROR(in);
         }
         swap(*result, out);
     }

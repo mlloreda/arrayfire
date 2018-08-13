@@ -61,8 +61,8 @@ detail::Array<To> castArray(const af_array &in)
     using detail::uchar;
     using detail::ushort;
 
-    const ArrayInfo& info = getInfo(in);
-    switch (info.getType()) {
+    ARG_SETUP(in);
+    switch (in_info.getType()) {
         case f32: return detail::cast<To, float  >(getArray<float  >(in));
         case f64: return detail::cast<To, double >(getArray<double >(in));
         case c32: return detail::cast<To, cfloat >(getArray<cfloat >(in));
@@ -75,7 +75,7 @@ detail::Array<To> castArray(const af_array &in)
         case u64: return detail::cast<To, uintl  >(getArray<uintl  >(in));
         case s16: return detail::cast<To, short  >(getArray<short  >(in));
         case u16: return detail::cast<To, ushort >(getArray<ushort >(in));
-        default: TYPE_ERROR(1, info.getType());
+        default: TYPE_ERROR(in);
     }
 }
 
@@ -130,7 +130,7 @@ static af_array createHandle(af::dim4 d, af_dtype dtype)
         case u64: return createHandle<uintl  >(d);
         case s16: return createHandle<short  >(d);
         case u16: return createHandle<ushort >(d);
-        default:    TYPE_ERROR(3, dtype);
+        default:    UNSUPPORTED_TYPE(dtype);
     }
 }
 

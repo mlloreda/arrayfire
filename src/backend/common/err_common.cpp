@@ -7,11 +7,11 @@
  * http://arrayfire.com/licenses/BSD-3-Clause
  ********************************************************/
 
-#include <af/exception.h>
 #include <af/device.h>
+#include <af/exception.h>
 #include <common/err_common.hpp>
-#include <type_util.hpp>
 #include <common/util.hpp>
+#include <type_util.hpp>
 
 #include <algorithm>
 #include <cstdio>
@@ -28,8 +28,11 @@
 #include <errorcodes.hpp>
 #endif
 
+#include <spdlog/fmt/ostr.h>
+
 using std::string;
 using std::stringstream;
+using std::vector;
 
 AfError::AfError(const char * const func,
                  const char * const file,
@@ -154,6 +157,73 @@ const string& DimensionError::getExpectedCondition() const
 int DimensionError::getArgIndex() const
 {
     return argIndex;
+}
+
+string getEnumString(const af_dtype type) {
+    std::string name;
+    switch (type) {
+    case f32: name = "f32"; break;
+    case c32: name = "c32"; break;
+    case f64: name = "f64"; break;
+    case c64: name = "c64"; break;
+    case b8:  name = "b8";  break;
+    case s32: name = "s32"; break;
+    case u32: name = "u32"; break;
+    case u8:  name = "u8";  break;
+    case s64: name = "s64"; break;
+    case u64: name = "u64"; break;
+    case s16: name = "s16"; break;
+    case u16: name = "u16"; break;
+    default: assert(false && "Invalid type");
+    }
+    return name;
+}
+
+void
+assert_type(const af_dtype in_type, const char * in_str,
+            const vector<af_dtype> types,
+            const char * file, const char * function, const int line)
+{
+    vector<af_dtype>::const_iterator it;
+    it = std::find(std::begin(types), std::end(types), in_type);
+    if (it == types.end()) {
+        string type_str;
+        for (int type_idx = 0; type_idx < types.size(); ++type_idx) {
+            type_str += string(getEnumString(types[type_idx]));
+            if (type_idx < types.size() - 1) {
+                type_str += ", ";
+            }
+        }
+        const string fmt_str = fmt::format("Array `{}` ({}) must be one of the following types: {}",
+                                           in_str, getEnumString(in_type), type_str);
+        throw AfError(function, file, line, fmt_str.c_str(), AF_ERR_TYPE);
+    }
+}
+void
+assert_type_eq(const af_dtype lhs_type, const af_dtype rhs_type,
+               const char * lhs_str, const char * rhs_str,
+               const char * file, const char * function, const int line)
+{
+    if (lhs_type != rhs_type) {
+        const string fmt_str = fmt::format("Arrays `{}` ({}) and `{}` ({}) must be of the same type.",
+                                           lhs_str, lhs_type, rhs_str, rhs_type);
+        throw AfError(function, file, line, fmt_str.c_str(), AF_ERR_TYPE);
+    }
+}
+void
+type_error(const ArrayInfo &in_info, const char * in_str,
+           const char * file, const char * function, const int line)
+{
+    const string fmt_str = fmt::format("Type of array `{}` ({}) is unsupported",
+                                       in_str, getEnumString(in_info.getType()));
+    throw AfError(function, file, line, fmt_str.c_str(), AF_ERR_TYPE);
+}
+void
+unsupported_type(const af_dtype in, const char * in_str,
+                 const char * file, const char * function, const int line)
+{
+    const string fmt_str = fmt::format("Type `{}` ({}) is unsupported", in_str, getEnumString(in));
+    throw AfError(function, file, line, fmt_str.c_str(), AF_ERR_TYPE);
 }
 
 void

@@ -40,22 +40,21 @@ af_err af_match_template(af_array *out, const af_array search_img, const af_arra
     try {
         ARG_ASSERT(3, (m_type>=AF_SAD && m_type<=AF_LSSD));
 
-        const ArrayInfo& sInfo = getInfo(search_img);
-        const ArrayInfo& tInfo = getInfo(template_img);
+        ARG_SETUP(search_img);
+        ARG_SETUP(template_img);
 
-        dim4 const sDims = sInfo.dims();
-        dim4 const tDims = tInfo.dims();
+        dim4 const sDims = search_img_info.dims();
+        dim4 const tDims = template_img_info.dims();
 
         dim_t sNumDims= sDims.ndims();
         dim_t tNumDims= tDims.ndims();
         ARG_ASSERT(1, (sNumDims>=2));
         ARG_ASSERT(2, (tNumDims==2));
 
-        af_dtype sType = sInfo.getType();
-        ARG_ASSERT(1, (sType==tInfo.getType()));
+        ASSERT_TYPE_EQ(search_img, template_img);
 
         af_array output = 0;
-        switch(sType) {
+        switch(search_img_info.getType()) {
             case f64: output = match_template<double, double>(search_img, template_img, m_type); break;
             case f32: output = match_template<float ,  float>(search_img, template_img, m_type); break;
             case s32: output = match_template<int   ,  float>(search_img, template_img, m_type); break;
@@ -64,7 +63,7 @@ af_err af_match_template(af_array *out, const af_array search_img, const af_arra
             case u16: output = match_template<ushort,  float>(search_img, template_img, m_type); break;
             case  b8: output = match_template<char  ,  float>(search_img, template_img, m_type); break;
             case  u8: output = match_template<uchar ,  float>(search_img, template_img, m_type); break;
-            default : TYPE_ERROR(1, sType);
+            default : TYPE_ERROR(search_img);
         }
         std::swap(*out, output);
     }

@@ -27,7 +27,7 @@ size_t size_of(af_dtype type)
             case u16: return sizeof(unsigned short);
             case s64: return sizeof(intl);
             case u64: return sizeof(uintl);
-            default : TYPE_ERROR(1, type);
+            default : UNSUPPORTED_TYPE(type);
         }
     } CATCHALL;
 

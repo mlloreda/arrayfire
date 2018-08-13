@@ -57,15 +57,14 @@ af_err af_transform(af_array *out, const af_array in, const af_array tf,
                     const af_interp_type method, const bool inverse)
 {
     try {
-        const ArrayInfo& t_info = getInfo(tf);
-        const ArrayInfo& i_info = getInfo(in);
+        ARG_SETUP(in);
+        ARG_SETUP(tf);
 
-        af::dim4 idims = i_info.dims();
-        af::dim4 tdims = t_info.dims();
-        af_dtype itype = i_info.getType();
+        af::dim4 idims = in_info.dims();
+        af::dim4 tdims = tf_info.dims();
 
         // Assert type and interpolation
-        ARG_ASSERT(2, t_info.getType() == f32);
+        ASSERT_TYPE(tf, TYPES(f32));
         ARG_ASSERT(5, method == AF_INTERP_NEAREST  ||
                       method == AF_INTERP_BILINEAR ||
                       method == AF_INTERP_BILINEAR_COSINE ||
@@ -133,7 +132,7 @@ af_err af_transform(af_array *out, const af_array in, const af_array tf,
         af::dim4 odims(o0, o1, o2, o3);
 
         af_array output = 0;
-        switch(itype) {
+        switch(in_info.getType()) {
             case f32: output = transform<float  >(in, tf, odims, method, inverse, perspective);  break;
             case f64: output = transform<double >(in, tf, odims, method, inverse, perspective);  break;
             case c32: output = transform<cfloat >(in, tf, odims, method, inverse, perspective);  break;
@@ -146,9 +145,9 @@ af_err af_transform(af_array *out, const af_array in, const af_array tf,
             case u16: output = transform<ushort >(in, tf, odims, method, inverse, perspective);  break;
             case u8:  output = transform<uchar  >(in, tf, odims, method, inverse, perspective);  break;
             case b8:  output = transform<char   >(in, tf, odims, method, inverse, perspective);  break;
-            default:  TYPE_ERROR(1, itype);
+            default:  TYPE_ERROR(in);
         }
-        std::swap(*out,output);
+        std::swap(*out, output);
     }
     CATCHALL;
 
@@ -181,8 +180,8 @@ af_err af_scale(af_array *out, const af_array in, const float scale0, const floa
                 const dim_t odim0, const dim_t odim1, const af_interp_type method)
 {
     try {
-        const ArrayInfo& i_info = getInfo(in);
-        af::dim4 idims = i_info.dims();
+        ARG_SETUP(in);
+        af::dim4 idims = in_info.dims();
 
         dim_t _odim0 = odim0, _odim1 = odim1;
         float sx, sy;

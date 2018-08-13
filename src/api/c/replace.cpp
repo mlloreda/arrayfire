@@ -31,30 +31,30 @@ void replace(af_array a, const af_array cond, const af_array b)
 af_err af_replace(af_array a, const af_array cond, const af_array b)
 {
     try {
-        const ArrayInfo& ainfo = getInfo(a);
-        const ArrayInfo& binfo = getInfo(b);
-        const ArrayInfo& cinfo = getInfo(cond);
+        ARG_SETUP(a);
+        ARG_SETUP(b);
+        ARG_SETUP(cond);
 
-        if(cinfo.ndims() == 0) {
+        if (cond_info.ndims() == 0) {
             return AF_SUCCESS;
         }
 
-        ARG_ASSERT(2, ainfo.getType() == binfo.getType());
-        ARG_ASSERT(1, cinfo.getType() == b8);
+        ASSERT_TYPE_EQ(a, b);
+        ASSERT_TYPE(cond, TYPES(b8));
 
-        DIM_ASSERT(1, ainfo.ndims() >= binfo.ndims());
-        DIM_ASSERT(1, cinfo.ndims() == std::min(ainfo.ndims(), binfo.ndims()));
+        DIM_ASSERT(1, a_info.ndims() >= b_info.ndims());
+        DIM_ASSERT(1, cond_info.ndims() == std::min(a_info.ndims(), b_info.ndims()));
 
-        dim4 adims = ainfo.dims();
-        dim4 bdims = binfo.dims();
-        dim4 cdims = cinfo.dims();
+        dim4 adims = a_info.dims();
+        dim4 bdims = b_info.dims();
+        dim4 cdims = cond_info.dims();
 
         for (int i = 0; i < 4; i++) {
             DIM_ASSERT(1, cdims[i] == std::min(adims[i], bdims[i]));
             DIM_ASSERT(2, adims[i] == bdims[i] || bdims[i] == 1);
         }
 
-        switch (ainfo.getType()) {
+        switch (a_info.getType()) {
         case f32: replace<float  >(a, cond, b); break;
         case f64: replace<double >(a, cond, b); break;
         case c32: replace<cfloat >(a, cond, b); break;
@@ -67,7 +67,7 @@ af_err af_replace(af_array a, const af_array cond, const af_array b)
         case u16: replace<ushort >(a, cond, b); break;
         case u8:  replace<uchar  >(a, cond, b); break;
         case b8:  replace<char   >(a, cond, b); break;
-        default:  TYPE_ERROR(2, ainfo.getType());
+        default:  TYPE_ERROR(a);
         }
 
     } CATCHALL;
@@ -83,20 +83,21 @@ void replace_scalar(af_array a, const af_array cond, const double b)
 af_err af_replace_scalar(af_array a, const af_array cond, const double b)
 {
     try {
-        const ArrayInfo& ainfo = getInfo(a);
-        const ArrayInfo& cinfo = getInfo(cond);
+        ARG_SETUP(a);
+        ARG_SETUP(cond);
 
-        ARG_ASSERT(1, cinfo.getType() == b8);
-        DIM_ASSERT(1, cinfo.ndims() == ainfo.ndims());
+        ASSERT_TYPE(cond, TYPES(b8));
 
-        dim4 adims = ainfo.dims();
-        dim4 cdims = cinfo.dims();
+        DIM_ASSERT(1, cond_info.ndims() == a_info.ndims());
+
+        dim4 adims = a_info.dims();
+        dim4 cdims = cond_info.dims();
 
         for (int i = 0; i < 4; i++) {
             DIM_ASSERT(1, cdims[i] == adims[i]);
         }
 
-        switch (ainfo.getType()) {
+        switch (a_info.getType()) {
         case f32: replace_scalar<float  >(a, cond, b); break;
         case f64: replace_scalar<double >(a, cond, b); break;
         case c32: replace_scalar<cfloat >(a, cond, b); break;
@@ -109,7 +110,7 @@ af_err af_replace_scalar(af_array a, const af_array cond, const double b)
         case u16: replace_scalar<ushort >(a, cond, b); break;
         case u8:  replace_scalar<uchar  >(a, cond, b); break;
         case b8:  replace_scalar<char   >(a, cond, b); break;
-        default:  TYPE_ERROR(2, ainfo.getType());
+        default:  TYPE_ERROR(a);
         }
 
     } CATCHALL;

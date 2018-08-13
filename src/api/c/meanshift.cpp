@@ -34,15 +34,15 @@ af_err af_mean_shift(af_array *out, const af_array in,
         ARG_ASSERT(3, (chromatic_sigma>=0));
         ARG_ASSERT(4, (num_iterations>0));
 
-        const ArrayInfo& info = getInfo(in);
-        af_dtype type  = info.getType();
-        af::dim4 dims  = info.dims();
+        ARG_SETUP(in);
+
+        af::dim4 dims  = in_info.dims();
 
         DIM_ASSERT(1, (dims.ndims()>=2));
         if (is_color) DIM_ASSERT(1, (dims[2]==3));
 
         af_array output;
-        switch(type) {
+        switch(in_info.getType()) {
             case f32: output = mean_shift<float >(in, spatial_sigma, chromatic_sigma, num_iterations, is_color); break;
             case f64: output = mean_shift<double>(in, spatial_sigma, chromatic_sigma, num_iterations, is_color); break;
             case b8 : output = mean_shift<char  >(in, spatial_sigma, chromatic_sigma, num_iterations, is_color); break;
@@ -53,9 +53,9 @@ af_err af_mean_shift(af_array *out, const af_array in,
             case s64: output = mean_shift<intl  >(in, spatial_sigma, chromatic_sigma, num_iterations, is_color); break;
             case u64: output = mean_shift<uintl >(in, spatial_sigma, chromatic_sigma, num_iterations, is_color); break;
             case u8 : output = mean_shift<uchar >(in, spatial_sigma, chromatic_sigma, num_iterations, is_color); break;
-            default : TYPE_ERROR(1, type);
+            default : TYPE_ERROR(in);
         }
-        std::swap(*out,output);
+        std::swap(*out, output);
     }
     CATCHALL;
 

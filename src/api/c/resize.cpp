@@ -30,8 +30,7 @@ af_err af_resize(af_array *out, const af_array in, const dim_t odim0, const dim_
                  const af_interp_type method)
 {
     try {
-        const ArrayInfo& info = getInfo(in);
-        af_dtype type = info.getType();
+        ARG_SETUP(in);
 
         ARG_ASSERT(4, method == AF_INTERP_NEAREST  ||
                       method == AF_INTERP_BILINEAR ||
@@ -43,9 +42,9 @@ af_err af_resize(af_array *out, const af_array in, const dim_t odim0, const dim_
         DIM_ASSERT(2, odim0 > 0);
         DIM_ASSERT(3, odim1 > 0);
 
-        bool is_resize_supported = (method == AF_INTERP_LOWER ||
-                                    method == AF_INTERP_NEAREST ||
-                                    method == AF_INTERP_BILINEAR);
+        const bool is_resize_supported = (method == AF_INTERP_LOWER ||
+                                          method == AF_INTERP_NEAREST ||
+                                          method == AF_INTERP_BILINEAR);
 
         if (!is_resize_supported) {
             // Fall back to scale for additional methods
@@ -53,8 +52,7 @@ af_err af_resize(af_array *out, const af_array in, const dim_t odim0, const dim_
         }
 
         af_array output;
-
-        switch(type) {
+        switch(in_info.getType()) {
             case f32: output = resize<float  >(in, odim0, odim1, method);  break;
             case f64: output = resize<double >(in, odim0, odim1, method);  break;
             case c32: output = resize<cfloat >(in, odim0, odim1, method);  break;
@@ -67,9 +65,9 @@ af_err af_resize(af_array *out, const af_array in, const dim_t odim0, const dim_
             case u16: output = resize<ushort >(in, odim0, odim1, method);  break;
             case u8:  output = resize<uchar  >(in, odim0, odim1, method);  break;
             case b8:  output = resize<char   >(in, odim0, odim1, method);  break;
-            default:  TYPE_ERROR(1, type);
+            default:  TYPE_ERROR(in);
         }
-        std::swap(*out,output);
+        std::swap(*out, output);
     }
     CATCHALL;
 

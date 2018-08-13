@@ -29,23 +29,22 @@ template<int rank, bool direction>
 static af_err fft(af_array *out, const af_array in, const double norm_factor, const dim_t npad, const dim_t * const pad)
 {
     try {
-        const ArrayInfo& info = getInfo(in);
-        af_dtype type  = info.getType();
-        af::dim4 dims  = info.dims();
+        ARG_SETUP(in);
+        af::dim4 dims  = in_info.dims();
 
-        if(dims.ndims() == 0) {
+        if (dims.ndims() == 0) {
             return af_retain_array(out, in);
         }
 
         DIM_ASSERT(1, (dims.ndims()>=rank));
 
         af_array output;
-        switch(type) {
+        switch(in_info.getType()) {
             case c32: output = fft<cfloat , cfloat , rank, direction>(in, norm_factor, npad, pad); break;
             case c64: output = fft<cdouble, cdouble, rank, direction>(in, norm_factor, npad, pad); break;
             case f32: output = fft<float , cfloat  , rank, direction>(in, norm_factor, npad, pad); break;
             case f64: output = fft<double, cdouble , rank, direction>(in, norm_factor, npad, pad); break;
-            default: TYPE_ERROR(1, type);
+            default: TYPE_ERROR(in);
         }
         std::swap(*out,output);
     }
@@ -104,19 +103,19 @@ template<int rank, bool direction>
 static af_err fft_inplace(af_array in, const double norm_factor)
 {
     try {
-        const ArrayInfo& info = getInfo(in);
-        af_dtype type  = info.getType();
-        af::dim4 dims  = info.dims();
+        ARG_SETUP(in);
 
-        if(dims.ndims() == 0) {
+        af::dim4 dims  = in_info.dims();
+
+        if (dims.ndims() == 0) {
             return AF_SUCCESS;
         }
         DIM_ASSERT(1, (dims.ndims()>=rank));
 
-        switch(type) {
+        switch(in_info.getType()) {
             case c32: fft_inplace<cfloat , rank, direction>(in, norm_factor); break;
             case c64: fft_inplace<cdouble, rank, direction>(in, norm_factor); break;
-            default: TYPE_ERROR(1, type);
+            default: TYPE_ERROR(in);
         }
     }
     CATCHALL;
@@ -166,24 +165,22 @@ template<int rank>
 static af_err fft_r2c(af_array *out, const af_array in, const double norm_factor, const dim_t npad, const dim_t * const pad)
 {
     try {
-        const ArrayInfo& info = getInfo(in);
-        af_dtype type  = info.getType();
-        af::dim4 dims  = info.dims();
+        ARG_SETUP(in);
 
-        if(dims.ndims() == 0) {
+        af::dim4 dims  = in_info.dims();
+
+        if (dims.ndims() == 0) {
             return af_retain_array(out, in);
         }
         DIM_ASSERT(1, (dims.ndims()>=rank));
 
         af_array output;
-        switch(type) {
+        switch(in_info.getType()) {
             case f32: output = fft_r2c<float , cfloat  , rank>(in, norm_factor, npad, pad); break;
             case f64: output = fft_r2c<double, cdouble , rank>(in, norm_factor, npad, pad); break;
-        default: {
-            TYPE_ERROR(1, type);
+            default: TYPE_ERROR(in);
         }
-        }
-        std::swap(*out,output);
+        std::swap(*out, output);
     }
     CATCHALL;
 
@@ -221,11 +218,11 @@ template<int rank>
 static af_err fft_c2r(af_array *out, const af_array in, const double norm_factor, const bool is_odd)
 {
     try {
-        const ArrayInfo& info = getInfo(in);
-        af_dtype type  = info.getType();
-        af::dim4 idims  = info.dims();
+        ARG_SETUP(in);
 
-        if(idims.ndims() == 0) {
+        af::dim4 idims  = in_info.dims();
+
+        if (idims.ndims() == 0) {
             return af_retain_array(out, in);
         }
         DIM_ASSERT(1, (idims.ndims()>=rank));
@@ -234,12 +231,12 @@ static af_err fft_c2r(af_array *out, const af_array in, const double norm_factor
         odims[0] = 2 * (odims[0] - 1) + (is_odd ? 1 : 0);
 
         af_array output;
-        switch(type) {
+        switch(in_info.getType()) {
             case c32: output = fft_c2r<cfloat , float  , rank>(in, norm_factor, odims); break;
             case c64: output = fft_c2r<cdouble, double , rank>(in, norm_factor, odims); break;
-            default: TYPE_ERROR(1, type);
+            default: TYPE_ERROR(in);
         }
-        std::swap(*out,output);
+        std::swap(*out, output);
     }
     CATCHALL;
 

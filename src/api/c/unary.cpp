@@ -59,7 +59,7 @@ static af_err af_unary(af_array *out, const af_array in)
 {
     try {
 
-        const ArrayInfo& in_info = getInfo(in);
+        ARG_SETUP(in);
         ARG_ASSERT(1, in_info.isReal());
 
         af_dtype in_type = in_info.getType();
@@ -72,7 +72,7 @@ static af_err af_unary(af_array *out, const af_array in)
         case f32 : res = unaryOp<float  , op>(in); break;
         case f64 : res = unaryOp<double , op>(in); break;
         default:
-            TYPE_ERROR(1, in_type); break;
+            UNSUPPORTED_TYPE(in_type); break;
         }
 
         std::swap(*out, res);
@@ -85,7 +85,7 @@ template<af_op_t op>
 static af_err af_unary_complex(af_array *out, const af_array in)
 {
     try {
-        const ArrayInfo& in_info = getInfo(in);
+        ARG_SETUP(in);
 
         af_dtype in_type = in_info.getType();
         af_array res;
@@ -99,7 +99,7 @@ static af_err af_unary_complex(af_array *out, const af_array in)
         case c32 : res = unaryOpCplx<cfloat , float , op>(in); break;
         case c64 : res = unaryOpCplx<cdouble, double, op>(in); break;
         default:
-            TYPE_ERROR(1, in_type); break;
+            UNSUPPORTED_TYPE(in_type); break;
         }
 
         std::swap(*out, res);
@@ -564,7 +564,7 @@ af_err af_not(af_array *out, const af_array in)
     try {
 
         af_array tmp;
-        const ArrayInfo& in_info = getInfo(in);
+        ARG_SETUP(in);
 
         AF_CHECK(af_constant(&tmp, 0,
                              in_info.ndims(),
@@ -582,7 +582,7 @@ af_err af_arg(af_array *out, const af_array in)
 {
     try {
 
-        const ArrayInfo& in_info = getInfo(in);
+        ARG_SETUP(in);
 
         if (!in_info.isComplex()) {
             return af_constant(out, 0,
@@ -610,7 +610,7 @@ af_err af_pow2(af_array *out, const af_array in)
     try {
 
         af_array two;
-        const ArrayInfo& in_info = getInfo(in);
+        ARG_SETUP(in);
 
         AF_CHECK(af_constant(&two, 2,
                              in_info.ndims(),
@@ -629,7 +629,7 @@ af_err af_factorial(af_array *out, const af_array in)
     try {
 
         af_array one;
-        const ArrayInfo& in_info = getInfo(in);
+        ARG_SETUP(in);
 
         AF_CHECK(af_constant(&one, 1,
                              in_info.ndims(),
@@ -681,7 +681,7 @@ static inline af_array checkOpCplx(const af_array in)
     Array<char> resR = checkOp<BT, op>(R);
     Array<char> resI = checkOp<BT, op>(I);
 
-    const ArrayInfo& in_info = getInfo(in);
+    ARG_SETUP(in);
     dim4 dims = in_info.dims();
     cplxLogicOp<op> cplxLogic;
     af_array res = cplxLogic(resR, resI, dims);
@@ -694,7 +694,7 @@ static af_err af_check(af_array *out, const af_array in)
 {
     try {
 
-        const ArrayInfo& in_info = getInfo(in);
+        ARG_SETUP(in);
 
         af_dtype in_type = in_info.getType();
         af_array res;
@@ -708,7 +708,7 @@ static af_err af_check(af_array *out, const af_array in)
         case c32 : res = checkOpCplx<cfloat , float , op>(in); break;
         case c64 : res = checkOpCplx<cdouble, double, op>(in); break;
         default:
-            TYPE_ERROR(1, in_type); break;
+            UNSUPPORTED_TYPE(in_type); break;
         }
 
         std::swap(*out, res);

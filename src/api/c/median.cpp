@@ -156,11 +156,10 @@ static af_array median(const af_array& in, const dim_t dim)
 af_err af_median_all(double *realVal, double *imagVal, const af_array in)
 {
     try {
-        const ArrayInfo& info = getInfo(in);
-        af_dtype type = info.getType();
+        ARG_SETUP(in);
 
-        ARG_ASSERT(2, info.ndims() > 0);
-        switch(type) {
+        ARG_ASSERT(2, in_info.ndims() > 0);
+        switch(in_info.getType()) {
             case f64: *realVal = median<double>(in); break;
             case f32: *realVal = median<float >(in); break;
             case s32: *realVal = median<int   >(in); break;
@@ -168,7 +167,7 @@ af_err af_median_all(double *realVal, double *imagVal, const af_array in)
             case s16: *realVal = median<short >(in); break;
             case u16: *realVal = median<ushort>(in); break;
             case  u8: *realVal = median<uchar >(in); break;
-            default : TYPE_ERROR(1, type);
+            default : TYPE_ERROR(in);
         }
     }
     CATCHALL;
@@ -180,12 +179,11 @@ af_err af_median(af_array* out, const af_array in, const dim_t dim)
     try {
         ARG_ASSERT(2, (dim >= 0 && dim <= 4));
 
-        af_array output = 0;
-        const ArrayInfo& info = getInfo(in);
+        ARG_SETUP(in);
+        ARG_ASSERT(1, in_info.ndims() > 0);
 
-        ARG_ASSERT(1, info.ndims() > 0);
-        af_dtype type = info.getType();
-        switch(type) {
+        af_array output = 0;
+        switch(in_info.getType()) {
             case f64: output = median<double>(in, dim); break;
             case f32: output = median<float >(in, dim); break;
             case s32: output = median<int   >(in, dim); break;
@@ -193,7 +191,7 @@ af_err af_median(af_array* out, const af_array in, const dim_t dim)
             case s16: output = median<short >(in, dim); break;
             case u16: output = median<ushort>(in, dim); break;
             case  u8: output = median<uchar >(in, dim); break;
-            default : TYPE_ERROR(1, type);
+            default : TYPE_ERROR(in);
         }
         std::swap(*out, output);
     }

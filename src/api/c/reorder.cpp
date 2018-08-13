@@ -63,14 +63,13 @@ static inline af_array reorder(const af_array in, const af::dim4 &rdims0)
 af_err af_reorder(af_array *out, const af_array in, const af::dim4 &rdims)
 {
     try {
-        const ArrayInfo& info = getInfo(in);
-        af_dtype type = info.getType();
+        ARG_SETUP(in);
 
-        if(info.elements() == 0) {
+        if (in_info.elements() == 0) {
             return af_retain_array(out, in);
         }
 
-        DIM_ASSERT(1, info.elements() > 0);
+        DIM_ASSERT(1, in_info.elements() > 0);
 
         // Check that dimensions are not repeated
         // allDims is to check if all dimensions are there exactly once
@@ -92,7 +91,7 @@ af_err af_reorder(af_array *out, const af_array in, const af::dim4 &rdims)
 
         af_array output;
 
-        switch(type) {
+        switch(in_info.getType()) {
             case f32: output = reorder<float  >(in, rdims);  break;
             case c32: output = reorder<cfloat >(in, rdims);  break;
             case f64: output = reorder<double >(in, rdims);  break;
@@ -105,7 +104,7 @@ af_err af_reorder(af_array *out, const af_array in, const af::dim4 &rdims)
             case u64: output = reorder<uintl  >(in, rdims);  break;
             case s16: output = reorder<short  >(in, rdims);  break;
             case u16: output = reorder<ushort >(in, rdims);  break;
-            default:  TYPE_ERROR(1, type);
+            default:  TYPE_ERROR(in);
         }
         std::swap(*out,output);
     }
