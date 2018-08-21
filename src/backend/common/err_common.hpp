@@ -165,6 +165,21 @@ void type_error(const ArrayInfo &in_info, const char * in_str,
 void unsupported_type(const af_dtype in, const char * in_str,
                       const char * file, const char * function, const int line);
 
+///////////////
+// Dim asserts
+///////////////
+
+// ASSERT_DIM(af_array, af_array)
+void dim_eq(const ArrayInfo &lhs, const ArrayInfo &rhs,
+            const char * lhs_str, const char * rhs_str,
+            const char * file, const char * function, const int line);
+
+// ASSERT_DIM_{LT,GT,EQ}(dim_idx, dim_val, af_array)
+void dim_cmp(const int op,
+             const int dim_idx, const int dim_val, const ArrayInfo &arr_info,
+             const char * arr_str,
+             const char * file, const char * function, const int line);
+
 #define ARG_SETUP(arg) \
      const ArrayInfo& arg##_info = getInfo(arg)
 
@@ -188,6 +203,25 @@ void unsupported_type(const af_dtype in, const char * in_str,
         unsupported_type(__VA_ARGS__, #__VA_ARGS__,         \
                          __FILE__, __FUNCTION__, __LINE__); \
     } while (0)
+
+// Dims
+#define ASSERT_DIM(LHS, RHS) do {                   \
+        dim_eq(getInfo(LHS), getInfo(RHS),          \
+               #LHS, #RHS,                          \
+               __FILE__, __FUNCTION__, __LINE__);   \
+    } while (0)
+#define ASSERT_DIM_LT(ARR, DIM_IDX, DIM_VAL) do {           \
+        dim_cmp(0, DIM_IDX, DIM_VAL, getInfo(ARR), #ARR,    \
+                __FILE__, __FUNCTION__, __LINE__);          \
+    } while(0)
+#define ASSERT_DIM_EQ(ARR, DIM_IDX, DIM_VAL) do {           \
+        dim_cmp(1, DIM_IDX, DIM_VAL, getInfo(ARR), #ARR,    \
+                __FILE__, __FUNCTION__, __LINE__);          \
+    } while(0)
+#define ASSERT_DIM_GT(ARR, DIM_IDX, DIM_VAL) do {           \
+        dim_cmp(2, DIM_IDX, DIM_VAL, getInfo(ARR), #ARR,    \
+                __FILE__, __FUNCTION__, __LINE__);          \
+    } while(0)
 
 
 #define DIM_ASSERT(INDEX, COND) do {                        \
