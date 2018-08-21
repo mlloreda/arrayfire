@@ -46,6 +46,7 @@ af_err af_select(af_array *out, const af_array cond, const af_array a, const af_
         dim4 cond_dims = cond_info.dims();
         dim4 odims(1, 1, 1, 1);
 
+        // \TODO(miguel)?
         for (int i = 0; i < 4; i++) {
             DIM_ASSERT(2, (adims[i] == bdims[i] && adims[i] == cond_dims[i])
                         || adims[i] == 1 || bdims[i] == 1 || cond_dims[i] == 1);

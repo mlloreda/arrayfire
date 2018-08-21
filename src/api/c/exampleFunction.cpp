@@ -58,9 +58,9 @@ af_err af_example_function(af_array* out, const af_array a, const af_someenum_t 
                                             // such as type of data, dimensions,
                                             // offsets and strides. This class is declared
                                             // in src/backend/common/ArrayInfo.hpp
-        af::dim4 dims = info.dims();
-
-        ARG_ASSERT(2, (dims.ndims()>=0 && dims.ndims()<=3));
+        ARG_SETUP(a);
+        ASSERT_NDIM_GT(a, -1);
+        ASSERT_NDIM_LT(a, 4);
                                             // defined in err_common.hpp
                                             // there are other useful Macros
                                             // for different purposes, feel free

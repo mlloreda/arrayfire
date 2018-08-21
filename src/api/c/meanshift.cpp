@@ -33,13 +33,11 @@ af_err af_mean_shift(af_array *out, const af_array in,
         ARG_ASSERT(2, (spatial_sigma>=0));
         ARG_ASSERT(3, (chromatic_sigma>=0));
         ARG_ASSERT(4, (num_iterations>0));
-
         ARG_SETUP(in);
-
-        af::dim4 dims  = in_info.dims();
-
-        DIM_ASSERT(1, (dims.ndims()>=2));
-        if (is_color) DIM_ASSERT(1, (dims[2]==3));
+        ASSERT_NDIM_GT(in, 1);
+        if (is_color) {
+            ASSERT_DIM_EQ(in, 2, 3);
+        }
 
         af_array output;
         switch(in_info.getType()) {

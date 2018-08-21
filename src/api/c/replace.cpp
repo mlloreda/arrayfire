@@ -34,20 +34,18 @@ af_err af_replace(af_array a, const af_array cond, const af_array b)
         ARG_SETUP(a);
         ARG_SETUP(b);
         ARG_SETUP(cond);
+        ASSERT_TYPE_EQ(a, b);
+        ASSERT_TYPE(cond, TYPES(b8));
 
         if (cond_info.ndims() == 0) {
             return AF_SUCCESS;
         }
-
-        ASSERT_TYPE_EQ(a, b);
-        ASSERT_TYPE(cond, TYPES(b8));
-
-        DIM_ASSERT(1, a_info.ndims() >= b_info.ndims());
+        DIM_ASSERT(1, a_info.ndims() >= b_info.ndims()); // \TODO(miguel)
         DIM_ASSERT(1, cond_info.ndims() == std::min(a_info.ndims(), b_info.ndims()));
 
-        dim4 adims = a_info.dims();
-        dim4 bdims = b_info.dims();
-        dim4 cdims = cond_info.dims();
+        const dim4 adims = a_info.dims();
+        const dim4 bdims = b_info.dims();
+        const dim4 cdims = cond_info.dims();
 
         for (int i = 0; i < 4; i++) {
             DIM_ASSERT(1, cdims[i] == std::min(adims[i], bdims[i]));
@@ -87,15 +85,8 @@ af_err af_replace_scalar(af_array a, const af_array cond, const double b)
         ARG_SETUP(cond);
 
         ASSERT_TYPE(cond, TYPES(b8));
-
-        DIM_ASSERT(1, cond_info.ndims() == a_info.ndims());
-
-        dim4 adims = a_info.dims();
-        dim4 cdims = cond_info.dims();
-
-        for (int i = 0; i < 4; i++) {
-            DIM_ASSERT(1, cdims[i] == adims[i]);
-        }
+        DIM_ASSERT(1, cond_info.ndims() == a_info.ndims()); // \TODO(miguel)
+        ASSERT_DIM(cond, a);
 
         switch (a_info.getType()) {
         case f32: replace_scalar<float  >(a, cond, b); break;

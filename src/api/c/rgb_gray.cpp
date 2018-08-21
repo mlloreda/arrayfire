@@ -107,21 +107,18 @@ af_err convert(af_array* out, const af_array in, const float r, const float g, c
     try {
         ARG_SETUP(in);
 
-        const af_dtype in_type     = in_info.getType();
-        af::dim4 inputDims = in_info.dims();
-
         // 2D is not required.
         if (in_info.elements() == 0) {
-            return af_create_handle(out, 0, nullptr, in_type);
+            return af_create_handle(out, 0, nullptr, in_info.getType());
         }
 
         // If RGB is input, then assert 3 channels
         // else 1 channel
-        if (isRGB2GRAY) ARG_ASSERT(1, (inputDims[2]==3));
-        else            ARG_ASSERT(1, (inputDims[2]==1));
+        if (isRGB2GRAY) ARG_ASSERT(1, (in_info.dims()[2]==3));
+        else            ARG_ASSERT(1, (in_info.dims()[2]==1));
 
         af_array output = 0;
-        switch(in_type) {
+        switch(in_info.getType()) {
             case f64: output = convert<double, double, isRGB2GRAY>(in, r, g, b); break;
             case f32: output = convert<float , float , isRGB2GRAY>(in, r, g, b); break;
             case u32: output = convert<uint  , float , isRGB2GRAY>(in, r, g, b); break;

@@ -29,11 +29,9 @@ static af_array sat(const af_array& in)
 
 af_err af_sat(af_array* out, const af_array in)
 {
-    try{
+    try {
         ARG_SETUP(in);
-        const dim4 dims = in_info.dims();
-
-        ARG_ASSERT(1, (dims.ndims() >= 2));
+        ASSERT_NDIM_GT(in, 1);
 
         af_array output = 0;
         switch(in_info.getType()) {

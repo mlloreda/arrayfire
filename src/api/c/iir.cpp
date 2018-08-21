@@ -63,7 +63,7 @@ af_err af_iir(af_array *y, const af_array b, const af_array a, const af_array x)
         ASSERT_TYPE_EQ(x, a);
         ASSERT_TYPE_EQ(x, b);
 
-        ARG_ASSERT(1, b_info.ndims() == a_info.ndims());
+        ARG_ASSERT(1, b_info.ndims() == a_info.ndims()); // \TODO(miguel)
 
         if (x_info.ndims() == 0) {
             return af_retain_array(y, x);

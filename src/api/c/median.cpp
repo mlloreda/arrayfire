@@ -157,8 +157,8 @@ af_err af_median_all(double *realVal, double *imagVal, const af_array in)
 {
     try {
         ARG_SETUP(in);
+        ASSERT_NDIM_GT(in, 0);
 
-        ARG_ASSERT(2, in_info.ndims() > 0);
         switch(in_info.getType()) {
             case f64: *realVal = median<double>(in); break;
             case f32: *realVal = median<float >(in); break;
@@ -178,9 +178,8 @@ af_err af_median(af_array* out, const af_array in, const dim_t dim)
 {
     try {
         ARG_ASSERT(2, (dim >= 0 && dim <= 4));
-
         ARG_SETUP(in);
-        ARG_ASSERT(1, in_info.ndims() > 0);
+        ASSERT_NDIM_GT(in, 0);
 
         af_array output = 0;
         switch(in_info.getType()) {

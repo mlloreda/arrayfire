@@ -227,10 +227,8 @@ af_err af_assign_gen(af_array *out, const af_array lhs,
 
         ARG_SETUP(lhs);
         ARG_SETUP(rhs);
-
         const dim4& lhsDims    = lhs_info.dims();
         const dim4& rhsDims    = rhs_info.dims();
-
 
         if (rhsDims.ndims() == 0)
             return af_retain_array(out, lhs);

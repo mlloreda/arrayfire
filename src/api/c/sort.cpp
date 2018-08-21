@@ -81,9 +81,9 @@ af_err af_sort_index(af_array *out, af_array *indices, const af_array in, const 
 {
     try {
         ARG_SETUP(in);
-        const af_dtype in_type = in_info.getType();
 
         if (in_info.elements() <= 0) {
+            const af_dtype in_type = in_info.getType();
             AF_CHECK(af_create_handle(out,     0, nullptr, in_type));
             AF_CHECK(af_create_handle(indices, 0, nullptr, in_type));
             return AF_SUCCESS;
@@ -91,7 +91,7 @@ af_err af_sort_index(af_array *out, af_array *indices, const af_array in, const 
 
         af_array val;
         af_array idx;
-        switch(in_type) {
+        switch(in_info.getType()) {
             case f32: sort_index<float  >(&val, &idx, in, dim, isAscending);  break;
             case f64: sort_index<double >(&val, &idx, in, dim, isAscending);  break;
             case s32: sort_index<int    >(&val, &idx, in, dim, isAscending);  break;
@@ -160,20 +160,17 @@ af_err af_sort_by_key(af_array *out_keys, af_array *out_values,
     try {
         ARG_SETUP(keys);
         ARG_SETUP(values);
-        const af_dtype keys_type = keys_info.getType();
-
-        DIM_ASSERT(4, keys_info.dims() == values_info.dims());
+        ASSERT_DIM(keys, values);
+        TYPE_ASSERT(keys_info.isReal()); // \TODO(miguel)
         if (keys_info.elements() == 0) {
-            AF_CHECK(af_create_handle(out_keys,   0, nullptr, keys_type));
-            AF_CHECK(af_create_handle(out_values, 0, nullptr, keys_type));
+            AF_CHECK(af_create_handle(out_keys,   0, nullptr, keys_info.getType()));
+            AF_CHECK(af_create_handle(out_values, 0, nullptr, keys_info.getType()));
             return AF_SUCCESS;
         }
 
-        TYPE_ASSERT(keys_info.isReal()); // \TODO(miguel)
-
         af_array oKey;
         af_array oVal;
-        switch(keys_type) {
+        switch(keys_info.getType()) {
             case f32: sort_by_key_tmplt<float  >(&oKey, &oVal, keys, values, dim, isAscending);  break;
             case f64: sort_by_key_tmplt<double >(&oKey, &oVal, keys, values, dim, isAscending);  break;
             case s32: sort_by_key_tmplt<int    >(&oKey, &oVal, keys, values, dim, isAscending);  break;
@@ -187,7 +184,7 @@ af_err af_sort_by_key(af_array *out_keys, af_array *out_values,
             default:  TYPE_ERROR(keys);
         }
         std::swap(*out_keys, oKey);
-        std::swap(*out_values , oVal);
+        std::swap(*out_values, oVal);
     }
     CATCHALL;
 

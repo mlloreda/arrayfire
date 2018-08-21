@@ -75,21 +75,17 @@ af_err af_qr_inplace(af_array *tau, af_array in)
 {
     try {
         ARG_SETUP(in);
-
+        ARG_ASSERT(1, in_info.isFloating()); // Only floating and complex types
         if (in_info.ndims() > 2) {
             AF_ERROR("qr can not be used in batch mode", AF_ERR_BATCH);
         }
 
-        const af_dtype in_type = in_info.getType();
-
-        ARG_ASSERT(1, in_info.isFloating()); // Only floating and complex types
-
         if (in_info.ndims() == 0) {
-            return af_create_handle(tau, 0, nullptr, in_type);
+            return af_create_handle(tau, 0, nullptr, in_info.getType());
         }
 
         af_array out;
-        switch(in_type) {
+        switch(in_info.getType()) {
             case f32: out = qr_inplace<float  >(in);  break;
             case f64: out = qr_inplace<double >(in);  break;
             case c32: out = qr_inplace<cfloat >(in);  break;

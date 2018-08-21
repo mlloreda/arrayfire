@@ -35,7 +35,7 @@ af_err af_device_array(af_array *arr, const void *data,
         dim4 d(1, 1, 1, 1);
         for(unsigned i = 0; i < ndims; i++) {
             d[i] = dims[i];
-            DIM_ASSERT(3, dims[i] >= 1);
+            DIM_ASSERT(3, dims[i] >= 1); // \TODO(miguel): actual dimt_t object passed in to func
         }
 
         switch (type) {

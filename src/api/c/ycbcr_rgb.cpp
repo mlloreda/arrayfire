@@ -131,10 +131,7 @@ af_err convert(af_array* out, const af_array& in, const af_ycc_std standard)
 {
     try {
         ARG_SETUP(in);
-
-        af::dim4 inputDims = in_info.dims();
-
-        ARG_ASSERT(1, (inputDims.ndims() >= 3));
+        ASSERT_NDIM_GT(in, 2);
 
         af_array output = 0;
         switch (in_info.getType()) {

@@ -50,7 +50,7 @@ af_err af_moddims(af_array *out, const af_array in,
         dim_t in_elements = in_info.elements();
         dim_t new_elements = newDims.elements();
 
-        DIM_ASSERT(1, in_elements == new_elements);
+        DIM_ASSERT(1, in_elements == new_elements); // \TODO(miguel) checking .elements()
 
         af_array output = 0;
         switch(in_info.getType()) {

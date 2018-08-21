@@ -378,9 +378,9 @@ inline void getScalar(T* out, const af_array& arr)
 af_err af_get_scalar(void* output_value, const af_array arr)
 {
     try {
+        ARG_SETUP(arr);
         ARG_ASSERT(0, (output_value!=NULL));
 
-        ARG_SETUP(arr);
         switch(arr_info.getType()) {
         case f32: getScalar<float  >(reinterpret_cast<float*  >(output_value), arr); break;
         case f64: getScalar<double >(reinterpret_cast<double* >(output_value), arr); break;

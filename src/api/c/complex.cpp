@@ -61,8 +61,7 @@ af_err af_cplx(af_array *out, const af_array in)
 {
     try {
         ARG_SETUP(in);
-
-        af_dtype in_type = in_info.getType();
+        const af_dtype in_type = in_info.getType();
         ASSERT_TYPE(in, TYPES(c32, c64));
 
         if (in_type == c32 || in_type == c64) { // \TODO(miguel)
@@ -94,7 +93,6 @@ af_err af_real(af_array *out, const af_array in)
 {
     try {
         ARG_SETUP(in);
-
         const af_dtype in_type = in_info.getType();
         if (in_type != c32 && in_type != c64) {
             return af_retain_array(out, in);
@@ -140,8 +138,7 @@ af_err af_conjg(af_array *out, const af_array in)
 {
     try {
         ARG_SETUP(in);
-
-        af_dtype in_type = in_info.getType();
+        const af_dtype in_type = in_info.getType();
         if (in_type != c32 && in_type != c64) {
             return af_retain_array(out, in);
         }

@@ -35,18 +35,14 @@ af_err convert(af_array* out, const af_array& in)
 {
     try {
         ARG_SETUP(in);
-
-        const af_dtype in_type = in_info.getType();
-        af::dim4 inputDims = in_info.dims();
+        ASSERT_NDIM_GT(in, 2);
 
         if (in_info.ndims() == 0) {
-            return af_create_handle(out, 0, nullptr, in_type);
+            return af_create_handle(out, 0, nullptr, in_info.getType());
         }
 
-        ARG_ASSERT(1, (inputDims.ndims() >= 3));
-
         af_array output = 0;
-        switch (in_type) {
+        switch (in_info.getType()) {
             case f64: output = convert<double, isHSV2RGB>(in); break;
             case f32: output = convert<float , isHSV2RGB>(in); break;
             default: TYPE_ERROR(in); break;

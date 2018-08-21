@@ -34,20 +34,14 @@ af_err af_diff1(af_array *out, const af_array in, const int dim)
 {
     try {
         ARG_ASSERT(2, ((dim >= 0) && (dim < 4)));
-
         ARG_SETUP(in);
-
-        const af_dtype in_type = in_info.getType();
-
-        af::dim4 in_dims = in_info.dims();
-        if (in_dims[dim] < 2) {
-            return af_create_handle(out, 0, nullptr, in_type);
+        ASSERT_DIM_GT(in, dim, 1);
+        if (in_info.dims()[dim] < 2) {
+            return af_create_handle(out, 0, nullptr, in_info.getType());
         }
 
-        DIM_ASSERT(1, in_dims[dim] >= 2);
-
         af_array output;
-        switch(in_type) {
+        switch(in_info.getType()) {
             case f32: output = diff1<float  >(in,dim);  break;
             case c32: output = diff1<cfloat >(in,dim);  break;
             case f64: output = diff1<double >(in,dim);  break;
@@ -74,20 +68,14 @@ af_err af_diff2(af_array *out, const af_array in, const int dim)
 
     try {
         ARG_ASSERT(2, ((dim >= 0) && (dim < 4)));
-
         ARG_SETUP(in);
-
-        const af_dtype in_type = in_info.getType();
-
-        af::dim4 in_dims = in_info.dims();
-        if (in_dims[dim] < 3) {
-            return af_create_handle(out, 0, nullptr, in_type);
+        ASSERT_DIM_GT(in, dim, 2);
+        if (in_info.dims()[dim] < 3) {
+            return af_create_handle(out, 0, nullptr, in_info.getType());
         }
 
-        DIM_ASSERT(1, in_dims[dim] >= 3);
-
         af_array output;
-        switch(in_type) {
+        switch(in_info.getType()) {
             case f32: output = diff2<float  >(in,dim);  break;
             case c32: output = diff2<cfloat >(in,dim);  break;
             case f64: output = diff2<double >(in,dim);  break;

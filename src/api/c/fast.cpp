@@ -53,16 +53,15 @@ af_err af_fast(af_features *out, const af_array in, const float thr,
 {
     try {
         ARG_SETUP(in);
-
-        const af::dim4 dims  = in_info.dims();
-
+        ASSERT_NDIM_GT(in, 1);
+        ASSERT_NDIM_LT(in, 4);
+        const dim4 dims  = in_info.dims();
         ARG_ASSERT(2, (dims[0] >= (dim_t)(2*edge+1) || dims[1] >= (dim_t)(2*edge+1)));
         ARG_ASSERT(3, thr > 0.0f);
         ARG_ASSERT(4, (arc_length >= 9 && arc_length <= 16));
         ARG_ASSERT(6, (feature_ratio > 0.0f && feature_ratio <= 1.0f));
 
-        const dim_t in_ndims = dims.ndims();
-        DIM_ASSERT(1, (in_ndims <= 3 && in_ndims >= 2));
+
 
         switch(in_info.getType()) {
             case f32: *out = fast<float >(in, thr, arc_length, non_max, feature_ratio, edge); break;

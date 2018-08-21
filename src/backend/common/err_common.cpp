@@ -33,6 +33,7 @@
 using std::string;
 using std::stringstream;
 using std::vector;
+using af::dim4;
 
 AfError::AfError(const char * const func,
                  const char * const file,
@@ -231,10 +232,10 @@ dim_eq(const ArrayInfo &lhs_info, const ArrayInfo &rhs_info,
        const char * lhs_str, const char * rhs_str,
        const char * file, const char * function, const int line)
 {
-    af::dim4 lhs_dims = lhs_info.dims();
-    af::dim4 rhs_dims = rhs_info.dims();
-    af_dtype lhs_type = lhs_info.getType();
-    af_dtype rhs_type = rhs_info.getType();
+    const dim4 lhs_dims = lhs_info.dims();
+    const dim4 rhs_dims = rhs_info.dims();
+    const af_dtype lhs_type = lhs_info.getType();
+    const af_dtype rhs_type = rhs_info.getType();
 
     if (lhs_dims != rhs_dims) {
         string fmt_str = fmt::format("Arrays `{}` ({}) and `{}` ({}) must be of the same dimensions.", lhs_str, lhs_dims, rhs_str, rhs_dims);
@@ -249,8 +250,7 @@ dim_cmp(const int op,
         const char * arr_str,
         const char * file, const char * function, const int line)
 {
-    af::dim4 arr_dims  = arr_info.dims();
-    // std::cout << "arr_dims: " << arr_dims << endl;
+    const dim4 arr_dims = arr_info.dims();
     std::string op_str;
     switch(op) {
     case 0: {
@@ -270,6 +270,37 @@ dim_cmp(const int op,
     if (!op_str.empty()) {
         std::string fmt_str;
         fmt_str = fmt::format("The size of array `{}` ({}) must be {} {} on dimension {}", arr_str, arr_dims, op_str, dim_val, dim_idx);
+        throw AfError(function, file, line, fmt_str.c_str(), AF_ERR_TYPE); // \TODO which af_err????
+    }
+}
+
+void
+ndim_cmp(const int op,
+         const int ndim_val,
+         const ArrayInfo &arr_info,
+         const char * arr_str,
+         const char * file, const char * function, const int line)
+{
+    const unsigned arr_ndims = arr_info.dims().ndims();
+    std::string op_str;
+    switch(op) {
+    case 0: {
+        if (!(arr_ndims < ndim_val))
+            op_str = "less than"; break;
+    }
+    case 1: {
+        if (!(arr_ndims == ndim_val))
+            op_str = "equal to"; break;
+    };
+    case 2: {
+        if (!(arr_ndims > ndim_val))
+            op_str = "greather than"; break;
+    }
+    default: assert(0);
+    }
+    if (!op_str.empty()) {
+        std::string fmt_str;
+        fmt_str = fmt::format("`{}` expects number of dimensions to be {}{}", arr_str, op_str, arr_ndims);
         throw AfError(function, file, line, fmt_str.c_str(), AF_ERR_TYPE); // \TODO which af_err????
     }
 }

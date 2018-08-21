@@ -240,7 +240,7 @@ getInfo(const af_array arr, bool sparse_check, bool device_check)
 
   // Check Sparse -> If false, then both standard Array<T> and SparseArray<T> are accepted
   // Otherwise only regular Array<T> is accepted
-  if(sparse_check) {
+  if (sparse_check) {
     ARG_ASSERT(0, info->isSparse() == false);
   }
 

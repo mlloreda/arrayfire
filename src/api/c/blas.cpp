@@ -73,7 +73,7 @@ af_err af_sparse_matmul(af_array *out,
             AF_ERROR("Sparse matmul can not be used in batch mode", AF_ERR_BATCH);
         }
 
-        TYPE_ASSERT(lhs_type == rhs_type);
+        TYPE_ASSERT(lhs_type == rhs_type); // \TODO(miguel)
 
         af::dim4 ldims = lhsBase.dims();
         int lColDim = (optLhs == AF_MAT_NONE) ? 1 : 0;
@@ -121,11 +121,11 @@ af_err af_matmul(af_array *out,
             AF_ERROR("Using this property is not yet supported in matmul", AF_ERR_NOT_SUPPORTED);
         }
 
-        dim4 lDims = lhs_info.dims();
-        dim4 rDims = rhs_info.dims();
+        const dim4 lDims = lhs_info.dims();
+        const dim4 rDims = rhs_info.dims();
 
         if (lDims.ndims() > 2 || rDims.ndims() > 2) {
-            DIM_ASSERT(1, lDims.ndims() == rDims.ndims());
+            DIM_ASSERT(1, lDims.ndims() == rDims.ndims()); // \TODO(miguel)
             if (lDims[2] != rDims[2] && lDims[2] != 1 && rDims[2] != 1) {
                 AF_ERROR("Batch size mismatch along dimension 2", AF_ERR_BATCH);
             }

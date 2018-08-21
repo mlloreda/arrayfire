@@ -29,10 +29,7 @@ static af_err bilateral(af_array *out, const af_array &in, const float &s_sigma,
 {
     try {
         ARG_SETUP(in);
-
-        dim4 dims  = in_info.dims();
-
-        DIM_ASSERT(1, (dims.ndims()>=2));
+        ASSERT_NDIM_GT(in, 1);
 
         af_array output;
         switch(in_info.getType()) {

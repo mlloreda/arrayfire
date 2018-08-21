@@ -124,29 +124,22 @@ af_err vectorFieldWrapper(const af_window wind, const af_array points, const af_
     }
 
     try {
-        ARG_SETUP(points);
         ARG_SETUP(directions);
-
-        af::dim4 pDims  = points_info.dims();
-        af::dim4 dDims  = directions_info.dims();
-
-        DIM_ASSERT(0, pDims == dDims);
-        DIM_ASSERT(0, pDims.ndims() == 2);
-        DIM_ASSERT(0, pDims[1] == 2 || pDims[1] == 3); // Columns:P 2 means 2D and 3 means 3D
-
+        ARG_SETUP(points);
         ASSERT_TYPE_EQ(points, directions);
+        ASSERT_NDIM_EQ(points, 2);
+        ASSERT_DIM(points, directions);
+        ASSERT_DIM_EQ(points, 1, 2);
+
+        const dim4 points_dims  = points_info.dims();
+        DIM_ASSERT(0, points_dims[1] == 2 || points_dims[1] == 3); // Columns:P 2 means 2D and 3 means 3D // \TODO(miguel) what to do about this or???
 
         forge::Window* window = reinterpret_cast<forge::Window*>(wind);
         makeContextCurrent(window);
 
         forge::Chart* chart = NULL;
-
-        vector<af_array> pnts;
-        pnts.push_back(points);
-
-        vector<af_array> dirs;
-        dirs.push_back(directions);
-
+        vector<af_array> pnts{points};
+        vector<af_array> dirs{directions};
         switch(points_info.getType()) {
             case f32: chart = setup_vector_field<float  >(window, pnts, dirs, props); break;
             case s32: chart = setup_vector_field<int    >(window, pnts, dirs, props); break;
@@ -175,35 +168,23 @@ af_err vectorFieldWrapper(const af_window wind,
                           const af_array xDirs, const af_array yDirs, const af_array zDirs,
                           const af_cell* const props)
 {
-    if(wind==0) {
+    if (wind == 0) {
         AF_RETURN_ERROR("Not a valid window", AF_SUCCESS);
     }
 
     try {
-        ARG_SETUP(xPoints);
-        ARG_SETUP(yPoints);
-        ARG_SETUP(zPoints);
-        ARG_SETUP(xDirs);
-        ARG_SETUP(yDirs);
-        ARG_SETUP(zDirs);
-
-        af::dim4 xpDims  = xPoints_info.dims();
-        af::dim4 ypDims  = yPoints_info.dims();
-        af::dim4 zpDims  = zPoints_info.dims();
-        af::dim4 xdDims  = xDirs_info.dims();
-        af::dim4 ydDims  = yDirs_info.dims();
-        af::dim4 zdDims  = zDirs_info.dims();
+        ARG_SETUP(xPoints); ARG_SETUP(yPoints); ARG_SETUP(zPoints);
+        ARG_SETUP(xDirs); ARG_SETUP(yDirs); ARG_SETUP(zDirs);
 
         // Assert all arrays are equal dimensions
-        DIM_ASSERT(1, xpDims == xdDims);
-        DIM_ASSERT(2, ypDims == ydDims);
-        DIM_ASSERT(3, zpDims == zdDims);
-
-        DIM_ASSERT(1, xpDims == ypDims);
-        DIM_ASSERT(1, xpDims == zpDims);
+        ASSERT_DIM(xPoints, xDirs);
+        ASSERT_DIM(yPoints, yDirs);
+        ASSERT_DIM(zPoints, zDirs);
+        ASSERT_DIM(xPoints, yPoints);
+        ASSERT_DIM(xPoints, zPoints);
 
         // Verify vector
-        DIM_ASSERT(1, xpDims.ndims() == 1);
+        ASSERT_NDIM_EQ(xPoints, 1);
 
         // Assert all arrays are equal types
         ASSERT_TYPE_EQ(xPoints, xDirs);
@@ -217,15 +198,8 @@ af_err vectorFieldWrapper(const af_window wind,
 
         forge::Chart* chart = NULL;
 
-        vector<af_array> points;
-        points.push_back(xPoints);
-        points.push_back(yPoints);
-        points.push_back(zPoints);
-
-        vector<af_array> directions;
-        directions.push_back(xDirs);
-        directions.push_back(yDirs);
-        directions.push_back(zDirs);
+        vector<af_array> points{xPoints, yPoints, zPoints};
+        vector<af_array> directions{xDirs, yDirs, zDirs};
 
         switch(xPoints_info.getType()) {
             case f32: chart = setup_vector_field<float  >(window, points, directions, props); break;
@@ -260,25 +234,12 @@ af_err vectorFieldWrapper(const af_window wind,
     }
 
     try {
-        ARG_SETUP(xPoints);
-        ARG_SETUP(yPoints);
-        ARG_SETUP(xDirs);
-        ARG_SETUP(yDirs);
-
-        af::dim4 xpDims = xPoints_info.dims();
-        af::dim4 ypDims = yPoints_info.dims();
-        af::dim4 xdDims = xDirs_info.dims();
-        af::dim4 ydDims = yDirs_info.dims();
-
-        // Assert all arrays are equal dimensions
-        DIM_ASSERT(1, xpDims == xdDims);
-        DIM_ASSERT(2, ypDims == ydDims);
-        DIM_ASSERT(1, xpDims == ypDims);
-
-        // Verify vector
-        DIM_ASSERT(1, xpDims.ndims() == 1);
-
-        // Assert all arrays are equal types
+        ARG_SETUP(xPoints); ARG_SETUP(yPoints);
+        ARG_SETUP(xDirs); ARG_SETUP(yDirs);
+        ASSERT_DIM(xPoints, xDirs);
+        ASSERT_DIM(yPoints, yDirs);
+        ASSERT_DIM(xPoints, yPoints);
+        ASSERT_NDIM_EQ(xPoints, 1);
         ASSERT_TYPE_EQ(xPoints, xDirs);
         ASSERT_TYPE_EQ(yPoints, yDirs);
         ASSERT_TYPE_EQ(xPoints, yPoints);
@@ -287,15 +248,8 @@ af_err vectorFieldWrapper(const af_window wind,
         makeContextCurrent(window);
 
         forge::Chart* chart = NULL;
-
-        vector<af_array> points;
-        points.push_back(xPoints);
-        points.push_back(yPoints);
-
-        vector<af_array> directions;
-        directions.push_back(xDirs);
-        directions.push_back(yDirs);
-
+        vector<af_array> points{xPoints, yPoints};
+        vector<af_array> directions{xDirs, yDirs};
         switch(xPoints_info.getType()) {
             case f32: chart = setup_vector_field<float  >(window, points, directions, props); break;
             case s32: chart = setup_vector_field<int    >(window, points, directions, props); break;

@@ -56,16 +56,14 @@ af_err af_orb(af_features* feat, af_array* desc,
 {
     try {
         ARG_SETUP(in);
-        af::dim4 dims  = in_info.dims();
-
-        ARG_ASSERT(2, (dims[0] >= 7 && dims[1] >= 7 && dims[2] == 1 && dims[3] == 1));
+        ASSERT_NDIM_LT(in, 4);
+        ASSERT_NDIM_GT(in, 1);
+        const dim4 in_dims  = in_info.dims();
+        ARG_ASSERT(2, (in_dims[0] >= 7 && in_dims[1] >= 7 && in_dims[2] == 1 && in_dims[3] == 1)); // \TODO(miguel)
         ARG_ASSERT(3, fast_thr > 0.0f);
         ARG_ASSERT(4, max_feat > 0);
         ARG_ASSERT(5, scl_fctr > 1.0f);
         ARG_ASSERT(6, levels > 0);
-
-        dim_t in_ndims = dims.ndims();
-        DIM_ASSERT(1, (in_ndims <= 3 && in_ndims >= 2));
 
         af_array tmp_desc;
         switch(in_info.getType()) {

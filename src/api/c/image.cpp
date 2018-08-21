@@ -85,10 +85,10 @@ af_err af_draw_image(const af_window wind, const af_array in, const af_cell* con
     try {
         ARG_SETUP(in);
 
-        af::dim4 in_dims = in_info.dims();
+        const dim4 in_dims = in_info.dims();
 
         DIM_ASSERT(0, in_dims[2] == 1 || in_dims[2] == 3 || in_dims[2] == 4);
-        DIM_ASSERT(0, in_dims[3] == 1);
+        ASSERT_DIM_EQ(in, 3, 1);
 
         forge::Window* window = reinterpret_cast<forge::Window*>(wind);
         makeContextCurrent(window);

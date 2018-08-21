@@ -235,13 +235,11 @@ template<af_op_t op>
 static af_err reduce_all_common(double *real_val, double *imag_val, const af_array in)
 {
     try {
-
-        ARG_SETUP(in);
-
-        ARG_ASSERT(2, in_info.ndims() > 0);
         ARG_ASSERT(0, real_val != NULL);
         *real_val = 0;
         if (imag_val != NULL) *imag_val = 0;
+        ARG_SETUP(in);
+        ASSERT_NDIM_GT(in, 0);
 
         cfloat  cfval;
         cdouble cdval;
@@ -386,19 +384,15 @@ template<af_op_t op>
 static af_err ireduce_common(af_array *val, af_array *idx, const af_array in, const int dim)
 {
     try {
-
         ARG_ASSERT(3, dim >= 0);
         ARG_ASSERT(3, dim <  4);
-
         ARG_SETUP(in);
-        ARG_ASSERT(2, in_info.ndims() > 0);
-
+        ASSERT_NDIM_GT(in, 0);
         if (dim >= (int)in_info.ndims()) {
             *val = retain(in);
             *idx = createHandleFromValue<uint>(in_info.dims(), 0);
             return AF_SUCCESS;
         }
-
 
         af_array res, loc;
         switch(in_info.getType()) {
@@ -446,12 +440,11 @@ static af_err ireduce_all_common(double *real_val, double *imag_val,
                                  unsigned *loc, const af_array in)
 {
     try {
-        ARG_SETUP(in);
-
-        ARG_ASSERT(3, in_info.ndims() > 0);
         ARG_ASSERT(0, real_val != NULL);
         *real_val = 0;
         if (imag_val) *imag_val = 0;
+        ARG_SETUP(in);
+        ASSERT_NDIM_GT(in, 0);
 
         cfloat  cfval;
         cdouble cdval;

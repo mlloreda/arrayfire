@@ -40,12 +40,8 @@ af_err af_medfilt1(af_array *out, const af_array in, const dim_t wind_width, con
     try {
         ARG_ASSERT(2, (wind_width>0));
         ARG_ASSERT(4, (edge_pad>=AF_PAD_ZERO && edge_pad<=AF_PAD_SYM));
-
         ARG_SETUP(in);
-        af::dim4 dims  = in_info.dims();
-
-        dim_t input_ndims = dims.ndims();
-        DIM_ASSERT(1, (input_ndims >= 1));
+        ASSERT_NDIM_GT(in, 0);
 
         if (wind_width == 1) {
             *out = retain(in);
@@ -89,14 +85,11 @@ af_err af_medfilt2(af_array *out, const af_array in, const dim_t wind_length, co
         ARG_ASSERT(4, (edge_pad>=AF_PAD_ZERO && edge_pad<=AF_PAD_SYM));
 
         ARG_SETUP(in);
-        af::dim4 dims  = in_info.dims();
+        ASSERT_NDIM_GT(in, 1);
 
         if (in_info.isColumn()) {
             return af_medfilt1(out, in, wind_width, edge_pad);
         }
-
-        dim_t input_ndims = dims.ndims();
-        DIM_ASSERT(1, (input_ndims >= 2));
 
         if (wind_length == 1) {
             *out = retain(in);
@@ -129,19 +122,13 @@ af_err af_minfilt(af_array *out, const af_array in, const dim_t wind_length,
         ARG_ASSERT(2, (wind_length>0));
         ARG_ASSERT(3, (wind_width>0));
         ARG_ASSERT(4, (edge_pad==AF_PAD_ZERO));
-
         ARG_SETUP(in);
-        af::dim4 dims  = in_info.dims();
-
-        dim_t input_ndims = dims.ndims();
-        DIM_ASSERT(1, (input_ndims >= 2));
+        ASSERT_NDIM_GT(in, 1);
 
         af_array mask;
-        dim_t wdims[] = {wind_length, wind_width};
+        const dim_t wdims[] = {wind_length, wind_width};
         AF_CHECK(af_constant(&mask, 1, 2, wdims, in_info.getType()));
-
         AF_CHECK(af_erode(out, in, mask));
-
         AF_CHECK(af_release_array(mask));
     }
     CATCHALL;
@@ -157,19 +144,13 @@ af_err af_maxfilt(af_array *out, const af_array in, const dim_t wind_length,
         ARG_ASSERT(2, (wind_length>0));
         ARG_ASSERT(3, (wind_width>0));
         ARG_ASSERT(4, (edge_pad==AF_PAD_ZERO));
-
         ARG_SETUP(in);
-        af::dim4 dims  = in_info.dims();
-
-        dim_t input_ndims = dims.ndims();
-        DIM_ASSERT(1, (input_ndims >= 2));
+        ASSERT_NDIM_GT(in, 1);
 
         af_array mask;
-        dim_t wdims[] = {wind_length, wind_width};
+        const dim_t wdims[] = {wind_length, wind_width};
         AF_CHECK(af_constant(&mask, 1, 2, wdims, in_info.getType()));
-
         AF_CHECK(af_dilate(out, in, mask));
-
         AF_CHECK(af_release_array(mask));
     }
     CATCHALL;

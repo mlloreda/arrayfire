@@ -28,15 +28,14 @@ af_err af_gradient(af_array *grows, af_array *gcols, const af_array in)
 {
     try {
         ARG_SETUP(in);
-        const af_dtype in_type = in_info.getType();
-        af::dim4 idims = in_info.dims();
-
-        DIM_ASSERT(2, in_info.elements() > 0);
+        DIM_ASSERT(2, in_info.elements() > 0); // \TODO(miguel);
 
         af_array grad0;
         af_array grad1;
-        AF_CHECK(af_create_handle(&grad0, idims.ndims(), idims.get(), in_type));
-        AF_CHECK(af_create_handle(&grad1, idims.ndims(), idims.get(), in_type));
+        const dim4 in_dims = in_info.dims();
+        const af_dtype in_type = in_info.getType();
+        AF_CHECK(af_create_handle(&grad0, in_dims.ndims(), in_dims.get(), in_type));
+        AF_CHECK(af_create_handle(&grad1, in_dims.ndims(), in_dims.get(), in_type));
 
         switch(in_type) {
             case f32: gradient<float  >(&grad0, &grad1, in);  break;

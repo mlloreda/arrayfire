@@ -53,9 +53,8 @@ static af_err af_arith(af_array *out, const af_array lhs, const af_array rhs, co
         ARG_SETUP(lhs);
         ARG_SETUP(rhs);
 
-        dim4 odims = getOutDims(lhs_info.dims(), rhs_info.dims(), batchMode);
-
         const af_dtype otype = implicit(lhs_info.getType(), rhs_info.getType());
+        const dim4 odims = getOutDims(lhs_info.dims(), rhs_info.dims(), batchMode);
         af_array res;
         switch (otype) {
         case f32: res = arithOp<float  , op>(lhs, rhs, odims); break;
@@ -86,9 +85,8 @@ static af_err af_arith_real(af_array *out, const af_array lhs, const af_array rh
         ARG_SETUP(lhs);
         ARG_SETUP(rhs);
 
-        dim4 odims = getOutDims(lhs_info.dims(), rhs_info.dims(), batchMode);
-
         const af_dtype otype = implicit(lhs_info.getType(), rhs_info.getType());
+        const dim4 odims = getOutDims(lhs_info.dims(), rhs_info.dims(), batchMode);
         af_array res;
         switch (otype) {
         case f32: res = arithOp<float  , op>(lhs, rhs, odims); break;
@@ -330,18 +328,16 @@ af_err af_root(af_array *out, const af_array lhs, const af_array rhs, const bool
 af_err af_atan2(af_array *out, const af_array lhs, const af_array rhs, const bool batchMode)
 {
     try {
-        const af_dtype type = implicit(lhs, rhs);
+        ARG_SETUP(lhs);
+        ARG_SETUP(rhs);
 
+        const af_dtype type = implicit(lhs, rhs);
         if (type != f32 && type != f64) {
             AF_ERROR("Only floating point arrays are supported for atan2 ",
                      AF_ERR_NOT_SUPPORTED);
         }
 
-        ARG_SETUP(lhs);
-        ARG_SETUP(rhs);
-
-        dim4 odims = getOutDims(lhs_info.dims(), rhs_info.dims(), batchMode);
-
+        const dim4 odims = getOutDims(lhs_info.dims(), rhs_info.dims(), batchMode);
         af_array res;
         switch (type) {
         case f32: res = arithOp<float , af_atan2_t>(lhs, rhs, odims); break;
@@ -358,18 +354,16 @@ af_err af_atan2(af_array *out, const af_array lhs, const af_array rhs, const boo
 af_err af_hypot(af_array *out, const af_array lhs, const af_array rhs, const bool batchMode)
 {
     try {
-        const af_dtype type = implicit(lhs, rhs);
+        ARG_SETUP(lhs);
+        ARG_SETUP(rhs);
 
+        const af_dtype type = implicit(lhs, rhs);
         if (type != f32 && type != f64) { // \TODO(miguel)
             AF_ERROR("Only floating point arrays are supported for hypot ",
                      AF_ERR_NOT_SUPPORTED);
         }
 
-        ARG_SETUP(lhs);
-        ARG_SETUP(rhs);
-
-        dim4 odims = getOutDims(lhs_info.dims(), rhs_info.dims(), batchMode);
-
+        const dim4 odims = getOutDims(lhs_info.dims(), rhs_info.dims(), batchMode);
         af_array res;
         switch (type) {
         case f32: res = arithOp<float , af_hypot_t>(lhs, rhs, odims); break;
@@ -394,13 +388,11 @@ template<af_op_t op>
 static af_err af_logic(af_array *out, const af_array lhs, const af_array rhs, const bool batchMode)
 {
     try {
-        const af_dtype type = implicit(lhs, rhs);
-
         ARG_SETUP(lhs);
         ARG_SETUP(rhs);
 
-        dim4 odims = getOutDims(lhs_info.dims(), rhs_info.dims(), batchMode);
-
+        const af_dtype type = implicit(lhs, rhs);
+        const dim4 odims = getOutDims(lhs_info.dims(), rhs_info.dims(), batchMode);
         af_array res;
         switch (type) {
         case f32: res = logicOp<float  , op>(lhs, rhs, odims); break;
@@ -475,12 +467,11 @@ template<af_op_t op>
 static af_err af_bitwise(af_array *out, const af_array lhs, const af_array rhs, const bool batchMode)
 {
     try {
-        const af_dtype type = implicit(lhs, rhs);
-
         ARG_SETUP(lhs);
         ARG_SETUP(rhs);
 
-        dim4 odims = getOutDims(lhs_info.dims(), rhs_info.dims(), batchMode);
+        const dim4 odims = getOutDims(lhs_info.dims(), rhs_info.dims(), batchMode);
+        const af_dtype type = implicit(lhs, rhs);
 
         if(odims.ndims() == 0) {
             return af_create_handle(out, 0, nullptr, type);

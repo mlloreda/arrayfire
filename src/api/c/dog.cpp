@@ -47,9 +47,8 @@ af_err af_dog(af_array *out, const af_array in, const int radius1, const int rad
 {
     try {
         ARG_SETUP(in);
-        dim4 inDims = in_info.dims();
-        ARG_ASSERT(1, (inDims.ndims()>=2));
-        ARG_ASSERT(1, (inDims.ndims()<=3));
+        ASSERT_NDIM_GT(in, 1);
+        ASSERT_NDIM_LT(in, 4);
 
         af_array output;
         switch(in_info.getType()) {

@@ -35,11 +35,8 @@ af_err af_sobel_operator(af_array *dx, af_array *dy, const af_array img, const u
         //FIXME: ADD SUPPORT FOR OTHER KERNEL SIZES
         //ARG_ASSERT(4, (ker_size==3 || ker_size==5 || ker_size==7));
         ARG_ASSERT(4, (ker_size==3));
-
         ARG_SETUP(img);
-        af::dim4 dims  = img_info.dims();
-
-        DIM_ASSERT(3, (dims.ndims() >= 2));
+        ASSERT_NDIM_GT(img, 1);
 
         ArrayPair output;
         switch(img_info.getType()) {

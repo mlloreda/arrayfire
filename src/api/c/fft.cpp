@@ -30,13 +30,10 @@ static af_err fft(af_array *out, const af_array in, const double norm_factor, co
 {
     try {
         ARG_SETUP(in);
-        af::dim4 dims  = in_info.dims();
-
-        if (dims.ndims() == 0) {
+        ASSERT_NDIM_GT(in, rank-1); // \TODO(miguel) ASSERT_NDIM_{GTE,LTE}()
+        if (in_info.dims().ndims() == 0) {
             return af_retain_array(out, in);
         }
-
-        DIM_ASSERT(1, (dims.ndims()>=rank));
 
         af_array output;
         switch(in_info.getType()) {
@@ -46,7 +43,7 @@ static af_err fft(af_array *out, const af_array in, const double norm_factor, co
             case f64: output = fft<double, cdouble , rank, direction>(in, norm_factor, npad, pad); break;
             default: TYPE_ERROR(in);
         }
-        std::swap(*out,output);
+        std::swap(*out, output);
     }
     CATCHALL;
 
@@ -104,13 +101,10 @@ static af_err fft_inplace(af_array in, const double norm_factor)
 {
     try {
         ARG_SETUP(in);
-
-        af::dim4 dims  = in_info.dims();
-
-        if (dims.ndims() == 0) {
+        ASSERT_NDIM_GT(in, rank-1);
+        if (in_info.dims().ndims() == 0) {
             return AF_SUCCESS;
         }
-        DIM_ASSERT(1, (dims.ndims()>=rank));
 
         switch(in_info.getType()) {
             case c32: fft_inplace<cfloat , rank, direction>(in, norm_factor); break;
@@ -166,13 +160,10 @@ static af_err fft_r2c(af_array *out, const af_array in, const double norm_factor
 {
     try {
         ARG_SETUP(in);
-
-        af::dim4 dims  = in_info.dims();
-
-        if (dims.ndims() == 0) {
+        ASSERT_NDIM_GT(in, rank-1);
+        if (in_info.dims().ndims() == 0) {
             return af_retain_array(out, in);
         }
-        DIM_ASSERT(1, (dims.ndims()>=rank));
 
         af_array output;
         switch(in_info.getType()) {
@@ -219,21 +210,17 @@ static af_err fft_c2r(af_array *out, const af_array in, const double norm_factor
 {
     try {
         ARG_SETUP(in);
-
-        af::dim4 idims  = in_info.dims();
-
-        if (idims.ndims() == 0) {
+        ASSERT_NDIM_GT(in, rank-1);
+        if (in_info.dims().ndims() == 0) {
             return af_retain_array(out, in);
         }
-        DIM_ASSERT(1, (idims.ndims()>=rank));
 
-        dim4 odims = idims;
-        odims[0] = 2 * (odims[0] - 1) + (is_odd ? 1 : 0);
-
+        dim4 out_dims = in_info.dims();
+        out_dims[0] = 2 * (out_dims[0] - 1) + (is_odd ? 1 : 0);
         af_array output;
         switch(in_info.getType()) {
-            case c32: output = fft_c2r<cfloat , float  , rank>(in, norm_factor, odims); break;
-            case c64: output = fft_c2r<cdouble, double , rank>(in, norm_factor, odims); break;
+            case c32: output = fft_c2r<cfloat , float  , rank>(in, norm_factor, out_dims); break;
+            case c64: output = fft_c2r<cdouble, double , rank>(in, norm_factor, out_dims); break;
             default: TYPE_ERROR(in);
         }
         std::swap(*out, output);

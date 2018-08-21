@@ -163,9 +163,7 @@ af_err af_create_sparse_array_from_ptr(
 
 
         af_array output = 0;
-
-        af::dim4 dims(nRows, nCols);
-
+        const dim4 dims(nRows, nCols);
         switch(type) {
             case f32: output = createSparseArrayFromPtr<float  >
                                (dims, nNZ, static_cast<const float  *>(values), rowIdx, colIdx, stype, source);
@@ -213,20 +211,20 @@ af_err af_create_sparse_array_from_dense(af_array *out, const af_array in,
         // Checks:
         // stype is within acceptable range
         // values is of floating point type
-        ARG_SETUP(in);
-
         if(!(stype == AF_STORAGE_CSR
           || stype == AF_STORAGE_CSC
           || stype == AF_STORAGE_COO)) {
             AF_ERROR("Storage type is out of range/unsupported", AF_ERR_ARG);
         }
 
-        // Only matrices allowed
-        DIM_ASSERT(1, in_info.ndims() == 2);
-
+        ARG_SETUP(in);
         TYPE_ASSERT(in_info.isFloating()); // \TODO(miguel)
 
-        af::dim4 dims(in_info.dims()[0], in_info.dims()[1]);
+        // Only matrices allowed
+        ASSERT_NDIM_EQ(in, 2);
+
+
+        const dim4 dims(in_info.dims()[0], in_info.dims()[1]);
         af_array output = 0;
         switch(in_info.getType()) {
             case f32: output = createSparseArrayFromDense<float  >(dims, in, stype); break;

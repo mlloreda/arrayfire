@@ -164,13 +164,13 @@ static af_array var_(const af_array& in, const af_array& weights,
 af_err af_var(af_array *out, const af_array in, const bool isbiased, const dim_t dim)
 {
     try {
-        ARG_SETUP(in);
-
-        ARG_ASSERT(3, (dim>=0 && dim<=3));
+        ARG_ASSERT(3, (dim>=0 && dim<=3)); // \TODO(miguel)
 
         af_array output = 0;
         af_array no_weights = 0;
         af_var_bias bias = (isbiased) ? AF_VARIANCE_POPULATION : AF_VARIANCE_SAMPLE;
+
+        ARG_SETUP(in);
         switch(in_info.getType()) {
             case f32: output = var_<float ,  float >(in, no_weights, bias, dim); break;
             case f64: output = var_<double,  double>(in, no_weights, bias, dim); break;
@@ -198,7 +198,7 @@ af_err af_var_weighted(af_array *out, const af_array in, const af_array weights,
         ARG_SETUP(in);
         ARG_SETUP(weights);
 
-        ARG_ASSERT(3, (dim>=0 && dim<=3));
+        ARG_ASSERT(3, (dim>=0 && dim<=3)); // \TODO(miguel)
         ASSERT_TYPE(weights, TYPES(f32, f64)); /* verify that weights are non-complex real numbers */
 
         af_array output = 0;

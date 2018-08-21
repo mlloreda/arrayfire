@@ -154,7 +154,7 @@ af_array iterDeconv(const af_array in, const af_array ker,
     auto psf     = castArray<T>(ker);
     const dim4& idims  = input.dims();
     const dim4& fdims  = psf.dims();
-    dim_t nElems = 1;
+    const dim_t nElems = 1;
 
     dim4 inUPad, psfUPad, inLPad, psfLPad, odims(1);
 
@@ -191,11 +191,8 @@ af_err af_iterative_deconv(af_array* out, const af_array in, const af_array ker,
     try {
         ARG_SETUP(in);
         ARG_SETUP(ker);
-        const dim4& inputDims = in_info.dims();
-        const dim4& kernelDims = ker_info.dims();
-
-        DIM_ASSERT(2, (inputDims.ndims() == 2));
-        DIM_ASSERT(3, (kernelDims.ndims() == 2));
+        ASSERT_NDIM_EQ(in, 2);
+        ASSERT_NDIM_EQ(ker, 2);
         ARG_ASSERT(4, (iterations > 0));
         ARG_ASSERT(5, std::isfinite(relax_factor));
         ARG_ASSERT(5, (relax_factor > 0));
@@ -203,9 +200,9 @@ af_err af_iterative_deconv(af_array* out, const af_array in, const af_array ker,
                        algo==AF_ITERATIVE_DECONV_LANDWEBER ||
                        algo==AF_ITERATIVE_DECONV_RICHARDSONLUCY));
 
-        af_array res   = 0;
         const unsigned iters = iterations;
         const float rfac     = relax_factor;
+        af_array res = 0;
         switch(in_info.getType()) {
             case f32: res = iterDeconv<float >(in,ker,iters,rfac,algo); break;
             case s16: res = iterDeconv<short >(in,ker,iters,rfac,algo); break;
@@ -295,12 +292,8 @@ af_err af_inverse_deconv(af_array* out, const af_array in, const af_array psf,
     try {
         ARG_SETUP(in);
         ARG_SETUP(psf);
-
-        const dim4& inputDims = in_info.dims();
-        const dim4& psfDims   = psf_info.dims();
-
-        DIM_ASSERT(2, (inputDims.ndims() == 2));
-        DIM_ASSERT(3, (psfDims.ndims() == 2));
+        ASSERT_NDIM_EQ(in, 2);
+        ASSERT_NDIM_EQ(psf, 2);
         ARG_ASSERT(4, std::isfinite(gamma));
         ARG_ASSERT(4, (gamma > 0));
         ARG_ASSERT(5, (algo==AF_INVERSE_DECONV_DEFAULT ||

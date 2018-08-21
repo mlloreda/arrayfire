@@ -56,26 +56,28 @@ af_err af_anisotropic_diffusion(af_array* out, const af_array in, const float dt
                                 const af_diffusion_eq eq)
 {
     try {
-        ARG_SETUP(in);
-
-        const af::dim4& inputDimensions = in_info.dims();
-        const af_dtype  inputType       = in_info.getType();
-        const unsigned  inputNumDims    = inputDimensions.ndims();
-
-        DIM_ASSERT(1, (inputNumDims>=2));
-
-        ARG_ASSERT(3, (K>0 || K<0));
+        // \NOTES(miguel)
+        //
+        // . How to take care of following ARG_ASSERTS? AF_ASSERT
+        //   would be a bit much, here.
+        //
+        // . `ASSERT_NDIM_GT(in, 1)` is not very clear. Easy to
+        //   confuse for `ASSERT_DIM_GT(af_array, dim_idx, dim_val)`
+        //
+        // . Do we need ARG_SETUP()? I think `getInfo(arr)` is more
+        //   clear. Improving macro name is another option.
+        //
+        ARG_ASSERT(3, (K > 0 || K < 0)); // \TODO(miguel) ASSERT_ARG(K, (K == 0));
         ARG_ASSERT(4, (iterations>0));
 
+        ARG_SETUP(in); // \TODO(miguel) INIT_INFO()?
+        ASSERT_NDIM_GT(in, 1);
+
         const float DT = dt;
-        const float maxDt = 1.0f/std::pow(2.0f, static_cast<float>(2)+1);
-
         const af_flux_function F = (fftype==AF_FLUX_DEFAULT ? AF_FLUX_EXPONENTIAL : fftype);
-
         auto input = castArray<float>(in);
-
         af_array output = 0;
-        switch(inputType) {
+        switch(in_info.getType()) {
             case f64: output = diffusion<double>(input, DT, K, iterations, F, eq); break;
             case f32:
             case s32:

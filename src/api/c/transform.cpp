@@ -57,14 +57,6 @@ af_err af_transform(af_array *out, const af_array in, const af_array tf,
                     const af_interp_type method, const bool inverse)
 {
     try {
-        ARG_SETUP(in);
-        ARG_SETUP(tf);
-
-        af::dim4 idims = in_info.dims();
-        af::dim4 tdims = tf_info.dims();
-
-        // Assert type and interpolation
-        ASSERT_TYPE(tf, TYPES(f32));
         ARG_ASSERT(5, method == AF_INTERP_NEAREST  ||
                       method == AF_INTERP_BILINEAR ||
                       method == AF_INTERP_BILINEAR_COSINE ||
@@ -72,13 +64,18 @@ af_err af_transform(af_array *out, const af_array in, const af_array tf,
                       method == AF_INTERP_BICUBIC_SPLINE ||
                       method == AF_INTERP_LOWER);
 
-        // Assert dimesions
+        ARG_SETUP(in);
+        ARG_SETUP(tf);
+        ASSERT_TYPE(tf, TYPES(f32));
+        const dim4 idims = in_info.dims();
+        const dim4 tdims = tf_info.dims();
+
         // Image can be 2D or higher
-        DIM_ASSERT(1, idims.elements() > 0);
-        DIM_ASSERT(1, idims.ndims() >= 2);
+        ASSERT_NDIM_GT(in, 1);
+        DIM_ASSERT(1, idims.elements() > 0); // \TODO(miguel)
 
         // Transform can be 3x2 for affine transform or 3x3 for perspective transform
-        DIM_ASSERT(2, (tdims[0] == 3 && (tdims[1] == 2 || tdims[1] == 3)));
+        DIM_ASSERT(2, (tdims[0] == 3 && (tdims[1] == 2 || tdims[1] == 3))); // \TODO(miguel)
 
         // If transform is batched, the output dimensions must be specified
         if(tdims[2] * tdims[3] > 1) {
@@ -181,27 +178,27 @@ af_err af_scale(af_array *out, const af_array in, const float scale0, const floa
 {
     try {
         ARG_SETUP(in);
-        af::dim4 idims = in_info.dims();
+        const dim4 in_dims = in_info.dims();
 
         dim_t _odim0 = odim0, _odim1 = odim1;
         float sx, sy;
 
-        if(_odim0 == 0 || _odim1 == 0) {
+        if (_odim0 == 0 || _odim1 == 0) {
 
             DIM_ASSERT(2, scale0 != 0);
             DIM_ASSERT(3, scale1 != 0);
 
             sx = 1.f / scale0, sy = 1.f / scale1;
-            _odim0 = idims[0] / sx;
-            _odim1 = idims[1] / sy;
+            _odim0 = in_dims[0] / sx;
+            _odim1 = in_dims[1] / sy;
 
         } else if (scale0 == 0 || scale1 == 0) {
 
             DIM_ASSERT(4, odim0 != 0);
             DIM_ASSERT(5, odim1 != 0);
 
-            sx = idims[0] / (float)_odim0;
-            sy = idims[1] / (float)_odim1;
+            sx = in_dims[0] / (float)_odim0;
+            sy = in_dims[1] / (float)_odim1;
 
         } else {
 
@@ -213,7 +210,7 @@ af_err af_scale(af_array *out, const af_array in, const float scale0, const floa
         trans_mat[0] = sx;
         trans_mat[4] = sy;
 
-        const af::dim4 tdims(3, 2, 1, 1);
+        const dim4 tdims(3, 2, 1, 1);
         af_array t = 0;
         AF_CHECK(af_create_array(&t, trans_mat, tdims.ndims(), tdims.get(), f32));
         AF_CHECK(af_transform(out, in, t, _odim0, _odim1, method, true));

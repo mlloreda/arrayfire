@@ -53,16 +53,13 @@ af_err af_corrcoef(double *realVal, double *imagVal, const af_array X, const af_
     try {
         ARG_SETUP(X);
         ARG_SETUP(Y);
-
-        dim4 xDims      = X_info.dims();
-        dim4 yDims      = Y_info.dims();
-
         ASSERT_TYPE_EQ(X, Y);
-
-        ARG_ASSERT(2, (xDims.ndims()==yDims.ndims()));
-
-        for (dim_t i=0; i<xDims.ndims(); ++i)
-            ARG_ASSERT(2, (xDims[i]==yDims[i]));
+        const dim4 xDims      = X_info.dims();
+        const dim4 yDims      = Y_info.dims();
+        ARG_ASSERT(2, (xDims.ndims() == yDims.ndims())); // \TODO(miguel)
+        for (dim_t i = 0; i < xDims.ndims(); ++i) {
+            ARG_ASSERT(2, (xDims[i] == yDims[i])); // \TODO(miguel)
+        }
 
         switch(X_info.getType()) {
             case f64: *realVal = corrcoef<double, double>(X, Y); break;

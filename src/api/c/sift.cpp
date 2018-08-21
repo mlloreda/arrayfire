@@ -56,8 +56,9 @@ af_err af_sift(af_features* feat, af_array* desc, const af_array in, const unsig
     try {
 #ifdef AF_WITH_NONFREE_SIFT
         ARG_SETUP(in);
-        af::dim4 dims  = in_info.dims();
-
+        ASSERT_NDIM_GT(in, 1);
+        ASSERT_NDIM_LT(in, 4);
+        const dim4 dims  = in_info.dims();
         ARG_ASSERT(2, (dims[0] >= 15 && dims[1] >= 15 && dims[2] == 1 && dims[3] == 1));
         ARG_ASSERT(3, n_layers > 0);
         ARG_ASSERT(4, contrast_thr > 0.0f);
@@ -65,9 +66,6 @@ af_err af_sift(af_features* feat, af_array* desc, const af_array in, const unsig
         ARG_ASSERT(6, init_sigma > 0.5f);
         ARG_ASSERT(8, img_scale > 0.0f);
         ARG_ASSERT(9, feature_ratio > 0.0f);
-
-        dim_t in_ndims = dims.ndims();
-        DIM_ASSERT(1, (in_ndims <= 3 && in_ndims >= 2));
 
         af_array tmp_desc;
         switch(in_info.getType()) {
@@ -96,8 +94,9 @@ af_err af_gloh(af_features* feat, af_array* desc, const af_array in, const unsig
     try {
 #ifdef AF_WITH_NONFREE_SIFT
         ARG_SETUP(in);
-        af::dim4 dims  = in_info.dims();
-
+        ASSERT_NDIM_GT(in, 1);
+        ASSERT_NDIM_LT(in, 4);
+        const dim4 dims  = in_info.dims();
         ARG_ASSERT(2, (dims[0] >= 15 && dims[1] >= 15 && dims[2] == 1 && dims[3] == 1));
         ARG_ASSERT(3, n_layers > 0);
         ARG_ASSERT(4, contrast_thr > 0.0f);
@@ -105,9 +104,6 @@ af_err af_gloh(af_features* feat, af_array* desc, const af_array in, const unsig
         ARG_ASSERT(6, init_sigma > 0.5f);
         ARG_ASSERT(8, img_scale > 0.0f);
         ARG_ASSERT(9, feature_ratio > 0.0f);
-
-        dim_t in_ndims = dims.ndims();
-        DIM_ASSERT(1, (in_ndims <= 3 && in_ndims >= 2));
 
         af_array tmp_desc;
         switch(in_info.getType()) {

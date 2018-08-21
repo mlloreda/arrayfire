@@ -34,19 +34,18 @@ forge::Chart* setup_plot(const forge::Window* const window, const af_array in_,
                          const af_cell* const props,
                          forge::PlotType ptype, forge::MarkerType mtype)
 {
-    Array<T> in = getArray<T>(in_);
-
-    af::dim4 dims = in.dims();
-
-    DIM_ASSERT(1, dims.ndims() == 2);
+    ARG_SETUP(in_);
+    ASSERT_NDIM_EQ(in_, 2);
+    const dim4 dims = in__info.dims(); // \TODO(miguel) verify
     DIM_ASSERT(1, (dims[0] == order || dims[1] == order));
 
     // The data expected by backend is 2D [order, n]
-    if(dims[1] == order) {
+    Array<T> in = getArray<T>(in_);
+    if (dims[1] == order) {
         in = transpose(in, false);
     }
 
-    af::dim4 tdims = in.dims(); //transposed dimensions
+    const dim4 tdims = in.dims(); //transposed dimensions
 
     ForgeManager& fgMngr = ForgeManager::getInstance();
 
@@ -131,10 +130,9 @@ af_err plotWrapper(const af_window wind, const af_array in, const int order_dim,
 
     try {
         ARG_SETUP(in);
-        af::dim4  dims = in_info.dims();
-
-        DIM_ASSERT(0, dims.ndims() == 2);
-        DIM_ASSERT(0, dims[order_dim] == 2 || dims[order_dim] == 3);
+        ASSERT_NDIM_EQ(in, 2);
+        const dim4  dims = in_info.dims();
+        DIM_ASSERT(0, dims[order_dim] == 2 || dims[order_dim] == 3); // \TODO(miguel)
 
         forge::Window* window = reinterpret_cast<forge::Window*>(wind);
         makeContextCurrent(window);
@@ -178,17 +176,11 @@ af_err plotWrapper(const af_window wind, const af_array X, const af_array Y, con
         ARG_SETUP(X);
         ARG_SETUP(Y);
         ARG_SETUP(Z);
-
-        af::dim4  xDims = X_info.dims();
-        af::dim4  yDims = Y_info.dims();
-        af::dim4  zDims = Z_info.dims();
-
-        DIM_ASSERT(0, xDims == yDims);
-        DIM_ASSERT(0, xDims == zDims);
-        DIM_ASSERT(0, X_info.isVector());
-
         ASSERT_TYPE_EQ(X, Y);
         ASSERT_TYPE_EQ(X, Z);
+        ASSERT_DIM(X, Y);
+        ASSERT_DIM(X, Z);
+        DIM_ASSERT(0, X_info.isVector()); // \TODO(miguel)
 
         // Join for set up vector
         af_array in = 0;
@@ -229,8 +221,8 @@ af_err plotWrapper(const af_window wind, const af_array X, const af_array Y,
                    const af_cell* const props,
                    forge::PlotType ptype = FG_PLOT_LINE, forge::MarkerType marker = FG_MARKER_NONE)
 {
-    if(wind==0) {
-        std::cerr<<"Not a valid window"<<std::endl;
+    if (wind == 0) {
+        std::cerr << "Not a valid window" << std::endl;
         return AF_SUCCESS;
     }
 
@@ -238,13 +230,12 @@ af_err plotWrapper(const af_window wind, const af_array X, const af_array Y,
         ARG_SETUP(X);
         ARG_SETUP(Y);
 
-        af::dim4  xDims = X_info.dims();
-        af::dim4  yDims = Y_info.dims();
-
-        DIM_ASSERT(0, xDims == yDims);
-        DIM_ASSERT(0, X_info.isVector());
-
+        // \TODO(miguel) ASSERT_TYPE_EQ and ASSERT_DIM should have more similar macro names.
+        // \TODO(miguel) ASSERT_TYPE_EQ -> ASSERT_TYPE_CMP(X, Y)
+        // \TODO(miguel)     ASSERT_DIM -> ASSERT_DIM_CMP(X, Y)
         ASSERT_TYPE_EQ(X, Y);
+        ASSERT_DIM(X, Y);
+        DIM_ASSERT(0, X_info.isVector()); // \TODO(miguel) AF_ASSERT(in );
 
         // Join for set up vector
         af_array in = 0;
@@ -384,10 +375,9 @@ af_err af_draw_plot3(const af_window wind, const af_array P, const af_cell* cons
 #if defined(WITH_GRAPHICS)
     try {
         ARG_SETUP(P);
+        const dim4 dims = P_info.dims();
 
-        af::dim4  dims = P_info.dims();
-
-        if(dims.ndims() == 2 && dims[1] == 3) {
+        if (dims.ndims() == 2 && dims[1] == 3) {
             return plotWrapper(wind, P, 1, props);
         } else if(dims.ndims() == 2 && dims[0] == 3) {
             return plotWrapper(wind, P, 0, props);
@@ -467,9 +457,9 @@ af_err af_draw_scatter3(const af_window wind, const af_array P, const af_marker_
     forge::MarkerType fg_marker = getFGMarker(af_marker);
     try {
         ARG_SETUP(P);
-        af::dim4  dims = P_info.dims();
+        const dim4 dims = P_info.dims();
 
-        if(dims.ndims() == 2 && dims[1] == 3) {
+        if (dims.ndims() == 2 && dims[1] == 3) {
             return plotWrapper(wind, P, 1, props, FG_PLOT_SCATTER, fg_marker);
         } else if(dims.ndims() == 2 && dims[0] == 3) {
             return plotWrapper(wind, P, 0, props, FG_PLOT_SCATTER, fg_marker);

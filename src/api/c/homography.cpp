@@ -50,36 +50,23 @@ af_err af_homography(af_array *H, int *inliers,
                      const unsigned iterations, const af_dtype otype)
 {
     try {
-        ARG_SETUP(x_src);
-        ARG_SETUP(y_src);
-        ARG_SETUP(x_dst);
-        ARG_SETUP(y_dst);
-
+        ARG_SETUP(x_src); ARG_SETUP(y_src);
+        ARG_SETUP(x_dst); ARG_SETUP(y_dst);
         ASSERT_TYPE(x_src, TYPES(f32));
         ASSERT_TYPE(y_src, TYPES(f32));
         ASSERT_TYPE(x_dst, TYPES(f32));
         ASSERT_TYPE(y_dst, TYPES(f32));
 
-        dim4 xsdims  = x_src_info.dims();
-        dim4 ysdims  = y_src_info.dims();
-        dim4 xddims  = x_dst_info.dims();
-        dim4 yddims  = y_dst_info.dims();
+        ASSERT_DIM_EQ(x_src, 0, 0);
+        ASSERT_DIM_EQ(y_src, 0, 0); // \TODO(miguel) append to first dim assert
+        ASSERT_DIM_EQ(x_dst, 0, 0);
+        ASSERT_DIM_EQ(y_dst, 0, 0);
 
-        // \TODO enable DIM assertions!
-        // int dim_idx = 0;
-        // ASSERT_DIM_GT(dim_idx, 0, x_src);
-        // ASSERT_DIM_GT(dim_idx, 0, x_dst);
-        // ASSERT_DIM_GT(dim_idx, 0, x_src, x_dst); // TODO multiple arrays
-        // ASSERT_DIM_GT(x_src, dim_idx, 0);
-        // ASSERT_DIM(x_src[0], y_src[0]) ?????
-        // ASSERT_DIM_GT(0, 0, x_src, x_dst);
+        ASSERT_NDIM_GT(x_dst, 0);
 
-        ARG_ASSERT(1, (xsdims[0] > 0));
-        ARG_ASSERT(2, (ysdims[0] == xsdims[0]));
-        ARG_ASSERT(3, (xddims[0] > 0));
-        ARG_ASSERT(4, (yddims[0] == xddims[0]));
-        ARG_ASSERT(5, (inlier_thr >= 0.1f));
-        ARG_ASSERT(6, (iterations > 0));
+        ARG_ASSERT(4, (y_dst_info.dims()[0] == x_dst_info.dims()[0])); // \TODO(miguel)
+        ARG_ASSERT(5, (inlier_thr >= 0.1f)); // \TODO(miguel)?
+        ARG_ASSERT(6, (iterations > 0));     // \TODO(miguel)?
 
         af_array outH;
         int outInl;

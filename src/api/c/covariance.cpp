@@ -55,17 +55,15 @@ af_err af_cov(af_array* out, const af_array X, const af_array Y, const bool isbi
 {
     try {
         ARG_SETUP(X);
-        ARG_SETUP(Y);;
+        ARG_SETUP(Y);
+        ASSERT_TYPE_EQ(X, Y);
+        ASSERT_NDIM_LT(X, 3);
 
-        dim4 xDims      = X_info.dims();
-        dim4 yDims      = Y_info.dims();
-
-        ARG_ASSERT(1, (xDims.ndims()<=2));
-        ARG_ASSERT(2, (xDims.ndims()==yDims.ndims()));
+        const dim4 xDims = X_info.dims();
+        const dim4 yDims = Y_info.dims();
+        ARG_ASSERT(2, (xDims.ndims()==yDims.ndims())); // \TODO(miguel) ASSERT_NDIM_EQ(X, Y)?
         ARG_ASSERT(2, (xDims[0]==yDims[0]));
         ARG_ASSERT(2, (xDims[1]==yDims[1]));
-
-        ASSERT_TYPE_EQ(X, Y);
 
         af_array output = 0;
         switch(X_info.getType()) {

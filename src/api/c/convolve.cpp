@@ -124,9 +124,7 @@ af_err convolve2_sep(af_array *out, af_array col_filter, af_array row_filter, co
 {
     try {
         ARG_SETUP(signal);
-
-        const dim4& sdims = signal_info.dims();
-        ARG_ASSERT(1, (sdims.ndims()>=2));
+        ASSERT_NDIM_GT(signal, 1);
 
         af_array output = 0;
         switch(signal_info.getType()) {
@@ -160,9 +158,8 @@ bool isFreqDomain(const af_array &signal, const af_array filter, af_conv_domain 
 
     ARG_SETUP(signal);
     ARG_SETUP(filter);
-
-    dim4 sdims = signal_info.dims();
-    dim4 fdims = filter_info.dims();
+    const dim4 sdims = signal_info.dims();
+    const dim4 fdims = filter_info.dims();
 
     if (identifyBatchKind<baseDim>(sdims, fdims) == AF_BATCH_DIFF) return true;
 

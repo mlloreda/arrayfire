@@ -65,9 +65,7 @@ af_err af_hist_equal(af_array *out, const af_array in, const af_array hist)
     try {
         ARG_SETUP(in);
         ARG_SETUP(hist);
-
-        af::dim4 histDims  = hist_info.dims();
-        ARG_ASSERT(2, (histDims.ndims()==1));
+        ASSERT_NDIM_EQ(hist, 1);
 
         af_array output = 0;
         switch(in_info.getType()) {

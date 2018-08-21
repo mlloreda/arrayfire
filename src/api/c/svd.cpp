@@ -23,10 +23,9 @@ using namespace detail;
 template <typename T>
 static inline void svd(af_array *s, af_array *u, af_array *vt, const af_array in)
 {
-    ARG_SETUP(in);  // ArrayInfo is the base class which
-    af::dim4 dims = in_info.dims();
-    int M = dims[0];
-    int N = dims[1];
+    ARG_SETUP(in);
+    const int M = in_info.dims()[0];
+    const int N = in_info.dims()[1];
 
     typedef typename af::dtype_traits<T>::base_type Tr;
 
@@ -45,10 +44,9 @@ static inline void svd(af_array *s, af_array *u, af_array *vt, const af_array in
 template <typename T>
 static inline void svdInPlace(af_array *s, af_array *u, af_array *vt, af_array in)
 {
-    ARG_SETUP(in);  // ArrayInfo is the base class which
-    af::dim4 dims = in_info.dims();
-    int M = dims[0];
-    int N = dims[1];
+    ARG_SETUP(in);
+    const int M = in_info.dims()[0];
+    const int N = in_info.dims()[1];
 
     typedef typename af::dtype_traits<T>::base_type Tr;
 
@@ -68,19 +66,17 @@ af_err af_svd(af_array *u, af_array *s, af_array *vt, const af_array in)
 {
     try {
         ARG_SETUP(in);
-        af::dim4 dims = in_info.dims();
-
-        ARG_ASSERT(3, (dims.ndims() >= 0 && dims.ndims() <= 3));
-        const af_dtype in_type = in_info.getType();
-
-        if(dims.ndims() == 0) {
+        ASSERT_NDIM_GT(in, -1);
+        ASSERT_NDIM_LT(in, 4);
+        if (in_info.dims().ndims() == 0) {
+            const af_dtype in_type = in_info.getType();
             AF_CHECK(af_create_handle(u, 0, nullptr, in_type));
             AF_CHECK(af_create_handle(s, 0, nullptr, in_type));
             AF_CHECK(af_create_handle(vt, 0, nullptr, in_type));
             return AF_SUCCESS;
         }
 
-        switch (in_type) {
+        switch (in_info.getType()) {
         case f64:
             svd<double>(s, u, vt, in);
             break;
@@ -105,20 +101,18 @@ af_err af_svd_inplace(af_array *u, af_array *s, af_array *vt, af_array in)
 {
     try {
         ARG_SETUP(in);
-        af::dim4 dims = in_info.dims();
-
-        DIM_ASSERT(3, dims[0] <= dims[1]);
-        ARG_ASSERT(3, (dims.ndims() >= 0 && dims.ndims() <= 3));
-        const af_dtype in_type = in_info.getType();
-
-        if (dims.ndims() == 0) {
+        ASSERT_NDIM_GT(in, -1);
+        ASSERT_NDIM_LT(in, 4);
+        DIM_ASSERT(3, in_info.dims()[0] <= in_info.dims()[1]); // \TODO(miguel)
+        if (in_info.dims().ndims() == 0) {
+            const af_dtype in_type = in_info.getType();
             AF_CHECK(af_create_handle(u, 0, nullptr, in_type));
             AF_CHECK(af_create_handle(s, 0, nullptr, in_type));
             AF_CHECK(af_create_handle(vt, 0, nullptr, in_type));
             return AF_SUCCESS;
         }
 
-        switch (in_type) {
+        switch (in_info.getType()) {
         case f64:
             svdInPlace<double>(s, u, vt, in);
             break;

@@ -42,14 +42,8 @@ static af_err morph(af_array *out, const af_array &in, const af_array &mask)
     try {
         ARG_SETUP(in);
         ARG_SETUP(mask);
-
-        af::dim4 dims  = in_info.dims();
-        af::dim4 mdims = mask_info.dims();
-        dim_t in_ndims = dims.ndims();
-        dim_t mask_ndims = mdims.ndims();
-
-        DIM_ASSERT(1, (in_ndims >= 2));
-        DIM_ASSERT(2, (mask_ndims == 2));
+        ASSERT_NDIM_GT(in, 1);
+        ASSERT_NDIM_EQ(mask, 2);
 
         af_array output;
         switch(in_info.getType()) {
@@ -76,14 +70,8 @@ static af_err morph3d(af_array *out, const af_array &in, const af_array &mask)
     try {
         ARG_SETUP(in);
         ARG_SETUP(mask);
-
-        af::dim4 dims  = in_info.dims();
-        af::dim4 mdims = mask_info.dims();
-        dim_t in_ndims = dims.ndims();
-        dim_t mask_ndims = mdims.ndims();
-
-        DIM_ASSERT(1, (in_ndims >= 3));
-        DIM_ASSERT(2, (mask_ndims == 3));
+        ASSERT_NDIM_GT(in, 2);
+        ASSERT_NDIM_EQ(mask, 3);
 
         af_array output;
         switch(in_info.getType()) {

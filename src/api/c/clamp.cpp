@@ -43,14 +43,11 @@ af_err af_clamp(af_array *out, const af_array in,
         ARG_SETUP(in);
         ARG_SETUP(lo);
         ARG_SETUP(hi);
-
-        DIM_ASSERT(2, lo_info.dims() == hi_info.dims());
-
+        ASSERT_DIM(lo, hi);
         ASSERT_TYPE_EQ(lo, hi);
 
-        dim4 odims = getOutDims(in_info.dims(), lo_info.dims(), batch);
+        const     dim4 odims = getOutDims(in_info.dims(), lo_info.dims(), batch);
         const af_dtype otype = implicit(in_info.getType(), lo_info.getType());
-
         af_array res;
         switch (otype) {
         case f32: res = clampOp<float  >(in, lo, hi, odims); break;

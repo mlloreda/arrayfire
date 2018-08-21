@@ -52,24 +52,23 @@ af_err af_harris(af_features *out, const af_array in, const unsigned max_corners
                  const unsigned block_size, const float k_thr)
 {
     try {
-        ARG_SETUP(in);
-        af::dim4 dims  = in_info.dims();
-        dim_t in_ndims = dims.ndims();
-
-        unsigned filter_len = (block_size == 0) ? floor(6.f * sigma) : block_size;
-        if (block_size == 0 && filter_len % 2 == 0)
-            filter_len--;
-
-        const unsigned edge = (block_size > 0) ? block_size / 2 : filter_len / 2;
-
-        DIM_ASSERT(1, (in_ndims == 2));
-        ARG_ASSERT(1, (dims[0] >= (dim_t)(2*edge+1) || dims[1] >= (dim_t)(2*edge+1)));
         ARG_ASSERT(3, (max_corners > 0) || (min_response > 0.0f));
         ARG_ASSERT(7, (k_thr >= 0.01f));
+
         // Upper limits for sigma and block_size are due to convolve2 template
         // at maximum length of 31 elements for the filter in OpenCL
         ARG_ASSERT(4, (block_size > 2) || (sigma >= 0.5f && sigma <= 5.f));
         ARG_ASSERT(5, (block_size <= 32));
+
+        ARG_SETUP(in);
+        ASSERT_NDIM_EQ(in, 2);
+        const dim4 in_dims = in_info.dims();
+        unsigned filter_len = (block_size == 0) ? floor(6.f * sigma) : block_size;
+        if (block_size == 0 && filter_len % 2 == 0) {
+            filter_len--;
+        }
+        const unsigned edge = (block_size > 0) ? block_size / 2 : filter_len / 2;
+        ARG_ASSERT(1, (in_dims[0] >= (dim_t)(2*edge+1) || in_dims[1] >= (dim_t)(2*edge+1))); // \TODO(miguel)
 
         switch(in_info.getType()) {
             case f64: *out = harris<double, double>(in, max_corners, min_response, sigma, filter_len, k_thr); break;

@@ -39,12 +39,8 @@ af_err af_topk(af_array *values, af_array *indices, const af_array in,
                      const int k, const int dim, const af_topk_function order)
 {
     try {
-        af::topkFunction ord = (order == AF_TOPK_DEFAULT ? AF_TOPK_MAX : order);
-
         ARG_SETUP(in);
-
-        ARG_ASSERT(1, (in_info.ndims()>0));
-
+        ASSERT_NDIM_GT(in, 0);
         if (in_info.elements() == 1) {
             dim_t dims[1] = {1};
             af_err errValue = af_constant(indices, 0, 1, dims, u32);
@@ -66,6 +62,7 @@ af_err af_topk(af_array *values, af_array *indices, const af_array in,
         if (rdim!=0)
             AF_ERROR("topk is supported along dimenion 0 only.", AF_ERR_NOT_SUPPORTED);
 
+        af::topkFunction ord = (order == AF_TOPK_DEFAULT ? AF_TOPK_MAX : order);
         switch(in_info.getType()) {
             // TODO(umar): FIX RETURN VALUES HERE
             case f32: topk<float >(values, indices, in, k, rdim, ord); break;

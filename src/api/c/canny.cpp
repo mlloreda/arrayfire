@@ -199,14 +199,13 @@ af_err af_canny(af_array* out, const af_array in, const af_canny_threshold ct,
 {
     try {
         ARG_SETUP(in);
-        af::dim4 dims  = in_info.dims();
-
-        DIM_ASSERT(2, (dims.ndims() >= 2));
+        ASSERT_NDIM_GT(in, 1);
         // Input should be a minimum of 5x5 image
         // since the gaussian filter used for smoothing
         // the input is of 5x5 size. It's not mandatory but
         // it is essentially of no use if image is less than 5x5
-        DIM_ASSERT(2, (dims[0]>=5 && dims[1]>=5));
+        ASSERT_DIM_GT(in, 0, 4);
+        ASSERT_DIM_GT(in, 1, 4);
         ARG_ASSERT(5, (sw==3));
 
         af_array output;

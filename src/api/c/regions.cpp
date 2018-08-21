@@ -27,16 +27,11 @@ static af_array regions(af_array const &in, af_connectivity connectivity)
 af_err af_regions(af_array *out, const af_array in, const af_connectivity connectivity, const af_dtype type)
 {
     try {
-        ARG_SETUP(in); // in_info
-
-
-        ARG_ASSERT(2, (connectivity==AF_CONNECTIVITY_4 || connectivity==AF_CONNECTIVITY_8));
-
-        dim4 dims  = in_info.dims();
-        dim_t in_ndims = dims.ndims();
-        DIM_ASSERT(1, (in_ndims <= 3 && in_ndims >= 2));
-
+        ARG_SETUP(in);
         ASSERT_TYPE(in, TYPES(b8));
+        ASSERT_NDIM_GT(in, 1);
+        ASSERT_NDIM_LT(in, 4);
+        ARG_ASSERT(2, (connectivity==AF_CONNECTIVITY_4 || connectivity==AF_CONNECTIVITY_8));
 
         af_array output;
         switch(type) {

@@ -37,14 +37,14 @@ forge::Chart* setup_surface(const forge::Window* const window,
     Array<T> zIn = getArray<T>(zVals);
 
     ARG_SETUP(xVals);
-    ARG_SETUP(yVals);
     ARG_SETUP(zVals);
-
-    af::dim4 X_dims = xVals_info.dims();
-    af::dim4 Y_dims = yVals_info.dims();
-    af::dim4 Z_dims = zVals_info.dims();
+    const dim4 Z_dims = zVals_info.dims();
 
     if (xVals_info.isVector()){
+        ARG_SETUP(yVals);
+        const dim4 X_dims = xVals_info.dims();
+        const dim4 Y_dims = yVals_info.dims();
+
         // Convert xIn is a column vector
         xIn = modDims(xIn, xIn.elements());
         // Now tile along second dimension
@@ -52,14 +52,14 @@ forge::Chart* setup_surface(const forge::Window* const window,
         xIn = tile(xIn, x_tdims);
 
         // Convert yIn to a row vector
-        yIn= modDims(yIn, af::dim4(1, yIn.elements()));
+        yIn = modDims(yIn, dim4(1, yIn.elements()));
         // Now tile along first dimension
         dim4 y_tdims(X_dims[0], 1, 1, 1);
         yIn = tile(yIn, y_tdims);
     }
 
     // Flatten xIn, yIn and zIn into row vectors
-    dim4 rowDims = dim4(1, zIn.elements());
+    const dim4 rowDims = dim4(1, zIn.elements());
     xIn = modDims(xIn, rowDims);
     yIn = modDims(yIn, rowDims);
     zIn = modDims(zIn, rowDims);
@@ -134,18 +134,16 @@ af_err af_draw_surface(const af_window wind, const af_array xVals, const af_arra
         ARG_SETUP(xVals);
         ARG_SETUP(yVals);
         ARG_SETUP(S);
-
-        af::dim4 X_dims = xVals_info.dims();
-        af::dim4 Y_dims = yVals_info.dims();
-        af::dim4 S_dims = S_info.dims();
-
         ASSERT_TYPE_EQ(xVals, yVals);
         ASSERT_TYPE_EQ(yVals, S);
 
         if (!yVals_info.isVector()) {
-            DIM_ASSERT(1, X_dims == Y_dims);
-            DIM_ASSERT(3, Y_dims == S_dims);
+            ASSERT_DIM(xVals, yVals);
+            ASSERT_DIM(yVals, S);
         } else {
+            const dim4 X_dims = xVals_info.dims();
+            const dim4 Y_dims = yVals_info.dims();
+            ARG_SETUP(S);
             DIM_ASSERT(3, (X_dims[0] * Y_dims[0] == (dim_t)S_info.elements()));
         }
 

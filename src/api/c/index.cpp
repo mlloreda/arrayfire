@@ -147,19 +147,18 @@ af_err af_lookup(af_array *out, const af_array in,
 {
     try {
         ARG_SETUP(indices);
-
         if (indices_info.ndims() == 0) {
             *out = retain(indices);
             return AF_SUCCESS;
         }
 
-        ARG_ASSERT(3, (dim >= 0 && dim <= 3));
-        ARG_ASSERT(2, indices_info.isVector() || indices_info.isScalar());
+        ARG_ASSERT(3, (dim >= 0 && dim <= 3)); // \TODO(miguel)
+        ARG_ASSERT(2, indices_info.isVector() || indices_info.isScalar()); // \TODO(miguel)
 
         const af_dtype indices_type = indices_info.getType();
-        ARG_ASSERT(2, (indices_type != c32));
-        ARG_ASSERT(2, (indices_type != c64));
-        ARG_ASSERT(2, (indices_type != b8));
+        ARG_ASSERT(2, (indices_type != c32)); // \TODO(miguel)
+        ARG_ASSERT(2, (indices_type != c64)); // \TODO(miguel)
+        ARG_ASSERT(2, (indices_type != b8));  // \TODO(miguel)
 
         af_array output = 0;
         switch(indices_type) {
@@ -194,16 +193,13 @@ af_err af_index_gen(af_array *out, const af_array in,
                     const dim_t ndims, const af_index_t* indexs)
 {
     try {
-        ARG_ASSERT(2, (ndims>0));
-        ARG_ASSERT(3, (indexs != NULL));
+        ARG_ASSERT(2, (ndims>0)); // \TODO(miguel)
+        ARG_ASSERT(3, (indexs != NULL)); // \TODO(miguel)
 
         ARG_SETUP(in);
-
         const dim4& iDims  = in_info.dims();
-        const af_dtype in_type = in_info.getType();
-
         if (iDims.ndims() <= 0) {
-            *out = createHandle(dim4(0), in_type);
+            *out = createHandle(dim4(0), in_info.getType());
             return AF_SUCCESS;
         }
 
@@ -239,9 +235,9 @@ af_err af_index_gen(af_array *out, const af_array in,
                     const ArrayInfo& idxInfo = getInfo(indexs[i].idx.arr);
                     af_dtype idxType = idxInfo.getType();
 
-                    ARG_ASSERT(3, (idxType != c32));
-                    ARG_ASSERT(3, (idxType != c64));
-                    ARG_ASSERT(3, (idxType != b8 ));
+                    ARG_ASSERT(3, (idxType != c32)); // \TODO(miguel)
+                    ARG_ASSERT(3, (idxType != c64)); // \TODO(miguel)
+                    ARG_ASSERT(3, (idxType != b8 )); // \TODO(miguel)
 
                     idxrs[i] = { { indexs[i].idx.arr },
                                  isSeq, indexs[i].isBatch };
@@ -266,7 +262,7 @@ af_err af_index_gen(af_array *out, const af_array in,
         af_index_t* ptr = idxrs.data();
 
         af_array output = 0;
-        switch(in_type) {
+        switch(in_info.getType()) {
             case c64: output = genIndex<cdouble>(in, ptr); break;
             case f64: output = genIndex<double >(in, ptr); break;
             case c32: output = genIndex<cfloat >(in, ptr); break;

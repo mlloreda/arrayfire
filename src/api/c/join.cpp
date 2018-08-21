@@ -39,14 +39,12 @@ static inline af_array join_many(const int dim, const unsigned n_arrays, const a
 af_err af_join(af_array *out, const int dim, const af_array first, const af_array second)
 {
     try {
+        ARG_ASSERT(1, dim >= 0 && dim < 4);
         ARG_SETUP(first);
         ARG_SETUP(second);
-
-        af::dim4  fdims = first_info.dims();
-        af::dim4  sdims = second_info.dims();
-
-        ARG_ASSERT(1, dim >= 0 && dim < 4);
         ASSERT_TYPE_EQ(first, second);
+        DIM_ASSERT(2, second_info.elements() > 0);
+        DIM_ASSERT(3, first_info.elements() > 0);
 
         if (second_info.elements() == 0) {
             return af_retain_array(out, first);
@@ -55,13 +53,10 @@ af_err af_join(af_array *out, const int dim, const af_array first, const af_arra
             return af_retain_array(out, second);
         }
 
-        DIM_ASSERT(2, second_info.elements() > 0);
-        DIM_ASSERT(3, first_info.elements() > 0);
-
         // All dimensions except join dimension must be equal
         // Compute output dims
         for(int i = 0; i < 4; i++) {
-            if(i != dim) DIM_ASSERT(2, fdims[i] == sdims[i]);
+            if(i != dim) DIM_ASSERT(2, first_info.dims()[i] == second_info.dims()[i]);
         }
 
         af_array output;

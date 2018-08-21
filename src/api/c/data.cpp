@@ -31,7 +31,7 @@ using namespace detail;
 dim4 verifyDims(const unsigned ndims, const dim_t * const dims)
 {
 
-    DIM_ASSERT(1, ndims >= 1);
+    DIM_ASSERT(1, ndims >= 1); // \TODO(miguel) don't have macro for this
 
     dim4 d(1, 1, 1, 1);
 
@@ -295,16 +295,13 @@ af_err af_diag_create(af_array *out, const af_array in, const int num)
 {
     try {
         ARG_SETUP(in);
-        const af_dtype in_type = in_info.getType();
-        DIM_ASSERT(1, in_info.ndims() <= 2);
-
-
+        ASSERT_NDIM_LT(in, 3);
         if (in_info.dims()[0] == 0) {
-            return af_create_handle(out, 0, nullptr, in_type);
+            return af_create_handle(out, 0, nullptr, in_info.getType());
         }
 
         af_array result;
-        switch(in_type) {
+        switch(in_info.getType()) {
         case f32:   result = diagCreate<float  >(in, num);    break;
         case c32:   result = diagCreate<cfloat >(in, num);    break;
         case f64:   result = diagCreate<double >(in, num);    break;
@@ -331,16 +328,13 @@ af_err af_diag_extract(af_array *out, const af_array in, const int num)
 
     try {
         ARG_SETUP(in);
-        const af_dtype in_type = in_info.getType();
-
-        if(in_info.ndims() == 0) {
-            return af_create_handle(out, 0, nullptr, in_type);
+        ASSERT_NDIM_GT(in, 1);
+        if (in_info.ndims() == 0) {
+            return af_create_handle(out, 0, nullptr, in_info.getType());
         }
 
-        DIM_ASSERT(1, in_info.ndims() >= 2);
-
         af_array result;
-        switch(in_type) {
+        switch(in_info.getType()) {
         case f32:   result = diagExtract<float  >(in, num);    break;
         case c32:   result = diagExtract<cfloat >(in, num);    break;
         case f64:   result = diagExtract<double >(in, num);    break;

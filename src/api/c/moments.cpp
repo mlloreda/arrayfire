@@ -74,8 +74,8 @@ af_err af_moments_all(double* out, const af_array in, const af_moment_type momen
 {
     try {
         ARG_SETUP(in);
-        dim4 idims = in_info.dims();
-        DIM_ASSERT(1, idims[2] == 1 && idims[3] == 1);
+        ASSERT_DIM_EQ(in, 2, 1);
+        ASSERT_DIM_EQ(in, 3, 1);
 
         af_array moments_arr;
         AF_CHECK(af_moments(&moments_arr, in, moment));

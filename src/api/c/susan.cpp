@@ -49,9 +49,8 @@ af_err af_susan(af_features* out, const af_array in,
 {
     try {
         ARG_SETUP(in);
-        af::dim4 dims  = in_info.dims();
-
-        ARG_ASSERT(1, dims.ndims()==2);
+        ASSERT_NDIM_EQ(in, 2);
+        const dim4 dims = in_info.dims();
         ARG_ASSERT(2, radius < 10);
         ARG_ASSERT(2, radius<=edge);
         ARG_ASSERT(3, diff_thr > 0.0f);

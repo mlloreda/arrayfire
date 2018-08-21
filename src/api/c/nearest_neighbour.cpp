@@ -42,26 +42,25 @@ af_err af_nearest_neighbour(af_array* idx, af_array* dist,
     try {
         ARG_SETUP(query);
         ARG_SETUP(train);
-
-        af::dim4 qDims  = query_info.dims();
-        af::dim4 tDims  = train_info.dims();
-
-        const uint train_samples = (dist_dim == 0) ? 1 : 0;
-
-        DIM_ASSERT(2, qDims[dist_dim] == tDims[dist_dim]);
-        DIM_ASSERT(2, qDims[2] == 1 && qDims[3] == 1);
-        DIM_ASSERT(3, tDims[2] == 1 && tDims[3] == 1);
-        DIM_ASSERT(4, (dist_dim == 0 || dist_dim == 1));
-        DIM_ASSERT(5, n_dist > 0 && n_dist <= (uint)tDims[train_samples]);
-        ARG_ASSERT(6, dist_type == AF_SAD || dist_type == AF_SSD || dist_type == AF_SHD);
-
         ASSERT_TYPE_EQ(query, train);
+        ASSERT_DIM_EQ(query, 2, 1);
+        ASSERT_DIM_EQ(query, 3, 1);
+        ASSERT_DIM_EQ(train, 2, 1);
+        ASSERT_DIM_EQ(train, 3, 1);
+
+        const dim4 query_dims = query_info.dims();
+        const dim4 train_dims = train_info.dims();
+        const uint train_samples = (dist_dim == 0) ? 1 : 0;
+        DIM_ASSERT(2, query_dims[dist_dim] == train_dims[dist_dim]);
+        DIM_ASSERT(4, (dist_dim == 0 || dist_dim == 1));
+        DIM_ASSERT(5, n_dist > 0 && n_dist <= (uint)train_dims[train_samples]);
+        ARG_ASSERT(6, dist_type == AF_SAD || dist_type == AF_SSD || dist_type == AF_SHD);
 
         // For Hamming, only u8, u16, u32 and u64 allowed.
         af_array oIdx;
         af_array oDist;
 
-        if(dist_type == AF_SHD) {
+        if (dist_type == AF_SHD) {
             ASSERT_TYPE(query, TYPES(u8, u16, u32, u64));
             switch(query_info.getType()) {
                 case u8:  nearest_neighbour<uchar , uint>(&oIdx, &oDist, query, train, dist_dim, n_dist, AF_SHD); break;

@@ -174,11 +174,20 @@ void dim_eq(const ArrayInfo &lhs, const ArrayInfo &rhs,
             const char * lhs_str, const char * rhs_str,
             const char * file, const char * function, const int line);
 
-// ASSERT_DIM_{LT,GT,EQ}(dim_idx, dim_val, af_array)
+// ASSERT_DIM_{LT,GT,EQ}(af_array, dim_idx, dim_val)
 void dim_cmp(const int op,
              const int dim_idx, const int dim_val, const ArrayInfo &arr_info,
              const char * arr_str,
              const char * file, const char * function, const int line);
+
+// ASSERT_NDIM_{LT,GT,EQ}(af_array, ndims)
+void ndim_cmp(const int op,
+              const int ndim_val,
+              const ArrayInfo &arr_info,
+              const char * arr_str,
+              const char * file, const char * function, const int line);
+
+
 
 #define ARG_SETUP(arg) \
      const ArrayInfo& arg##_info = getInfo(arg)
@@ -187,16 +196,16 @@ void dim_cmp(const int op,
 
 // Types
 #define ASSERT_TYPE(ARR, ...) do {                                  \
-        assert_type(getInfo(ARR).getType(), #ARR, {__VA_ARGS__},    \
+        assert_type(ARR ## _info.getType(), #ARR, {__VA_ARGS__},    \
                     __FILE__, __FUNCTION__, __LINE__);              \
     } while(0)
 #define ASSERT_TYPE_EQ(LHS, RHS) do {                                   \
-        assert_type_eq(getInfo(LHS).getType(), getInfo(RHS).getType(),  \
+        assert_type_eq(LHS ## _info.getType(), RHS ## _info.getType(),  \
                        #LHS, #RHS,                                      \
                        __FILE__, __FUNCTION__, __LINE__);               \
     } while(0)
 #define TYPE_ERROR(...) do {                            \
-        type_error(getInfo(__VA_ARGS__), #__VA_ARGS__,  \
+        type_error(__VA_ARGS__ ## _info, #__VA_ARGS__,  \
                    __FILE__, __FUNCTION__, __LINE__);   \
     } while(0)
 #define UNSUPPORTED_TYPE(...) do {                          \
@@ -206,21 +215,34 @@ void dim_cmp(const int op,
 
 // Dims
 #define ASSERT_DIM(LHS, RHS) do {                   \
-        dim_eq(getInfo(LHS), getInfo(RHS),          \
+        dim_eq(LHS ## _info, RHS ## _info,          \
                #LHS, #RHS,                          \
                __FILE__, __FUNCTION__, __LINE__);   \
     } while (0)
 #define ASSERT_DIM_LT(ARR, DIM_IDX, DIM_VAL) do {           \
-        dim_cmp(0, DIM_IDX, DIM_VAL, getInfo(ARR), #ARR,    \
+        dim_cmp(0, DIM_IDX, DIM_VAL, ARR ## _info, #ARR,    \
                 __FILE__, __FUNCTION__, __LINE__);          \
     } while(0)
 #define ASSERT_DIM_EQ(ARR, DIM_IDX, DIM_VAL) do {           \
-        dim_cmp(1, DIM_IDX, DIM_VAL, getInfo(ARR), #ARR,    \
+        dim_cmp(1, DIM_IDX, DIM_VAL, ARR ## _info, #ARR,    \
                 __FILE__, __FUNCTION__, __LINE__);          \
     } while(0)
 #define ASSERT_DIM_GT(ARR, DIM_IDX, DIM_VAL) do {           \
-        dim_cmp(2, DIM_IDX, DIM_VAL, getInfo(ARR), #ARR,    \
+        dim_cmp(2, DIM_IDX, DIM_VAL, ARR ## _info, #ARR,    \
                 __FILE__, __FUNCTION__, __LINE__);          \
+    } while(0)
+
+#define ASSERT_NDIM_LT(ARR, NDIM_VAL) do {          \
+        ndim_cmp(0, NDIM_VAL, ARR ## _info, #ARR,   \
+                 __FILE__, __FUNCTION__, __LINE__); \
+    } while(0)
+#define ASSERT_NDIM_EQ(ARR, NDIM_VAL) do {          \
+        ndim_cmp(1, NDIM_VAL, ARR ## _info, #ARR,   \
+                 __FILE__, __FUNCTION__, __LINE__); \
+    } while(0)
+#define ASSERT_NDIM_GT(ARR, NDIM_VAL) do {          \
+        ndim_cmp(2, NDIM_VAL, ARR ## _info, #ARR,   \
+                 __FILE__, __FUNCTION__, __LINE__); \
     } while(0)
 
 
